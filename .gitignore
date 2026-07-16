@@ -1,0 +1,45 @@
+# Dependencies
+node_modules/
+
+# Production
+dist/
+
+# Vite
+.vite/
+
+# TypeScript
+*.tsbuildinfo
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+
+# Environment
+.env
+.env.*
+
+# IDE
+.vscode/
+.idea/
+
+# Operating System
+.DS_Store
+Thumbs.db
+
+# Coverage
+coverage/
+
+# Playwright
+playwright-report/
+test-results/
+
+# Temporary
+*.tmp
+*.temp
+/main
+
+# Local documents
+*.pdf
+*.zip
