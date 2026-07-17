@@ -1,4 +1,4 @@
-import { createBrowserRouter } from 'react-router';
+import { createBrowserRouter, Navigate } from 'react-router';
 
 import {
   browserAuthSessionStore,
@@ -6,7 +6,6 @@ import {
   LoginPage,
   mockAuthService,
   OtpVerificationPage,
-  ProtectedPlaceholderPage,
   RegistrationPage,
   TermsPlaceholderPage,
 } from '@/features/auth';
@@ -17,6 +16,7 @@ import {
   PermissionIntroductionPage,
   WelcomePage,
 } from '@/features/onboarding';
+import { DashboardPage } from '@/features/dashboard';
 
 export const router = createBrowserRouter([
   {
@@ -64,7 +64,11 @@ export const router = createBrowserRouter([
   },
   {
     path: '/auth/authenticated',
-    element: <ProtectedPlaceholderPage sessionStore={browserAuthSessionStore} />,
+    element: <Navigate to="/app/dashboard" replace />,
+  },
+  {
+    path: '/app/dashboard',
+    element: <DashboardPage sessionStore={browserAuthSessionStore} />,
   },
   {
     path: '/legal/terms',
