@@ -12,10 +12,6 @@ interface DemoAccessPageProps {
   accessStore: DemoAccessStore;
 }
 
-interface DemoAccessGateProps extends DemoAccessPageProps {
-  children: ReactNode;
-}
-
 interface DemoAccessResetProps {
   accessStore: DemoAccessStore;
   children: ReactNode;
@@ -25,17 +21,6 @@ export function DemoAccessReset({ accessStore, children }: DemoAccessResetProps)
   useEffect(() => {
     accessStore.clearProfile();
   }, [accessStore]);
-
-  return children;
-}
-
-export function DemoAccessGate({ sessionStore, accessStore, children }: DemoAccessGateProps) {
-  if (!sessionStore.getSession()) {
-    accessStore.clearProfile();
-    return <Navigate to="/auth/login" replace />;
-  }
-
-  if (!accessStore.getProfile()) return <Navigate to="/app/access-preview" replace />;
 
   return children;
 }

@@ -2,9 +2,9 @@ import { createBrowserRouter, Navigate } from 'react-router';
 
 import {
   browserDemoAccessStore,
-  DemoAccessGate,
   DemoAccessPage,
   DemoAccessReset,
+  ProtectedApplicationRoute,
 } from '@/features/access-control';
 
 import {
@@ -77,17 +77,23 @@ export const router = createBrowserRouter([
   {
     path: '/app/dashboard',
     element: (
-      <DemoAccessGate sessionStore={browserAuthSessionStore} accessStore={browserDemoAccessStore}>
+      <ProtectedApplicationRoute
+        sessionStore={browserAuthSessionStore}
+        accessStore={browserDemoAccessStore}
+      >
         <DashboardPage sessionStore={browserAuthSessionStore} />
-      </DemoAccessGate>
+      </ProtectedApplicationRoute>
     ),
   },
   {
     path: '/app/live-map',
     element: (
-      <DemoAccessGate sessionStore={browserAuthSessionStore} accessStore={browserDemoAccessStore}>
+      <ProtectedApplicationRoute
+        sessionStore={browserAuthSessionStore}
+        accessStore={browserDemoAccessStore}
+      >
         <LiveMapPage sessionStore={browserAuthSessionStore} />
-      </DemoAccessGate>
+      </ProtectedApplicationRoute>
     ),
   },
   {
@@ -105,9 +111,12 @@ export const router = createBrowserRouter([
   {
     path: '/app/groups',
     element: (
-      <DemoAccessGate sessionStore={browserAuthSessionStore} accessStore={browserDemoAccessStore}>
+      <ProtectedApplicationRoute
+        sessionStore={browserAuthSessionStore}
+        accessStore={browserDemoAccessStore}
+      >
         <GroupsPage />
-      </DemoAccessGate>
+      </ProtectedApplicationRoute>
     ),
   },
 ]);

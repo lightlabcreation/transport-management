@@ -7,7 +7,8 @@ import type { AuthSessionStore } from '@/features/auth';
 
 import { createDemoAccessStore } from './demo-access-store';
 import { demoAccessProfiles } from './demo-access.profiles';
-import { DemoAccessGate, DemoAccessPage, DemoAccessReset } from './DemoAccessPage';
+import { DemoAccessPage, DemoAccessReset } from './DemoAccessPage';
+import { ProtectedApplicationRoute } from './ProtectedApplicationRoute';
 
 const validSession = {
   kind: 'authenticated' as const,
@@ -129,7 +130,7 @@ describe('DemoAccessPage', () => {
   });
 });
 
-describe('DemoAccessGate', () => {
+describe('ProtectedApplicationRoute', () => {
   it('redirects an authenticated user without a profile to Access Preview', async () => {
     const accessStore = createDemoAccessStore(window.sessionStorage);
     const router = createMemoryRouter(
@@ -137,9 +138,12 @@ describe('DemoAccessGate', () => {
         {
           path: '/app/dashboard',
           element: (
-            <DemoAccessGate sessionStore={createSessionStore()} accessStore={accessStore}>
+            <ProtectedApplicationRoute
+              sessionStore={createSessionStore()}
+              accessStore={accessStore}
+            >
               <h1>Protected dashboard</h1>
-            </DemoAccessGate>
+            </ProtectedApplicationRoute>
           ),
         },
         { path: '/app/access-preview', element: <h1>Access Preview boundary</h1> },
@@ -160,9 +164,12 @@ describe('DemoAccessGate', () => {
         {
           path: '/app/dashboard',
           element: (
-            <DemoAccessGate sessionStore={createSessionStore()} accessStore={accessStore}>
+            <ProtectedApplicationRoute
+              sessionStore={createSessionStore()}
+              accessStore={accessStore}
+            >
               <h1>Protected dashboard</h1>
-            </DemoAccessGate>
+            </ProtectedApplicationRoute>
           ),
         },
       ],
