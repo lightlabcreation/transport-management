@@ -70,3 +70,23 @@ export interface GroupSummaryStats {
   suspended: number;
 }
 
+export interface GroupFormState {
+  name: string;
+  description: string;
+  category: 'Family' | 'Friends' | 'School' | 'Company' | 'Security' | 'Delivery';
+  visibility: 'public' | 'private';
+  trackingMode: 'continuous' | 'optional' | 'disabled';
+  backgroundTracking: boolean;
+  locationAccuracy: 'high' | 'medium' | 'low';
+  refreshInterval: '10s' | '30s' | '1m' | '5m';
+  visibilityPolicy:
+    | 'everyone'
+    | 'admins_only'
+    | 'nearby_only'
+    | 'invisible'
+    | 'hidden_admin';
+  roleCapabilities: Record<GroupRole, GroupCapability[]>;
+  acceptTerms: boolean;
+}
+
+
