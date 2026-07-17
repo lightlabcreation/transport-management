@@ -7,8 +7,41 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 const javascriptFiles = ['**/*.{js,mjs,cjs}'];
-const typescriptFiles = ['src/**/*.{ts,tsx}', 'vite.config.ts'];
+const typescriptFiles = ['src/**/*.{ts,tsx}', 'vite.config.ts', 'vitest.config.ts'];
 const sourceAndConfigFiles = [...javascriptFiles, ...typescriptFiles];
+const sourceFiles = ['src/**/*.{js,jsx,ts,tsx}'];
+const appConfigFiles = ['src/app/config/**/*.{js,jsx,ts,tsx}'];
+const sharedLayerFiles = [
+  'src/{assets,components,hooks,lib,mocks,services,store,styles,types,utils}/**/*.{js,jsx,ts,tsx}',
+];
+const featureFiles = ['src/features/**/*.{js,jsx,ts,tsx}'];
+
+const publicApiImportRestrictions = [
+  {
+    group: ['@/app/config/*', '@/app/config/**'],
+    message: 'Import application configuration from @/app/config.',
+  },
+  {
+    group: ['@/features/*/*', '@/features/*/**'],
+    message: 'Import another feature through its public feature root.',
+  },
+];
+
+const sharedLayerImportRestrictions = [
+  ...publicApiImportRestrictions,
+  {
+    group: ['@/app', '@/app/*', '@/app/**', '@/features', '@/features/*', '@/features/**'],
+    message: 'Shared layers must not import application or feature code.',
+  },
+];
+
+const featureImportRestrictions = [
+  ...publicApiImportRestrictions,
+  {
+    group: ['@/app', '@/app/*', '@/app/**'],
+    message: 'Feature code must not import the application layer.',
+  },
+];
 
 const stableReactHooksRecommendedRules = Object.fromEntries(
   Object.entries(reactHooks.configs.flat.recommended.rules).filter(([ruleName]) =>
@@ -115,12 +148,31 @@ export default tseslint.config(
     },
   },
   {
-    files: ['vite.config.ts'],
+    files: ['vite.config.ts', 'vitest.config.ts'],
     languageOptions: {
       globals: globals.node,
     },
     rules: {
       'no-console': 'off',
+    },
+  },
+  {
+    files: sourceFiles,
+    ignores: appConfigFiles,
+    rules: {
+      'no-restricted-imports': ['error', { patterns: publicApiImportRestrictions }],
+    },
+  },
+  {
+    files: sharedLayerFiles,
+    rules: {
+      'no-restricted-imports': ['error', { patterns: sharedLayerImportRestrictions }],
+    },
+  },
+  {
+    files: featureFiles,
+    rules: {
+      'no-restricted-imports': ['error', { patterns: featureImportRestrictions }],
     },
   },
   eslintConfigPrettier,
