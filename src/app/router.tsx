@@ -9,6 +9,7 @@ import {
   RegistrationPage,
   TermsPlaceholderPage,
 } from '@/features/auth';
+import { GroupsPage } from '@/features/groups';
 import {
   LanguageSelectionPage,
   ModeSelectionPage,
@@ -69,4 +70,11 @@ export const router = createBrowserRouter([
     path: '/legal/terms',
     element: <TermsPlaceholderPage />,
   },
+  // [DEV PREVIEW] GRP-001 — Groups Directory MVP
+  // Temporary route for developer review. Permanent shell integration is D1's responsibility.
+  {
+    path: '/app/groups',
+    element: <GroupsPage />,
+  },
 ]);
+
