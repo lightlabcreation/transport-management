@@ -1,6 +1,13 @@
 import { createBrowserRouter, Navigate } from 'react-router';
 
 import {
+  browserDemoAccessStore,
+  DemoAccessGate,
+  DemoAccessPage,
+  DemoAccessReset,
+} from '@/features/access-control';
+
+import {
   browserAuthSessionStore,
   createMockAuthSession,
   LoginPage,
@@ -27,7 +34,11 @@ export const router = createBrowserRouter([
   },
   {
     path: '/auth/login',
-    element: <LoginPage authService={mockAuthService} />,
+    element: (
+      <DemoAccessReset accessStore={browserDemoAccessStore}>
+        <LoginPage authService={mockAuthService} />
+      </DemoAccessReset>
+    ),
   },
   {
     path: '/onboarding/language',
@@ -65,11 +76,25 @@ export const router = createBrowserRouter([
   },
   {
     path: '/app/dashboard',
-    element: <DashboardPage sessionStore={browserAuthSessionStore} />,
+    element: (
+      <DemoAccessGate sessionStore={browserAuthSessionStore} accessStore={browserDemoAccessStore}>
+        <DashboardPage sessionStore={browserAuthSessionStore} />
+      </DemoAccessGate>
+    ),
   },
   {
     path: '/app/live-map',
-    element: <LiveMapPage sessionStore={browserAuthSessionStore} />,
+    element: (
+      <DemoAccessGate sessionStore={browserAuthSessionStore} accessStore={browserDemoAccessStore}>
+        <LiveMapPage sessionStore={browserAuthSessionStore} />
+      </DemoAccessGate>
+    ),
+  },
+  {
+    path: '/app/access-preview',
+    element: (
+      <DemoAccessPage sessionStore={browserAuthSessionStore} accessStore={browserDemoAccessStore} />
+    ),
   },
   {
     path: '/legal/terms',
@@ -79,6 +104,10 @@ export const router = createBrowserRouter([
   // Temporary route for developer review. Permanent shell integration is D1's responsibility.
   {
     path: '/app/groups',
-    element: <GroupsPage />,
+    element: (
+      <DemoAccessGate sessionStore={browserAuthSessionStore} accessStore={browserDemoAccessStore}>
+        <GroupsPage />
+      </DemoAccessGate>
+    ),
   },
 ]);
