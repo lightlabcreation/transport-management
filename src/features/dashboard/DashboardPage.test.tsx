@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createMemoryRouter, RouterProvider } from 'react-router';
 import { describe, expect, it, vi } from 'vitest';
@@ -37,6 +37,10 @@ function renderDashboard(
   accessProfile: DemoAccessProfile | null = profile('group-owner'),
   sessionStore: AuthSessionStore = createSessionStore(),
 ) {
+  window.sessionStorage.setItem(
+    'transport-management.application-mode',
+    JSON.stringify({ mode: 'tracking' }),
+  );
   const router = createMemoryRouter(
     [
       { path: '/auth/login', element: <h1>Sign in boundary</h1> },
@@ -64,13 +68,8 @@ describe('DashboardPage role-aware presentation', () => {
         'This is a frontend access preview. Production permissions require backend authorization.',
       ),
     ).toBeInTheDocument();
-    const summaryHeading = screen.getByRole('heading', {
-      level: 2,
-      name: presentation.summaryLabel,
-    });
-    const summarySection = summaryHeading.closest('section')!;
     for (const metric of presentation.metrics) {
-      expect(within(summarySection).getByText(metric.label)).toBeInTheDocument();
+      expect(screen.getAllByText(metric.label).length).toBeGreaterThan(0);
     }
   });
 

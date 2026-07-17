@@ -2,10 +2,10 @@ import { useMemo, useState } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router';
 
 import { Input } from '@/components/ui/input';
-import type { AuthSessionStore } from '@/features/auth';
-import { ApplicationShell, getNavigationItems } from '@/features/shell';
-import { browserDemoAccessStore } from '@/features/access-control';
+import { getApplicationNavigation } from '@/features/app-navigation';
 import { browserApplicationModeStore } from '@/features/application-mode';
+import type { AuthSessionStore } from '@/features/auth';
+import { ApplicationShell } from '@/features/shell';
 
 import { MapCanvas } from './components/MapCanvas';
 import { MapStatusBar } from './components/MapStatusBar';
@@ -30,6 +30,8 @@ export function LiveMapPage({ sessionStore, viewState = 'ready' }: LiveMapPagePr
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [selectedMember, setSelectedMember] = useState<TrackedMember | null>(null);
   const [announcement, setAnnouncement] = useState('');
+  const applicationMode = browserApplicationModeStore.getMode();
+  const applicationNavigation = applicationMode ? getApplicationNavigation(applicationMode) : [];
 
   const filteredMembers = useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase();
@@ -62,19 +64,11 @@ export function LiveMapPage({ sessionStore, viewState = 'ready' }: LiveMapPagePr
     setStatusFilter('all');
   }
 
-  const profile = browserDemoAccessStore.getProfile();
-  const applicationMode = browserApplicationModeStore.getMode();
-  const navItems = getNavigationItems({ profile, applicationMode });
-
   return (
     <ApplicationShell
-      navigationItems={navItems}
+      navigationItems={applicationNavigation}
       currentPath={location.pathname}
-      userSummary={{
-        name: 'Demo Operator',
-        mobile: '+•• ••••••3210',
-        roleLabel: profile?.name || 'Operations',
-      }}
+      userSummary={{ name: 'Demo Operator', mobile: '+•• ••••••3210', roleLabel: 'Operations' }}
       onLogout={handleLogout}
     >
       <div className="space-y-section">
