@@ -23,7 +23,7 @@ import {
   PermissionIntroductionPage,
   WelcomePage,
 } from '@/features/onboarding';
-import { DashboardPage } from '@/features/dashboard';
+import { DashboardRoute } from '@/features/dashboard';
 import { HomePage } from '@/features/home';
 import { LiveMapPage } from '@/features/live-map';
 
@@ -81,7 +81,10 @@ export const router = createBrowserRouter([
         sessionStore={browserAuthSessionStore}
         accessStore={browserDemoAccessStore}
       >
-        <DashboardPage sessionStore={browserAuthSessionStore} />
+        <DashboardRoute
+          sessionStore={browserAuthSessionStore}
+          accessStore={browserDemoAccessStore}
+        />
       </ProtectedApplicationRoute>
     ),
   },
