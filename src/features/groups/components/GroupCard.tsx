@@ -43,7 +43,6 @@ export function GroupCard({ group, onClick }: GroupCardProps) {
       onKeyDown={onClick ? handleKeyDown : undefined}
       aria-label={`Group ${group.name}, click to view details`}
     >
-
       {/* Top row: Avatar + Name + Badges */}
       <div className="flex items-start gap-3">
         {/* Avatar initials */}

@@ -4,7 +4,7 @@ import { Navigate, useLocation, useNavigate } from 'react-router';
 import { Button } from '@/components/ui/button';
 import type { DemoAccessProfile } from '@/features/access-control';
 import type { AuthSessionStore } from '@/features/auth';
-import { ApplicationShell, type NavigationItem } from '@/features/shell';
+import { ApplicationShell, navigationItems } from '@/features/shell';
 
 import { getDashboardPresentation } from './dashboard.access';
 import {
@@ -20,10 +20,6 @@ interface DashboardPageProps {
   sessionStore: AuthSessionStore;
   accessProfile: DemoAccessProfile | null;
 }
-
-const navigationItems: NavigationItem[] = [
-  { id: 'dashboard', label: 'Dashboard', href: '/app/dashboard', ariaLabel: 'Dashboard' },
-];
 
 export function DashboardPage({ sessionStore, accessProfile }: DashboardPageProps) {
   const location = useLocation();

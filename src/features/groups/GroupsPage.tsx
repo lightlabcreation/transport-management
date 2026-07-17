@@ -1,6 +1,10 @@
 import { useEffect, useMemo, useState } from 'react';
+import { Navigate, useLocation, useNavigate } from 'react-router';
 
 import { Button } from '@/components/ui/button';
+import { browserDemoAccessStore } from '@/features/access-control';
+import { browserAuthSessionStore } from '@/features/auth';
+import { ApplicationShell, navigationItems } from '@/features/shell';
 
 import { GroupFilters } from './components/GroupFilters';
 import { GroupList } from './components/GroupList';
@@ -19,6 +23,10 @@ import type {
 const LOADING_DELAY_MS = 600;
 
 export function GroupsPage() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const profile = browserDemoAccessStore.getProfile();
+
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [isCreatingGroup, setIsCreatingGroup] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -80,77 +88,103 @@ export function GroupsPage() {
     setFilters({ search: '', visibility: 'all', status: 'all' });
   }
 
-  if (isCreatingGroup) {
-    return <CreateGroupPage onBack={() => setIsCreatingGroup(false)} />;
+  function handleLogout() {
+    browserAuthSessionStore.clearSession();
+    void navigate('/auth/login', { replace: true });
   }
 
-  if (selectedGroup) {
-    return <GroupDetailsPage group={selectedGroup} onBack={() => setSelectedGroup(null)} />;
+  if (!browserAuthSessionStore.getSession()) {
+    return <Navigate to="/auth/login" replace />;
   }
+
+  if (!profile) {
+    return <Navigate to="/app/access-preview" replace />;
+  }
+
+  const profileId = profile.id;
+  const canCreateGroup =
+    profileId === 'group-owner' ||
+    profileId === 'group-admin' ||
+    profileId === 'delegated-group-administrator';
 
   return (
-    <main
-      className="min-h-screen bg-background px-4 py-6 md:px-6 lg:px-8"
-      aria-label="Groups directory"
+    <ApplicationShell
+      navigationItems={navigationItems}
+      currentPath={location.pathname}
+      userSummary={{
+        name: 'Demo Operator',
+        mobile: '+•• ••••••3210',
+        roleLabel: profile.name,
+      }}
+      onLogout={handleLogout}
     >
-      <div className="mx-auto max-w-[var(--container-content)] space-y-6">
-        {/* Page header */}
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div>
-            <h1 className="text-heading-md font-bold text-foreground">Groups</h1>
-            <p className="mt-1 text-body-sm text-muted-foreground">
-              Manage your groups, track members, and coordinate activities.
-            </p>
-          </div>
-
-          <Button onClick={() => setIsCreatingGroup(true)} aria-label="Create new group" className="shrink-0">
-            Create Group
-          </Button>
-        </div>
-
-        {/* Loading state */}
-        {isLoading ? (
-          <div
-            className="flex items-center justify-center py-24 text-muted-foreground"
-            role="status"
-            aria-label="Loading groups"
-          >
-            <div className="flex flex-col items-center gap-3">
-              {/* Feature-local spinner — no shared Spinner component per task spec */}
-              <div
-                className="size-8 animate-spin rounded-full border-2 border-border border-t-primary"
-                aria-hidden="true"
-              />
-              <p className="text-body-sm">Loading groups…</p>
+      {isCreatingGroup ? (
+        <CreateGroupPage onBack={() => setIsCreatingGroup(false)} />
+      ) : selectedGroup ? (
+        <GroupDetailsPage group={selectedGroup} onBack={() => setSelectedGroup(null)} />
+      ) : (
+        <div className="space-y-6">
+          {/* Page header */}
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+              <h2 className="text-heading-md font-bold text-foreground">Groups</h2>
+              <p className="mt-1 text-body-sm text-muted-foreground">
+                Manage your groups, track members, and coordinate activities.
+              </p>
             </div>
+
+            {canCreateGroup && (
+              <Button
+                onClick={() => setIsCreatingGroup(true)}
+                aria-label="Create new group"
+                className="shrink-0"
+              >
+                Create Group
+              </Button>
+            )}
           </div>
-        ) : (
-          <>
-            {/* Summary cards */}
-            <GroupSummary stats={stats} />
 
-            {/* Filters */}
-            <GroupFilters
-              filters={filters}
-              onSearchChange={handleSearchChange}
-              onVisibilityChange={handleVisibilityChange}
-              onStatusChange={handleStatusChange}
-              onClearFilters={handleClearFilters}
-              resultCount={filteredGroups.length}
-            />
+          {/* Loading state */}
+          {isLoading ? (
+            <div
+              className="flex items-center justify-center py-24 text-muted-foreground"
+              role="status"
+              aria-label="Loading groups"
+            >
+              <div className="flex flex-col items-center gap-3">
+                <div
+                  className="size-8 animate-spin rounded-full border-2 border-border border-t-primary"
+                  aria-hidden="true"
+                />
+                <p className="text-body-sm">Loading groups…</p>
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* Summary cards */}
+              <GroupSummary stats={stats} />
 
-            {/* Groups list/table */}
-            <GroupList
-              groups={filteredGroups}
-              onClearFilters={handleClearFilters}
-              hasActiveFilters={hasActiveFilters}
-              onGroupClick={(group) => setSelectedGroup(group)}
-            />
-          </>
-        )}
-      </div>
-    </main>
+              {/* Filters */}
+              <GroupFilters
+                filters={filters}
+                onSearchChange={handleSearchChange}
+                onVisibilityChange={handleVisibilityChange}
+                onStatusChange={handleStatusChange}
+                onClearFilters={handleClearFilters}
+                resultCount={filteredGroups.length}
+              />
+
+              {/* Groups list/table */}
+              <GroupList
+                groups={filteredGroups}
+                onClearFilters={handleClearFilters}
+                hasActiveFilters={hasActiveFilters}
+                onGroupClick={(group) => setSelectedGroup(group)}
+              />
+            </>
+          )}
+        </div>
+      )}
+    </ApplicationShell>
   );
 }
-
-

@@ -93,8 +93,10 @@ export const mockGroups: Group[] = [
     lastUpdated: '2026-07-15T11:00:00Z',
     initials: 'CS',
     category: 'School',
-    trackingPolicy: 'Active tracking during scheduled route periods only (7 AM - 9 AM, 2 PM - 5 PM).',
-    visibilityPolicy: 'Shared view enabled for verified parent tokens. Public coordinates are obfuscated.',
+    trackingPolicy:
+      'Active tracking during scheduled route periods only (7 AM - 9 AM, 2 PM - 5 PM).',
+    visibilityPolicy:
+      'Shared view enabled for verified parent tokens. Public coordinates are obfuscated.',
     members: mockMembers,
     joinRequests: [],
   },
@@ -109,8 +111,10 @@ export const mockGroups: Group[] = [
     lastUpdated: '2026-07-13T16:45:00Z',
     initials: 'RC',
     category: 'Recreation',
-    trackingPolicy: 'Opt-in trip sharing during active events only. No continuous background tracking.',
-    visibilityPolicy: 'Open tracking list visible to all members. Non-members see starting and ending hubs.',
+    trackingPolicy:
+      'Opt-in trip sharing during active events only. No continuous background tracking.',
+    visibilityPolicy:
+      'Open tracking list visible to all members. Non-members see starting and ending hubs.',
     members: mockMembers.slice(2), // fewer members
     joinRequests: mockJoinRequests.slice(0, 1),
   },

@@ -1,12 +1,6 @@
 import { useState, useEffect } from 'react';
 
-import type {
-  Group,
-  GroupRole,
-  GroupCapability,
-  GroupMember,
-  JoinRequest,
-} from './groups.types';
+import type { Group, GroupRole, GroupCapability, GroupMember, JoinRequest } from './groups.types';
 import { Button } from '@/components/ui/button';
 import { MemberManagementList } from './components/MemberManagementList';
 import { JoinRequestsPanel } from './components/JoinRequestsPanel';
@@ -42,11 +36,7 @@ const DEFAULT_ROLE_CAPABILITIES: Record<GroupRole, GroupCapability[]> = {
     'reject_join_requests',
     'view_live_map',
   ],
-  moderator: [
-    'invite_members',
-    'approve_join_requests',
-    'reject_join_requests',
-  ],
+  moderator: ['invite_members', 'approve_join_requests', 'reject_join_requests'],
   member: ['view_live_map'],
   guest: [],
 };
@@ -64,11 +54,29 @@ const ALL_CAPABILITIES: GroupCapability[] = [
   'export_reports',
 ];
 
+import { browserDemoAccessStore } from '@/features/access-control';
+
+const ROLE_MAPPING: Record<string, GroupRole> = {
+  'group-owner': 'owner',
+  'delegated-group-administrator': 'delegated_admin',
+  'group-admin': 'admin',
+  moderator: 'moderator',
+  member: 'member',
+  'group-guest': 'guest',
+};
+
+function getInitialRole(): GroupRole {
+  const profile = browserDemoAccessStore.getProfile();
+  return profile ? ROLE_MAPPING[profile.id] || 'owner' : 'owner';
+}
+
 export function GroupDetailsPage({ group, onBack }: GroupDetailsPageProps) {
   // Viewer simulation context state
-  const [selectedRole, setSelectedRole] = useState<GroupRole>('owner');
+  const initialRole = getInitialRole();
+
+  const [selectedRole, setSelectedRole] = useState<GroupRole>(initialRole);
   const [activeCapabilities, setActiveCapabilities] = useState<GroupCapability[]>(
-    DEFAULT_ROLE_CAPABILITIES.owner
+    DEFAULT_ROLE_CAPABILITIES[initialRole],
   );
 
   // Group data state for mock interactivity
@@ -106,7 +114,7 @@ export function GroupDetailsPage({ group, onBack }: GroupDetailsPageProps) {
   // Capability toggler
   function toggleCapability(cap: GroupCapability) {
     setActiveCapabilities((prev) =>
-      prev.includes(cap) ? prev.filter((c) => c !== cap) : [...prev, cap]
+      prev.includes(cap) ? prev.filter((c) => c !== cap) : [...prev, cap],
     );
   }
 
@@ -120,9 +128,7 @@ export function GroupDetailsPage({ group, onBack }: GroupDetailsPageProps) {
   }
 
   function handleChangeRole(memberId: string, newRole: GroupRole) {
-    setMembers((prev) =>
-      prev.map((m) => (m.id === memberId ? { ...m, role: newRole } : m))
-    );
+    setMembers((prev) => prev.map((m) => (m.id === memberId ? { ...m, role: newRole } : m)));
   }
 
   // Join requests actions
@@ -175,7 +181,8 @@ export function GroupDetailsPage({ group, onBack }: GroupDetailsPageProps) {
 
     setShowConfirmDestructive({
       action: 'Reset Policies',
-      description: 'Are you sure you want to RESET all location-tracking policies to system defaults? This will apply to all members.',
+      description:
+        'Are you sure you want to RESET all location-tracking policies to system defaults? This will apply to all members.',
       onConfirm: () => {
         setLocalGroup((prev) => ({
           ...prev,
@@ -188,12 +195,19 @@ export function GroupDetailsPage({ group, onBack }: GroupDetailsPageProps) {
   }
 
   return (
-    <main className="min-h-screen bg-background px-4 py-6 md:px-6 lg:px-8" aria-label="Group details workspace">
+    <main
+      className="min-h-screen bg-background px-4 py-6 md:px-6 lg:px-8"
+      aria-label="Group details workspace"
+    >
       <div className="mx-auto max-w-[var(--container-content)] space-y-6">
-        
         {/* Navigation / Simulation Notification Toast */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <Button variant="outline" onClick={onBack} aria-label="Back to Groups list" className="self-start">
+          <Button
+            variant="outline"
+            onClick={onBack}
+            aria-label="Back to Groups list"
+            className="self-start"
+          >
             ← Back to Directory
           </Button>
 
@@ -226,7 +240,6 @@ export function GroupDetailsPage({ group, onBack }: GroupDetailsPageProps) {
                   Proceed Action
                 </Button>
               </div>
-
             </div>
           </div>
         )}
@@ -307,20 +320,24 @@ export function GroupDetailsPage({ group, onBack }: GroupDetailsPageProps) {
                   <span className="rounded-full bg-muted border border-border px-2.5 py-0.5 text-body-xs font-semibold text-muted-foreground capitalize">
                     {localGroup.category || 'General'}
                   </span>
-                  <span className={`rounded-full px-2.5 py-0.5 text-body-xs font-semibold capitalize border ${
-                    localGroup.visibility === 'public'
-                      ? 'bg-blue-500/10 text-blue-600 border-blue-500/20'
-                      : 'bg-orange-500/10 text-orange-600 border-orange-500/20'
-                  }`}>
+                  <span
+                    className={`rounded-full px-2.5 py-0.5 text-body-xs font-semibold capitalize border ${
+                      localGroup.visibility === 'public'
+                        ? 'bg-blue-500/10 text-blue-600 border-blue-500/20'
+                        : 'bg-orange-500/10 text-orange-600 border-orange-500/20'
+                    }`}
+                  >
                     {localGroup.visibility}
                   </span>
-                  <span className={`rounded-full px-2.5 py-0.5 text-body-xs font-semibold capitalize border ${
-                    localGroup.status === 'active'
-                      ? 'bg-green-500/10 text-green-600 border-green-500/20'
-                      : localGroup.status === 'pending'
-                      ? 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20'
-                      : 'bg-red-500/10 text-red-600 border-red-500/20'
-                  }`}>
+                  <span
+                    className={`rounded-full px-2.5 py-0.5 text-body-xs font-semibold capitalize border ${
+                      localGroup.status === 'active'
+                        ? 'bg-green-500/10 text-green-600 border-green-500/20'
+                        : localGroup.status === 'pending'
+                          ? 'bg-yellow-500/10 text-yellow-600 border-yellow-500/20'
+                          : 'bg-red-500/10 text-red-600 border-red-500/20'
+                    }`}
+                  >
                     {localGroup.status}
                   </span>
                 </div>
@@ -330,7 +347,11 @@ export function GroupDetailsPage({ group, onBack }: GroupDetailsPageProps) {
 
             <div className="flex items-center gap-2 self-end sm:self-start">
               {activeCapabilities.includes('edit_group') ? (
-                <Button variant="outline" onClick={handleEditGroup} aria-label="Edit group information">
+                <Button
+                  variant="outline"
+                  onClick={handleEditGroup}
+                  aria-label="Edit group information"
+                >
                   Edit Group
                 </Button>
               ) : (
@@ -345,7 +366,6 @@ export function GroupDetailsPage({ group, onBack }: GroupDetailsPageProps) {
         {/* Policies & Info Summary Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div className="md:col-span-2 space-y-6">
-            
             {/* Action Buttons Panel */}
             <div className="rounded-xl border border-border bg-card p-6 space-y-4">
               <h3 className="text-body-md font-bold text-foreground">Available Actions</h3>
@@ -355,15 +375,23 @@ export function GroupDetailsPage({ group, onBack }: GroupDetailsPageProps) {
                     Invite Members
                   </Button>
                 )}
-                
+
                 {activeCapabilities.includes('view_live_map') && (
-                  <Button variant="outline" onClick={handleViewLiveMap} aria-label="View live GPS telemetry map">
+                  <Button
+                    variant="outline"
+                    onClick={handleViewLiveMap}
+                    aria-label="View live GPS telemetry map"
+                  >
                     View Live Map
                   </Button>
                 )}
 
                 {activeCapabilities.includes('export_reports') && (
-                  <Button variant="outline" onClick={handleExportReports} aria-label="Export reports file">
+                  <Button
+                    variant="outline"
+                    onClick={handleExportReports}
+                    aria-label="Export reports file"
+                  >
                     Export Reports
                   </Button>
                 )}
@@ -413,17 +441,21 @@ export function GroupDetailsPage({ group, onBack }: GroupDetailsPageProps) {
             {/* Policies section */}
             <div className="rounded-xl border border-border bg-card p-6 space-y-4">
               <h3 className="text-body-md font-bold text-foreground">Policies Summary</h3>
-              
+
               <div className="space-y-3 divide-y divide-border">
                 <div className="pt-0">
-                  <p className="text-body-xs font-semibold text-muted-foreground uppercase">Tracking Policy</p>
+                  <p className="text-body-xs font-semibold text-muted-foreground uppercase">
+                    Tracking Policy
+                  </p>
                   <p className="mt-1 text-body-sm text-foreground">
                     {localGroup.trackingPolicy || 'No policy defined.'}
                   </p>
                 </div>
-                
+
                 <div className="pt-3">
-                  <p className="text-body-xs font-semibold text-muted-foreground uppercase">Visibility Policy</p>
+                  <p className="text-body-xs font-semibold text-muted-foreground uppercase">
+                    Visibility Policy
+                  </p>
                   <p className="mt-1 text-body-sm text-foreground">
                     {localGroup.visibilityPolicy || 'No policy defined.'}
                   </p>

@@ -6,13 +6,7 @@ export type VisibilityFilter = GroupVisibility | 'all';
 
 export type StatusFilter = GroupStatus | 'all';
 
-export type GroupRole =
-  | 'owner'
-  | 'delegated_admin'
-  | 'admin'
-  | 'moderator'
-  | 'member'
-  | 'guest';
+export type GroupRole = 'owner' | 'delegated_admin' | 'admin' | 'moderator' | 'member' | 'guest';
 
 export type GroupCapability =
   | 'edit_group'
@@ -79,14 +73,7 @@ export interface GroupFormState {
   backgroundTracking: boolean;
   locationAccuracy: 'high' | 'medium' | 'low';
   refreshInterval: '10s' | '30s' | '1m' | '5m';
-  visibilityPolicy:
-    | 'everyone'
-    | 'admins_only'
-    | 'nearby_only'
-    | 'invisible'
-    | 'hidden_admin';
+  visibilityPolicy: 'everyone' | 'admins_only' | 'nearby_only' | 'invisible' | 'hidden_admin';
   roleCapabilities: Record<GroupRole, GroupCapability[]>;
   acceptTerms: boolean;
 }
-
-

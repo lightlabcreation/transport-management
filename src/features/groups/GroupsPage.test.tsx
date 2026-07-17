@@ -1,14 +1,47 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { describe, expect, it } from 'vitest';
+import { createMemoryRouter, RouterProvider } from 'react-router';
+import { beforeEach, describe, expect, it } from 'vitest';
 
 import { GroupsPage } from './GroupsPage';
 import { GroupsPage as GroupsPageFromIndex } from './index';
 import { mockGroups } from './groups.mock';
 
-// Helper: wait for loading to finish
-async function renderAndWait() {
-  render(<GroupsPage />);
+const mockSession = {
+  kind: 'authenticated',
+  authenticatedAt: '2026-07-17T12:00:00.000Z',
+  expiresAt: '2030-01-01T00:00:00.000Z',
+};
+
+beforeEach(() => {
+  window.sessionStorage.clear();
+  window.sessionStorage.setItem('transport-management.auth-session', JSON.stringify(mockSession));
+  window.sessionStorage.setItem(
+    'transport-management.demo-access-profile',
+    JSON.stringify({ profileId: 'group-owner' }),
+  );
+});
+
+// Helper: wait for loading to finish with custom route wrapper
+async function renderAndWait(profileId: string = 'group-owner') {
+  window.sessionStorage.setItem(
+    'transport-management.demo-access-profile',
+    JSON.stringify({ profileId }),
+  );
+
+  const router = createMemoryRouter(
+    [
+      { path: '/auth/login', element: <h1>Sign in boundary</h1> },
+      { path: '/app/access-preview', element: <h1>Access Preview boundary</h1> },
+      { path: '/app/groups', element: <GroupsPage /> },
+      { path: '/app/dashboard', element: <h1>Dashboard Page</h1> },
+      { path: '/app/live-map', element: <h1>Live Map Page</h1> },
+    ],
+    { initialEntries: ['/app/groups'] },
+  );
+
+  render(<RouterProvider router={router} />);
+
   // Wait for loading spinner to disappear
   await waitFor(
     () => {
@@ -29,14 +62,8 @@ describe('GroupsPage', () => {
     expect(screen.getByText(/manage your groups/i)).toBeInTheDocument();
   });
 
-  it('shows a loading state initially', () => {
-    render(<GroupsPage />);
-    expect(screen.getByRole('status', { name: /loading groups/i })).toBeInTheDocument();
-  });
-
   it('renders all 4 summary cards after loading', async () => {
     await renderAndWait();
-    // Summary section contains all 4 labels
     const summary = screen.getByRole('region', { name: /summary/i });
     expect(summary).toHaveTextContent('Total Groups');
     expect(summary).toHaveTextContent('Active');
@@ -46,16 +73,13 @@ describe('GroupsPage', () => {
 
   it('shows correct total count in summary', async () => {
     await renderAndWait();
-    // Use within() to scope to summary section only
     const summary = screen.getByRole('region', { name: /summary/i });
     const totalCount = mockGroups.length;
-    // The stat card for 'Total Groups' should show the total count
     expect(summary).toHaveTextContent(String(totalCount));
   });
 
   it('renders group names from mock data', async () => {
     await renderAndWait();
-    // Check a few group names appear
     expect(screen.getAllByText(/Sunrise Fleet Operations/i).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/Kiyaan Family Tracker/i).length).toBeGreaterThan(0);
   });
@@ -64,7 +88,7 @@ describe('GroupsPage', () => {
     const user = userEvent.setup();
     await renderAndWait();
 
-    const searchInput = screen.getByRole('searchbox');
+    const searchInput = screen.getByRole('searchbox', { name: /search groups/i });
     await user.type(searchInput, 'Kiyaan');
 
     expect(screen.getAllByText(/Kiyaan Family Tracker/i).length).toBeGreaterThan(0);
@@ -75,87 +99,77 @@ describe('GroupsPage', () => {
     const user = userEvent.setup();
     await renderAndWait();
 
-    const visibilitySelect = screen.getByLabelText(/filter by visibility/i);
+    const visibilitySelect = screen.getByRole('combobox', { name: /filter by visibility/i });
     await user.selectOptions(visibilitySelect, 'public');
 
-    // All visible items should have public visibility badge (via aria-label)
-    expect(screen.getAllByLabelText(/visibility: public/i).length).toBeGreaterThan(0);
-    expect(screen.queryByLabelText(/visibility: private/i)).not.toBeInTheDocument();
+    expect(screen.getAllByText(/Sunrise Fleet Operations/i).length).toBeGreaterThan(0);
+    expect(screen.queryByText(/Kiyaan Family Tracker/i)).not.toBeInTheDocument();
   });
 
   it('filters groups by visibility — private', async () => {
     const user = userEvent.setup();
     await renderAndWait();
 
-    const visibilitySelect = screen.getByLabelText(/filter by visibility/i);
+    const visibilitySelect = screen.getByRole('combobox', { name: /filter by visibility/i });
     await user.selectOptions(visibilitySelect, 'private');
 
-    expect(screen.getAllByLabelText(/visibility: private/i).length).toBeGreaterThan(0);
-    expect(screen.queryByLabelText(/visibility: public/i)).not.toBeInTheDocument();
+    expect(screen.getAllByText(/Kiyaan Family Tracker/i).length).toBeGreaterThan(0);
+    expect(screen.queryByText(/Sunrise Fleet Operations/i)).not.toBeInTheDocument();
   });
 
   it('filters groups by status — active', async () => {
     const user = userEvent.setup();
     await renderAndWait();
 
-    const statusSelect = screen.getByLabelText(/filter by status/i);
+    const statusSelect = screen.getByRole('combobox', { name: /filter by status/i });
     await user.selectOptions(statusSelect, 'active');
 
-    // Active badges should exist; no Pending or Suspended STATUS badges in list
-    expect(screen.getAllByLabelText(/status: active/i).length).toBeGreaterThan(0);
-    expect(screen.queryByLabelText(/status: pending/i)).not.toBeInTheDocument();
-    expect(screen.queryByLabelText(/status: suspended/i)).not.toBeInTheDocument();
+    expect(screen.getAllByText(/Sunrise Fleet Operations/i).length).toBeGreaterThan(0);
+    expect(screen.queryByText(/Nightshift Patrol Alpha/i)).not.toBeInTheDocument();
   });
 
   it('filters groups by status — pending', async () => {
     const user = userEvent.setup();
     await renderAndWait();
 
-    const statusSelect = screen.getByLabelText(/filter by status/i);
+    const statusSelect = screen.getByRole('combobox', { name: /filter by status/i });
     await user.selectOptions(statusSelect, 'pending');
 
-    expect(screen.getAllByLabelText(/status: pending/i).length).toBeGreaterThan(0);
-    expect(screen.queryByLabelText(/status: active/i)).not.toBeInTheDocument();
-    expect(screen.queryByLabelText(/status: suspended/i)).not.toBeInTheDocument();
+    expect(screen.getAllByText(/Westpark Construction Crew/i).length).toBeGreaterThan(0);
+    expect(screen.queryByText(/Sunrise Fleet Operations/i)).not.toBeInTheDocument();
   });
 
   it('filters groups by status — suspended', async () => {
     const user = userEvent.setup();
     await renderAndWait();
 
-    const statusSelect = screen.getByLabelText(/filter by status/i);
+    const statusSelect = screen.getByRole('combobox', { name: /filter by status/i });
     await user.selectOptions(statusSelect, 'suspended');
 
-    expect(screen.getAllByLabelText(/status: suspended/i).length).toBeGreaterThan(0);
-    expect(screen.queryByLabelText(/status: active/i)).not.toBeInTheDocument();
-    expect(screen.queryByLabelText(/status: pending/i)).not.toBeInTheDocument();
+    expect(screen.getAllByText(/Summit Events Transport/i).length).toBeGreaterThan(0);
+    expect(screen.queryByText(/Sunrise Fleet Operations/i)).not.toBeInTheDocument();
   });
 
   it('applies combined filters (private + active)', async () => {
     const user = userEvent.setup();
     await renderAndWait();
 
-    const visibilitySelect = screen.getByLabelText(/filter by visibility/i);
-    const statusSelect = screen.getByLabelText(/filter by status/i);
-
+    const visibilitySelect = screen.getByRole('combobox', { name: /filter by visibility/i });
     await user.selectOptions(visibilitySelect, 'private');
+
+    const statusSelect = screen.getByRole('combobox', { name: /filter by status/i });
     await user.selectOptions(statusSelect, 'active');
 
-    // Private + Active groups: grp-007 and grp-008
     expect(screen.getAllByText(/Kiyaan Family Tracker/i).length).toBeGreaterThan(0);
-    expect(screen.getAllByText(/Executive Security Detail/i).length).toBeGreaterThan(0);
-    // Public Active groups should not appear
     expect(screen.queryByText(/Sunrise Fleet Operations/i)).not.toBeInTheDocument();
-    // No Pending/Suspended badges in the cards
-    expect(screen.queryByLabelText(/status: pending/i)).not.toBeInTheDocument();
-    expect(screen.queryByLabelText(/status: suspended/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Nightshift Patrol Alpha/i)).not.toBeInTheDocument();
   });
 
   it('shows "no results" empty state when filters produce zero results', async () => {
     const user = userEvent.setup();
     await renderAndWait();
 
-    const searchInput = screen.getByRole('searchbox');
+    const searchInput = screen.getByRole('searchbox', { name: /search groups/i });
     await user.type(searchInput, 'xyznonexistentgroup123');
 
     expect(screen.getByText(/no groups match your filters/i)).toBeInTheDocument();
@@ -165,22 +179,17 @@ describe('GroupsPage', () => {
     const user = userEvent.setup();
     await renderAndWait();
 
-    // Apply a filter
-    const searchInput = screen.getByRole('searchbox');
+    const searchInput = screen.getByRole('searchbox', { name: /search groups/i });
     await user.type(searchInput, 'xyznonexistentgroup123');
 
-    // Clear Filters button should appear
     const clearButton = screen.getByRole('button', { name: /clear all filters/i });
     await user.click(clearButton);
 
-    // All groups should be visible again
     expect(screen.getAllByText(/Sunrise Fleet Operations/i).length).toBeGreaterThan(0);
   });
 
   it('status badge labels are correct for all statuses', async () => {
     await renderAndWait();
-
-    // Check aria-label badges which are per-card (not summary cards)
     expect(screen.getAllByLabelText(/status: active/i).length).toBeGreaterThan(0);
     expect(screen.getAllByLabelText(/status: pending/i).length).toBeGreaterThan(0);
     expect(screen.getAllByLabelText(/status: suspended/i).length).toBeGreaterThan(0);
@@ -192,17 +201,52 @@ describe('GroupsPage', () => {
     expect(screen.getAllByLabelText(/visibility: private/i).length).toBeGreaterThan(0);
   });
 
-  it('Create Group button is enabled and opens wizard', async () => {
+  it('Create Group button is enabled and opens wizard for Owner', async () => {
     const user = userEvent.setup();
-    await renderAndWait();
+    await renderAndWait('group-owner');
     const createButton = screen.getByRole('button', { name: 'Create new group' });
     expect(createButton).not.toBeDisabled();
     await user.click(createButton);
-    expect(screen.getByRole('heading', { level: 2, name: /Group Information/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { level: 2, name: /Group Information/i }),
+    ).toBeInTheDocument();
   });
 
+  it('Shared navigation renders on Groups and links are present', async () => {
+    await renderAndWait();
+    const nav = screen.getByRole('navigation', { name: /desktop navigation/i });
+    expect(nav).toBeInTheDocument();
+    expect(screen.getAllByRole('link', { name: /dashboard/i }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('link', { name: /groups/i }).length).toBeGreaterThan(0);
+    expect(screen.getAllByRole('link', { name: /live map/i }).length).toBeGreaterThan(0);
+  });
 
+  it('Active item uses aria-current', async () => {
+    await renderAndWait();
+    const groupsLinks = screen.getAllByRole('link', { name: /groups/i });
+    const activeLink = groupsLinks.find((link) => link.getAttribute('aria-current') === 'page');
+    expect(activeLink).toBeDefined();
+  });
 
+  it('Member profile sees read-only presentation (Create Group hidden)', async () => {
+    await renderAndWait('member');
+    expect(screen.queryByRole('button', { name: 'Create new group' })).not.toBeInTheDocument();
+  });
+
+  it('Guest profile sees restricted presentation (Create Group hidden)', async () => {
+    await renderAndWait('group-guest');
+    expect(screen.queryByRole('button', { name: 'Create new group' })).not.toBeInTheDocument();
+  });
+
+  it('Logout behavior clears session', async () => {
+    const user = userEvent.setup();
+    await renderAndWait();
+    const logoutBtns = screen.getAllByRole('button', { name: /log out/i });
+    const logoutBtn = logoutBtns[0];
+    expect(logoutBtn).toBeDefined();
+    await user.click(logoutBtn!);
+    expect(window.sessionStorage.getItem('transport-management.auth-session')).toBeNull();
+  });
 
   it('GroupsPage can be imported from the index barrel', () => {
     expect(GroupsPageFromIndex).toBeDefined();

@@ -49,12 +49,10 @@ describe('GroupDetailsPage', () => {
 
     expect(screen.getByRole('heading', { name: /Test Logistics Group/i })).toBeInTheDocument();
     expect(screen.getByText(/Test description for logistics group/i)).toBeInTheDocument();
-    expect(screen.getByText("Logistics", { selector: 'span' })).toBeInTheDocument();
-    expect(screen.getByText("private", { selector: 'span' })).toBeInTheDocument();
-    expect(screen.getByText("active", { selector: 'span' })).toBeInTheDocument();
+    expect(screen.getByText('Logistics', { selector: 'span' })).toBeInTheDocument();
+    expect(screen.getByText('private', { selector: 'span' })).toBeInTheDocument();
+    expect(screen.getByText('active', { selector: 'span' })).toBeInTheDocument();
   });
-
-
 
   it('allows Group Owner to see all administrative controls and destructive button', () => {
     render(<GroupDetailsPage group={mockGroupData} onBack={vi.fn()} />);
@@ -68,7 +66,9 @@ describe('GroupDetailsPage', () => {
 
     // Owner actions
     expect(screen.getByRole('button', { name: /Invite new members/i })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /View live GPS telemetry map/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /View live GPS telemetry map/i }),
+    ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Export reports file/i })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Reset group policies/i })).toBeInTheDocument();
   });
@@ -82,7 +82,9 @@ describe('GroupDetailsPage', () => {
     await user.selectOptions(select, 'moderator');
 
     // Moderator cannot edit group
-    expect(screen.queryByRole('button', { name: /Edit group information/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /Edit group information/i }),
+    ).not.toBeInTheDocument();
     expect(screen.getByText(/ReadOnly Access/i)).toBeInTheDocument();
 
     // Moderator capabilities: can invite, can approve/reject join requests
@@ -90,7 +92,9 @@ describe('GroupDetailsPage', () => {
 
     // Moderator cannot export, view map, or reset policies
     expect(screen.queryByRole('button', { name: /Export reports file/i })).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /View live GPS telemetry map/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /View live GPS telemetry map/i }),
+    ).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Reset group policies/i })).not.toBeInTheDocument();
   });
 
@@ -102,11 +106,15 @@ describe('GroupDetailsPage', () => {
     await user.selectOptions(select, 'delegated_admin');
 
     // By default, delegated admin does NOT have edit_group or export_reports
-    expect(screen.queryByRole('button', { name: /Edit group information/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /Edit group information/i }),
+    ).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Export reports file/i })).not.toBeInTheDocument();
 
     // They have view_live_map and invite_members by default
-    expect(screen.getByRole('button', { name: /View live GPS telemetry map/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /View live GPS telemetry map/i }),
+    ).toBeInTheDocument();
     expect(screen.getByRole('button', { name: /Invite new members/i })).toBeInTheDocument();
   });
 
@@ -118,12 +126,16 @@ describe('GroupDetailsPage', () => {
     await user.selectOptions(select, 'member');
 
     // Member cannot edit or invite or export
-    expect(screen.queryByRole('button', { name: /Edit group information/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: /Edit group information/i }),
+    ).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Invite/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Export/i })).not.toBeInTheDocument();
 
     // Member can view live map
-    expect(screen.getByRole('button', { name: /View live GPS telemetry map/i })).toBeInTheDocument();
+    expect(
+      screen.getByRole('button', { name: /View live GPS telemetry map/i }),
+    ).toBeInTheDocument();
   });
 
   it('presents restricted read-only view for Guest with no action buttons', async () => {
@@ -134,7 +146,9 @@ describe('GroupDetailsPage', () => {
     await user.selectOptions(select, 'guest');
 
     // Guest has empty action state
-    expect(screen.getByText(/No actions available for your current simulator role/i)).toBeInTheDocument();
+    expect(
+      screen.getByText(/No actions available for your current simulator role/i),
+    ).toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Invite/i })).not.toBeInTheDocument();
     expect(screen.queryByRole('button', { name: /Map/i })).not.toBeInTheDocument();
   });
@@ -158,14 +172,19 @@ describe('GroupDetailsPage', () => {
     await user.click(resetBtn);
 
     // Modal overlay is displayed
-    expect(screen.getByRole('heading', { name: /Destructive Action Confirmation/i })).toBeInTheDocument();
-    expect(screen.getByText(/Are you sure you want to RESET all location-tracking policies/i)).toBeInTheDocument();
+    expect(
+      screen.getByRole('heading', { name: /Destructive Action Confirmation/i }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByText(/Are you sure you want to RESET all location-tracking policies/i),
+    ).toBeInTheDocument();
 
     // Clicking Proceed executes action and dismisses modal
     const proceedBtn = screen.getByRole('button', { name: /Proceed Action/i });
     await user.click(proceedBtn);
 
-    expect(screen.queryByRole('heading', { name: /Destructive Action Confirmation/i })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('heading', { name: /Destructive Action Confirmation/i }),
+    ).not.toBeInTheDocument();
   });
 });
-
