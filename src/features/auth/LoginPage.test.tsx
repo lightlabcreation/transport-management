@@ -22,6 +22,7 @@ function renderLogin(authService: AuthService) {
 function createAuthService(requestOtp: AuthService['requestOtp']): AuthService {
   return {
     requestOtp,
+    register: vi.fn<AuthService['register']>(),
     verifyOtp: vi.fn<AuthService['verifyOtp']>(),
   };
 }
@@ -30,7 +31,7 @@ describe('LoginPage', () => {
   it('renders only the passwordless Login controls', () => {
     renderLogin(createAuthService(vi.fn()));
 
-    expect(screen.getByRole('heading', { name: 'Sign in' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Welcome back' })).toBeInTheDocument();
     expect(screen.getByLabelText('Country code')).toHaveAttribute(
       'autocomplete',
       'tel-country-code',
@@ -55,6 +56,7 @@ describe('LoginPage', () => {
     const user = userEvent.setup();
     const requestOtp = vi.fn<AuthService['requestOtp']>().mockResolvedValue({
       status: 'otp_sent',
+      source: 'login',
       challengeId: 'challenge-1',
       maskedMobile: '+•• ••••••3210',
       expiresAt: '2026-07-17T12:00:00.000Z',
@@ -95,6 +97,7 @@ describe('LoginPage', () => {
 
     resolveRequest({
       status: 'otp_sent',
+      source: 'login',
       challengeId: 'challenge-1',
       maskedMobile: '+•• ••••••3210',
       expiresAt: '2026-07-17T12:00:00.000Z',

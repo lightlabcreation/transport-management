@@ -7,7 +7,15 @@ import {
   mockAuthService,
   OtpVerificationPage,
   ProtectedPlaceholderPage,
+  RegistrationPage,
+  TermsPlaceholderPage,
 } from '@/features/auth';
+import {
+  LanguageSelectionPage,
+  ModeSelectionPage,
+  PermissionIntroductionPage,
+  WelcomePage,
+} from '@/features/onboarding';
 
 export const router = createBrowserRouter([
   {
@@ -24,6 +32,26 @@ export const router = createBrowserRouter([
     element: <LoginPage authService={mockAuthService} />,
   },
   {
+    path: '/onboarding/language',
+    element: <LanguageSelectionPage />,
+  },
+  {
+    path: '/onboarding/welcome',
+    element: <WelcomePage />,
+  },
+  {
+    path: '/onboarding/mode',
+    element: <ModeSelectionPage />,
+  },
+  {
+    path: '/onboarding/permissions',
+    element: <PermissionIntroductionPage />,
+  },
+  {
+    path: '/auth/register',
+    element: <RegistrationPage authService={mockAuthService} />,
+  },
+  {
     path: '/auth/verify',
     element: (
       <OtpVerificationPage
@@ -36,5 +64,9 @@ export const router = createBrowserRouter([
   {
     path: '/auth/authenticated',
     element: <ProtectedPlaceholderPage sessionStore={browserAuthSessionStore} />,
+  },
+  {
+    path: '/legal/terms',
+    element: <TermsPlaceholderPage />,
   },
 ]);

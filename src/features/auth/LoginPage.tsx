@@ -8,6 +8,8 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
 import { AuthServiceError, type AuthService, type AuthServiceErrorCode } from './authService';
+import { AuthPageFrame } from './AuthPageFrame';
+import { normalizePhoneNumber } from './phoneNumber';
 
 const mobileSchema = z.object({
   countryCode: z
@@ -30,6 +32,8 @@ interface FieldErrors {
 }
 
 const serviceErrorMessages: Record<AuthServiceErrorCode, string> = {
+  duplicate_account: 'Something went wrong. Please try again.',
+  validation: 'Something went wrong. Please try again.',
   invalid_otp: 'Something went wrong. Please try again.',
   expired_challenge: 'Something went wrong. Please try again.',
   rate_limited: 'Too many requests. Please wait before trying again.',
@@ -93,11 +97,12 @@ export function LoginPage({ authService }: LoginPageProps) {
 
     try {
       const response = await authService.requestOtp({
-        mobileNumber: `${result.data.countryCode}${result.data.nationalNumber}`,
+        mobileNumber: normalizePhoneNumber(result.data.countryCode, result.data.nationalNumber),
       });
 
       void navigate('/auth/verify', {
         state: {
+          source: response.source,
           challengeId: response.challengeId,
           maskedMobile: response.maskedMobile,
           expiresAt: response.expiresAt,
@@ -115,93 +120,93 @@ export function LoginPage({ authService }: LoginPageProps) {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-background px-gutter py-section text-foreground">
-      <section className="w-full max-w-form rounded-lg border border-border bg-surface p-page shadow-sm">
-        <p className="text-body-sm font-semibold text-primary">Transport Management</p>
-        <h1 className="mt-2 text-heading-md font-semibold">Sign in</h1>
-        <p className="mt-2 text-body text-muted-foreground">
-          Enter your mobile number to continue securely without a password.
-        </p>
-
-        <form
-          className="mt-section space-y-4"
-          noValidate
-          onSubmit={(event) => void handleSubmit(event)}
-        >
-          <div className="space-y-2">
-            <Label htmlFor="country-code">Country code</Label>
-            <Input
-              ref={countryCodeRef}
-              id="country-code"
-              name="countryCode"
-              type="tel"
-              inputMode="tel"
-              autoComplete="tel-country-code"
-              value={countryCode}
-              onChange={(event) => setCountryCode(event.currentTarget.value)}
-              aria-invalid={fieldErrors.countryCode ? true : undefined}
-              aria-describedby={fieldErrors.countryCode ? 'country-code-error' : undefined}
-              placeholder="+"
-            />
-            {fieldErrors.countryCode ? (
-              <p id="country-code-error" className="text-body-sm text-danger">
-                {fieldErrors.countryCode}
-              </p>
-            ) : null}
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="mobile-number">Mobile number</Label>
-            <Input
-              ref={nationalNumberRef}
-              id="mobile-number"
-              name="mobileNumber"
-              type="tel"
-              inputMode="tel"
-              autoComplete="tel-national"
-              value={nationalNumber}
-              onChange={(event) => setNationalNumber(event.currentTarget.value)}
-              aria-invalid={fieldErrors.nationalNumber ? true : undefined}
-              aria-describedby={fieldErrors.nationalNumber ? 'mobile-number-error' : undefined}
-            />
-            {fieldErrors.nationalNumber ? (
-              <p id="mobile-number-error" className="text-body-sm text-danger">
-                {fieldErrors.nationalNumber}
-              </p>
-            ) : null}
-          </div>
-
-          {serviceError ? (
-            <div
-              ref={serviceErrorRef}
-              role="alert"
-              tabIndex={-1}
-              className="rounded-md border border-danger p-3 text-body-sm text-danger"
-            >
-              {serviceError}
-            </div>
-          ) : null}
-
-          {isSubmitting ? (
-            <p role="status" className="text-body-sm text-muted-foreground">
-              Requesting verification…
-            </p>
-          ) : null}
-
-          <Button type="submit" fullWidth isLoading={isSubmitting}>
-            Continue
-          </Button>
-        </form>
-
-        <nav aria-label="Authentication links" className="mt-6 flex flex-wrap gap-4 text-body-sm">
-          <Link className="text-primary underline-offset-4 hover:underline" to="/auth/register">
-            Register
+    <AuthPageFrame
+      compact
+      eyebrow="Passwordless access"
+      title="Welcome back"
+      description="Enter your mobile number and we’ll send a one-time verification code. No password to remember."
+      footer={
+        <nav aria-label="Authentication links" className="flex justify-center gap-5">
+          <Link
+            className="font-medium text-primary underline-offset-4 hover:underline"
+            to="/auth/register"
+          >
+            Create an account
           </Link>
-          <Link className="text-primary underline-offset-4 hover:underline" to="/legal/terms">
+          <Link
+            className="text-muted-foreground underline-offset-4 hover:text-primary hover:underline"
+            to="/legal/terms"
+          >
             Terms
           </Link>
         </nav>
-      </section>
-    </main>
+      }
+    >
+      <form className="space-y-5" noValidate onSubmit={(event) => void handleSubmit(event)}>
+        <div className="space-y-2">
+          <Label htmlFor="country-code">Country code</Label>
+          <Input
+            ref={countryCodeRef}
+            id="country-code"
+            name="countryCode"
+            type="tel"
+            inputMode="tel"
+            autoComplete="tel-country-code"
+            value={countryCode}
+            onChange={(event) => setCountryCode(event.currentTarget.value)}
+            aria-invalid={fieldErrors.countryCode ? true : undefined}
+            aria-describedby={fieldErrors.countryCode ? 'country-code-error' : undefined}
+            placeholder="+"
+          />
+          {fieldErrors.countryCode ? (
+            <p id="country-code-error" className="text-body-sm text-danger">
+              {fieldErrors.countryCode}
+            </p>
+          ) : null}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="mobile-number">Mobile number</Label>
+          <Input
+            ref={nationalNumberRef}
+            id="mobile-number"
+            name="mobileNumber"
+            type="tel"
+            inputMode="tel"
+            autoComplete="tel-national"
+            value={nationalNumber}
+            onChange={(event) => setNationalNumber(event.currentTarget.value)}
+            aria-invalid={fieldErrors.nationalNumber ? true : undefined}
+            aria-describedby={fieldErrors.nationalNumber ? 'mobile-number-error' : undefined}
+          />
+          {fieldErrors.nationalNumber ? (
+            <p id="mobile-number-error" className="text-body-sm text-danger">
+              {fieldErrors.nationalNumber}
+            </p>
+          ) : null}
+        </div>
+
+        {serviceError ? (
+          <div
+            ref={serviceErrorRef}
+            role="alert"
+            tabIndex={-1}
+            className="rounded-md border border-danger p-3 text-body-sm text-danger"
+          >
+            {serviceError}
+          </div>
+        ) : null}
+
+        {isSubmitting ? (
+          <p role="status" className="text-body-sm text-muted-foreground">
+            Requesting verification…
+          </p>
+        ) : null}
+
+        <Button className="mt-2" type="submit" size="lg" fullWidth isLoading={isSubmitting}>
+          Continue
+        </Button>
+      </form>
+    </AuthPageFrame>
   );
 }

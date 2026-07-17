@@ -9,13 +9,18 @@ import { createAuthSessionStore, type AuthSessionStore } from './authSessionStor
 import { OtpVerificationPage } from './OtpVerificationPage';
 
 const challengeState = {
+  source: 'login' as const,
   challengeId: 'challenge-1',
   maskedMobile: '+•• ••••••3210',
   expiresAt: '2030-01-01T00:05:00.000Z',
 };
 
 function createAuthService(verifyOtp: AuthService['verifyOtp']): AuthService {
-  return { requestOtp: vi.fn<AuthService['requestOtp']>(), verifyOtp };
+  return {
+    requestOtp: vi.fn<AuthService['requestOtp']>(),
+    register: vi.fn<AuthService['register']>(),
+    verifyOtp,
+  };
 }
 
 function createSessionStore(): AuthSessionStore {
@@ -35,6 +40,7 @@ function renderVerification(
   const router = createMemoryRouter(
     [
       { path: '/auth/login', element: <h1>Sign in boundary</h1> },
+      { path: '/auth/register', element: <h1>Registration boundary</h1> },
       {
         path: '/auth/verify',
         element: (
@@ -74,6 +80,37 @@ describe('OtpVerificationPage', () => {
     expect(screen.getByText('Enter the 6-digit verification code.')).toBeInTheDocument();
     expect(screen.getByLabelText('Verification code')).toHaveFocus();
     expect(verifyOtp).not.toHaveBeenCalled();
+  });
+
+  it('returns a registration challenge to Registration when changing the number', async () => {
+    const user = userEvent.setup();
+    const authService = createAuthService(vi.fn());
+    const router = createMemoryRouter(
+      [
+        { path: '/auth/login', element: <h1>Sign in boundary</h1> },
+        { path: '/auth/register', element: <h1>Registration boundary</h1> },
+        {
+          path: '/auth/verify',
+          element: (
+            <OtpVerificationPage
+              authService={authService}
+              sessionFactory={() => createMockAuthSession()}
+              sessionStore={createSessionStore()}
+            />
+          ),
+        },
+      ],
+      {
+        initialEntries: [
+          { pathname: '/auth/verify', state: { ...challengeState, source: 'registration' } },
+        ],
+      },
+    );
+    render(<RouterProvider router={router} />);
+
+    await user.click(screen.getByRole('link', { name: 'Change mobile number' }));
+
+    expect(router.state.location.pathname).toBe('/auth/register');
   });
 
   it('verifies the challenge and reaches the neutral authenticated boundary', async () => {

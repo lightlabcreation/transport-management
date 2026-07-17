@@ -3,6 +3,7 @@ import { Navigate, useNavigate } from 'react-router';
 import { Button } from '@/components/ui/button';
 
 import type { AuthSessionStore } from './authSessionStore';
+import { AuthPageFrame } from './AuthPageFrame';
 
 interface ProtectedPlaceholderPageProps {
   sessionStore: AuthSessionStore;
@@ -20,17 +21,27 @@ export function ProtectedPlaceholderPage({ sessionStore }: ProtectedPlaceholderP
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-background p-page text-foreground">
-      <section className="w-full max-w-form rounded-lg border border-border bg-surface p-page shadow-sm">
-        <h1 className="text-heading-md font-semibold">Authenticated</h1>
+    <AuthPageFrame
+      compact
+      eyebrow="Access confirmed"
+      title="Authenticated"
+      description="Your passwordless verification was successful."
+    >
+      <div className="text-center">
+        <div
+          aria-hidden="true"
+          className="mx-auto grid size-16 place-items-center rounded-full bg-primary/10 text-heading-lg font-semibold text-primary"
+        >
+          ✓
+        </div>
+        <h2 className="mt-5 text-heading-sm font-semibold">You’re securely signed in</h2>
         <p className="mt-2 text-body text-muted-foreground">
-          Your identity has been verified. The post-authentication destination will be added in a
-          later slice.
+          Your product destination will appear here when the application workspace is ready.
         </p>
-        <Button className="mt-6" variant="outline" onClick={handleLogout}>
-          Log out
-        </Button>
-      </section>
-    </main>
+      </div>
+      <Button className="mt-7" fullWidth variant="outline" onClick={handleLogout}>
+        Log out
+      </Button>
+    </AuthPageFrame>
   );
 }

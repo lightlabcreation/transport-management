@@ -21,7 +21,23 @@ export function createMockAuthService({
 
       return {
         status: 'otp_sent',
+        source: 'login',
         challengeId: 'mock-auth-challenge',
+        maskedMobile: '+•• ••••••3210',
+        expiresAt: '2030-01-01T00:05:00.000Z',
+      };
+    },
+    async register() {
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
+
+      if (outcome.type === 'failure') {
+        throw new AuthServiceError(outcome.code);
+      }
+
+      return {
+        status: 'otp_sent',
+        source: 'registration',
+        challengeId: 'mock-registration-challenge',
         maskedMobile: '+•• ••••••3210',
         expiresAt: '2030-01-01T00:05:00.000Z',
       };

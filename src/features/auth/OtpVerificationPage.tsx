@@ -6,9 +6,15 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
-import { AuthServiceError, type AuthService, type AuthServiceErrorCode } from './authService';
+import {
+  AuthServiceError,
+  type AuthChallengeSource,
+  type AuthService,
+  type AuthServiceErrorCode,
+} from './authService';
 import type { SessionFactory } from './authSession';
 import type { AuthSessionStore } from './authSessionStore';
+import { AuthPageFrame } from './AuthPageFrame';
 
 interface OtpVerificationPageProps {
   authService: AuthService;
@@ -17,12 +23,15 @@ interface OtpVerificationPageProps {
 }
 
 interface VerificationState {
+  source: AuthChallengeSource;
   challengeId: string;
   maskedMobile: string;
   expiresAt: string;
 }
 
 const errorMessages: Record<AuthServiceErrorCode, string> = {
+  duplicate_account: 'Something went wrong. Please try again.',
+  validation: 'Something went wrong. Please try again.',
   invalid_otp: 'That verification code is incorrect. Try again.',
   expired_challenge: 'This verification code has expired. Request a new code.',
   rate_limited: 'Too many attempts. Please wait before trying again.',
@@ -35,6 +44,7 @@ function isVerificationState(value: unknown): value is VerificationState {
   if (!value || typeof value !== 'object') return false;
   const state = value as Partial<VerificationState>;
   return (
+    (state.source === 'login' || state.source === 'registration') &&
     typeof state.challengeId === 'string' &&
     typeof state.maskedMobile === 'string' &&
     typeof state.expiresAt === 'string'
@@ -62,6 +72,10 @@ export function OtpVerificationPage({
 
   if (!challenge) return <Navigate to="/auth/login" replace />;
   const activeChallenge = challenge;
+  const expiryLabel = new Date(activeChallenge.expiresAt).toLocaleTimeString([], {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -92,70 +106,75 @@ export function OtpVerificationPage({
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-background px-gutter py-section text-foreground">
-      <section className="w-full max-w-form rounded-lg border border-border bg-surface p-page shadow-sm">
-        <p className="text-body-sm font-semibold text-primary">Transport Management</p>
-        <h1 className="mt-2 text-heading-md font-semibold">Verify your mobile</h1>
-        <p className="mt-2 text-body text-muted-foreground">
-          Enter the verification code sent to {activeChallenge.maskedMobile}.
-        </p>
-
-        <form
-          className="mt-section space-y-4"
-          noValidate
-          onSubmit={(event) => void handleSubmit(event)}
-        >
-          <div className="space-y-2">
-            <Label htmlFor="verification-code">Verification code</Label>
-            <Input
-              ref={codeRef}
-              id="verification-code"
-              name="verificationCode"
-              type="text"
-              inputMode="numeric"
-              autoComplete="one-time-code"
-              maxLength={6}
-              value={code}
-              onChange={(event) => setCode(event.currentTarget.value)}
-              aria-invalid={fieldError ? true : undefined}
-              aria-describedby={fieldError ? 'verification-code-error' : undefined}
-            />
-            {fieldError ? (
-              <p id="verification-code-error" className="text-body-sm text-danger">
-                {fieldError}
-              </p>
-            ) : null}
-          </div>
-
-          {serviceError ? (
-            <div
-              ref={alertRef}
-              role="alert"
-              tabIndex={-1}
-              className="rounded-md border border-danger p-3 text-body-sm text-danger"
-            >
-              {serviceError}
-            </div>
-          ) : null}
-
-          {isSubmitting ? (
-            <p role="status" className="text-body-sm text-muted-foreground">
-              Verifying…
+    <AuthPageFrame
+      compact
+      eyebrow="Secure verification"
+      title="Verify your mobile"
+      description={`Enter the six-digit code sent to ${activeChallenge.maskedMobile}.`}
+    >
+      <div
+        aria-hidden="true"
+        className="mx-auto mb-6 grid size-14 place-items-center rounded-full bg-primary/10 text-heading-md font-semibold text-primary"
+      >
+        ✓
+      </div>
+      <form className="space-y-5" noValidate onSubmit={(event) => void handleSubmit(event)}>
+        <div className="space-y-2">
+          <Label htmlFor="verification-code">Verification code</Label>
+          <Input
+            ref={codeRef}
+            id="verification-code"
+            name="verificationCode"
+            type="text"
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            maxLength={6}
+            placeholder="000000"
+            value={code}
+            onChange={(event) => setCode(event.currentTarget.value)}
+            aria-invalid={fieldError ? true : undefined}
+            aria-describedby={fieldError ? 'verification-code-error' : undefined}
+            className="text-center text-heading-sm font-semibold tracking-[0.5em]"
+          />
+          {fieldError ? (
+            <p id="verification-code-error" className="text-body-sm text-danger">
+              {fieldError}
             </p>
           ) : null}
+        </div>
 
-          <Button type="submit" fullWidth isLoading={isSubmitting}>
-            Verify
-          </Button>
-        </form>
+        <p className="rounded-md bg-surface-muted px-3 py-2 text-center text-body-sm text-muted-foreground">
+          Code expires at {expiryLabel}
+        </p>
 
-        <Link
-          className="mt-6 inline-block text-body-sm text-primary underline-offset-4 hover:underline"
-          to="/auth/login"
-        >
-          Change mobile number
-        </Link>
-      </section>
-    </main>
+        {serviceError ? (
+          <div
+            ref={alertRef}
+            role="alert"
+            tabIndex={-1}
+            className="rounded-md border border-danger p-3 text-body-sm text-danger"
+          >
+            {serviceError}
+          </div>
+        ) : null}
+
+        {isSubmitting ? (
+          <p role="status" className="text-body-sm text-muted-foreground">
+            Verifying…
+          </p>
+        ) : null}
+
+        <Button type="submit" size="lg" fullWidth isLoading={isSubmitting}>
+          Verify
+        </Button>
+      </form>
+
+      <Link
+        className="mt-6 block text-center text-body-sm font-medium text-primary underline-offset-4 hover:underline"
+        to={activeChallenge.source === 'registration' ? '/auth/register' : '/auth/login'}
+      >
+        Change mobile number
+      </Link>
+    </AuthPageFrame>
   );
 }
