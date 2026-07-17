@@ -3,8 +3,10 @@ import { Navigate, useLocation, useNavigate } from 'react-router';
 
 import { Button } from '@/components/ui/button';
 import { browserDemoAccessStore } from '@/features/access-control';
+import { getApplicationNavigation } from '@/features/app-navigation';
+import { browserApplicationModeStore } from '@/features/application-mode';
 import { browserAuthSessionStore } from '@/features/auth';
-import { ApplicationShell, navigationItems } from '@/features/shell';
+import { ApplicationShell } from '@/features/shell';
 
 import { GroupFilters } from './components/GroupFilters';
 import { GroupList } from './components/GroupList';
@@ -26,6 +28,8 @@ export function GroupsPage() {
   const location = useLocation();
   const navigate = useNavigate();
   const profile = browserDemoAccessStore.getProfile();
+  const applicationMode = browserApplicationModeStore.getMode();
+  const applicationNavigation = applicationMode ? getApplicationNavigation(applicationMode) : [];
 
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [isCreatingGroup, setIsCreatingGroup] = useState(false);
@@ -109,7 +113,7 @@ export function GroupsPage() {
 
   return (
     <ApplicationShell
-      navigationItems={navigationItems}
+      navigationItems={applicationNavigation}
       currentPath={location.pathname}
       userSummary={{
         name: 'Demo Operator',

@@ -2,8 +2,10 @@ import { useMemo, useState } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router';
 
 import { Input } from '@/components/ui/input';
+import { getApplicationNavigation } from '@/features/app-navigation';
+import { browserApplicationModeStore } from '@/features/application-mode';
 import type { AuthSessionStore } from '@/features/auth';
-import { ApplicationShell, navigationItems } from '@/features/shell';
+import { ApplicationShell } from '@/features/shell';
 
 import { MapCanvas } from './components/MapCanvas';
 import { MapStatusBar } from './components/MapStatusBar';
@@ -28,6 +30,8 @@ export function LiveMapPage({ sessionStore, viewState = 'ready' }: LiveMapPagePr
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [selectedMember, setSelectedMember] = useState<TrackedMember | null>(null);
   const [announcement, setAnnouncement] = useState('');
+  const applicationMode = browserApplicationModeStore.getMode();
+  const applicationNavigation = applicationMode ? getApplicationNavigation(applicationMode) : [];
 
   const filteredMembers = useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase();
@@ -62,7 +66,7 @@ export function LiveMapPage({ sessionStore, viewState = 'ready' }: LiveMapPagePr
 
   return (
     <ApplicationShell
-      navigationItems={navigationItems}
+      navigationItems={applicationNavigation}
       currentPath={location.pathname}
       userSummary={{ name: 'Demo Operator', mobile: '+•• ••••••3210', roleLabel: 'Operations' }}
       onLogout={handleLogout}

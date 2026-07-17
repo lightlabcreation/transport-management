@@ -20,6 +20,10 @@ beforeEach(() => {
     'transport-management.demo-access-profile',
     JSON.stringify({ profileId: 'group-owner' }),
   );
+  window.sessionStorage.setItem(
+    'transport-management.application-mode',
+    JSON.stringify({ mode: 'tracking' }),
+  );
 });
 
 // Helper: wait for loading to finish with custom route wrapper

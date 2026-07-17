@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { createBrowserRouter, Navigate } from 'react-router';
 
 import {
@@ -8,7 +9,12 @@ import {
   ProtectedApplicationRoute,
 } from '@/features/access-control';
 import { AppPagePlaceholder, appPageDefinitions } from '@/features/app-pages';
-import { browserApplicationModeStore } from '@/features/application-mode';
+import {
+  ApplicationModeGate,
+  ApplicationModeReset,
+  ApplicationModeSelectionPage,
+  browserApplicationModeStore,
+} from '@/features/application-mode';
 
 import {
   browserAuthSessionStore,
@@ -18,6 +24,7 @@ import {
   OtpVerificationPage,
   RegistrationPage,
   TermsPlaceholderPage,
+  type AuthSessionStore,
 } from '@/features/auth';
 import { GroupsPage } from '@/features/groups';
 import {
@@ -30,6 +37,35 @@ import { DashboardRoute } from '@/features/dashboard';
 import { HomePage } from '@/features/home';
 import { LiveMapPage } from '@/features/live-map';
 
+const accessPreviewSessionStore: AuthSessionStore = {
+  getSession: () => browserAuthSessionStore.getSession(),
+  setSession: (session) => browserAuthSessionStore.setSession(session),
+  clearSession: () => {
+    browserAuthSessionStore.clearSession();
+    browserDemoAccessStore.clearProfile();
+    browserPendingDemoAccessStore.clearProfile();
+    browserApplicationModeStore.clearMode();
+  },
+  isSessionValid: (session) => browserAuthSessionStore.isSessionValid(session),
+};
+
+function protectApplicationPage(children: ReactNode, requireMode = true) {
+  return (
+    <ProtectedApplicationRoute
+      sessionStore={browserAuthSessionStore}
+      accessStore={browserDemoAccessStore}
+    >
+      {requireMode ? (
+        <ApplicationModeGate modeStore={browserApplicationModeStore}>
+          {children}
+        </ApplicationModeGate>
+      ) : (
+        children
+      )}
+    </ProtectedApplicationRoute>
+  );
+}
+
 export const router = createBrowserRouter([
   {
     path: '/',
@@ -38,15 +74,20 @@ export const router = createBrowserRouter([
   {
     path: '/auth/login',
     element: (
-      <DemoAccessReset
-        accessStore={browserDemoAccessStore}
-        pendingDemoAccessStore={browserPendingDemoAccessStore}
+      <ApplicationModeReset
+        modeStore={browserApplicationModeStore}
+        shouldReset={() => browserDemoAccessStore.getProfile() !== null}
       >
-        <LoginPage
-          authService={mockAuthService}
+        <DemoAccessReset
+          accessStore={browserDemoAccessStore}
           pendingDemoAccessStore={browserPendingDemoAccessStore}
-        />
-      </DemoAccessReset>
+        >
+          <LoginPage
+            authService={mockAuthService}
+            pendingDemoAccessStore={browserPendingDemoAccessStore}
+          />
+        </DemoAccessReset>
+      </ApplicationModeReset>
     ),
   },
   {
@@ -87,61 +128,55 @@ export const router = createBrowserRouter([
   },
   {
     path: '/app/dashboard',
-    element: (
-      <ProtectedApplicationRoute
+    element: protectApplicationPage(
+      <DashboardRoute
         sessionStore={browserAuthSessionStore}
         accessStore={browserDemoAccessStore}
-      >
-        <DashboardRoute
-          sessionStore={browserAuthSessionStore}
-          accessStore={browserDemoAccessStore}
-        />
-      </ProtectedApplicationRoute>
+      />,
     ),
   },
   {
     path: '/app/live-map',
-    element: (
-      <ProtectedApplicationRoute
-        sessionStore={browserAuthSessionStore}
-        accessStore={browserDemoAccessStore}
-      >
-        <LiveMapPage sessionStore={browserAuthSessionStore} />
-      </ProtectedApplicationRoute>
-    ),
+    element: protectApplicationPage(<LiveMapPage sessionStore={browserAuthSessionStore} />),
   },
   {
     path: '/app/access-preview',
     element: (
-      <DemoAccessPage sessionStore={browserAuthSessionStore} accessStore={browserDemoAccessStore} />
+      <DemoAccessPage
+        sessionStore={accessPreviewSessionStore}
+        accessStore={browserDemoAccessStore}
+      />
     ),
   },
   {
     path: '/legal/terms',
     element: <TermsPlaceholderPage />,
   },
+  {
+    path: '/app/select-mode',
+    element: protectApplicationPage(
+      <ApplicationModeSelectionPage
+        modeStore={browserApplicationModeStore}
+        onLogout={() => browserAuthSessionStore.clearSession()}
+      />,
+      false,
+    ),
+  },
   // [DEV PREVIEW] GRP-001 — Groups Directory MVP
   // Temporary route for developer review. Permanent shell integration is D1's responsibility.
   {
     path: '/app/groups',
-    element: (
-      <ProtectedApplicationRoute
-        sessionStore={browserAuthSessionStore}
-        accessStore={browserDemoAccessStore}
-      >
-        <GroupsPage />
-      </ProtectedApplicationRoute>
-    ),
+    element: protectApplicationPage(<GroupsPage />),
   },
   ...appPageDefinitions.map(({ path, title }) => ({
     path,
-    element: (
-      <ProtectedApplicationRoute
+    element: protectApplicationPage(
+      <AppPagePlaceholder
+        title={title}
         sessionStore={browserAuthSessionStore}
         accessStore={browserDemoAccessStore}
-      >
-        <AppPagePlaceholder title={title} />
-      </ProtectedApplicationRoute>
+        modeStore={browserApplicationModeStore}
+      />,
     ),
   })),
 ]);

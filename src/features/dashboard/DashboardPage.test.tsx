@@ -37,6 +37,10 @@ function renderDashboard(
   accessProfile: DemoAccessProfile | null = profile('group-owner'),
   sessionStore: AuthSessionStore = createSessionStore(),
 ) {
+  window.sessionStorage.setItem(
+    'transport-management.application-mode',
+    JSON.stringify({ mode: 'tracking' }),
+  );
   const router = createMemoryRouter(
     [
       { path: '/auth/login', element: <h1>Sign in boundary</h1> },
@@ -65,7 +69,7 @@ describe('DashboardPage role-aware presentation', () => {
       ),
     ).toBeInTheDocument();
     for (const metric of presentation.metrics) {
-      expect(screen.getByText(metric.label)).toBeInTheDocument();
+      expect(screen.getAllByText(metric.label).length).toBeGreaterThan(0);
     }
   });
 

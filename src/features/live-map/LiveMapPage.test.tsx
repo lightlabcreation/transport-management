@@ -27,6 +27,10 @@ function renderLiveMap({
   hasSession = true,
   viewState = 'ready',
 }: { hasSession?: boolean; viewState?: LiveMapViewState } = {}) {
+  window.sessionStorage.setItem(
+    'transport-management.application-mode',
+    JSON.stringify({ mode: 'tracking' }),
+  );
   const router = createMemoryRouter(
     [
       { path: '/auth/login', element: <h1>Sign in boundary</h1> },
