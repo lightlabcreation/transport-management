@@ -3,7 +3,7 @@ import { Navigate, useLocation, useNavigate } from 'react-router';
 
 import { Input } from '@/components/ui/input';
 import type { AuthSessionStore } from '@/features/auth';
-import { ApplicationShell, type NavigationItem } from '@/features/shell';
+import { ApplicationShell, navigationItems } from '@/features/shell';
 
 import { MapCanvas } from './components/MapCanvas';
 import { MapStatusBar } from './components/MapStatusBar';
@@ -18,12 +18,6 @@ interface LiveMapPageProps {
 }
 
 type StatusFilter = 'all' | MemberStatus;
-
-const navigationItems: NavigationItem[] = [
-  { id: 'dashboard', label: 'Dashboard', href: '/app/dashboard', ariaLabel: 'Dashboard' },
-  { id: 'live-map', label: 'Live Map', href: '/app/live-map', ariaLabel: 'Live Map' },
-  { id: 'groups', label: 'Groups', href: '/app/groups', ariaLabel: 'Groups' },
-];
 
 const statusFilters: StatusFilter[] = ['all', 'online', 'offline', 'stale'];
 

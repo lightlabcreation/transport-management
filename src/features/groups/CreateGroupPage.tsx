@@ -17,7 +17,6 @@ interface CreateGroupPageProps {
 
 type WizardStep = 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
-
 const ALL_CAPABILITIES: GroupCapability[] = [
   'edit_group',
   'invite_members',
@@ -71,10 +70,7 @@ export function CreateGroupPage({ onBack }: CreateGroupPageProps) {
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  function handleInputChange<K extends keyof GroupFormState>(
-    field: K,
-    value: GroupFormState[K]
-  ) {
+  function handleInputChange<K extends keyof GroupFormState>(field: K, value: GroupFormState[K]) {
     setForm((prev) => ({ ...prev, [field]: value }));
     if (validationErrors[field]) {
       setValidationErrors((prev) => {
@@ -90,9 +86,7 @@ export function CreateGroupPage({ onBack }: CreateGroupPageProps) {
 
     setForm((prev) => {
       const current = prev.roleCapabilities[role];
-      const updated = current.includes(cap)
-        ? current.filter((c) => c !== cap)
-        : [...current, cap];
+      const updated = current.includes(cap) ? current.filter((c) => c !== cap) : [...current, cap];
       return {
         ...prev,
         roleCapabilities: {
@@ -150,13 +144,18 @@ export function CreateGroupPage({ onBack }: CreateGroupPageProps) {
   }
 
   return (
-    <div className="mx-auto max-w-[var(--container-content)] p-4 space-y-6" aria-label="Create group form workspace">
+    <div
+      className="mx-auto max-w-[var(--container-content)] p-4 space-y-6"
+      aria-label="Create group form workspace"
+    >
       {step < 7 && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-heading-md font-bold text-foreground">Create New Group</h1>
-              <p className="text-body-xs text-muted-foreground">Setup group details and location tracking preferences.</p>
+              <p className="text-body-xs text-muted-foreground">
+                Setup group details and location tracking preferences.
+              </p>
             </div>
             <span className="text-body-sm font-semibold text-primary">Step {step} of 6</span>
           </div>
@@ -199,9 +198,7 @@ export function CreateGroupPage({ onBack }: CreateGroupPageProps) {
       {step === 6 && (
         <StepReview form={form} onChange={handleInputChange} errors={validationErrors} />
       )}
-      {step === 7 && (
-        <StepSuccess name={form.name} onReset={handleReset} onBack={onBack} />
-      )}
+      {step === 7 && <StepSuccess name={form.name} onReset={handleReset} onBack={onBack} />}
 
       {step < 7 && (
         <div className="flex items-center justify-between border-t border-border pt-4">
@@ -225,7 +222,6 @@ export function CreateGroupPage({ onBack }: CreateGroupPageProps) {
               onClick={handleSubmit}
               aria-label="Submit group creation request"
             >
-
               {isSubmitting ? 'Submitting...' : 'Register Group'}
             </Button>
           )}

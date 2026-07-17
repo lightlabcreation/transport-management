@@ -66,7 +66,6 @@ export function MemberManagementList({
       onActionTriggered(`Simulated: Member "${memberName}" has been blocked.`);
     }
     setConfirmTarget(null);
-
   }
 
   return (
@@ -79,8 +78,8 @@ export function MemberManagementList({
               Confirm {confirmTarget.action === 'remove' ? 'Removal' : 'Block'}
             </h3>
             <p className="mt-2 text-body-sm text-muted-foreground">
-              Are you sure you want to {confirmTarget.action} <strong>{confirmTarget.memberName}</strong>? 
-              This action will take effect immediately.
+              Are you sure you want to {confirmTarget.action}{' '}
+              <strong>{confirmTarget.memberName}</strong>? This action will take effect immediately.
             </p>
             <div className="mt-6 flex justify-end gap-3">
               <Button
@@ -98,7 +97,6 @@ export function MemberManagementList({
                 Confirm {confirmTarget.action === 'remove' ? 'Remove' : 'Block'}
               </Button>
             </div>
-
           </div>
         </div>
       )}
@@ -127,7 +125,12 @@ export function MemberManagementList({
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-3">
                         <div className="flex size-9 items-center justify-center rounded-full bg-primary/10 font-medium text-primary text-body-xs">
-                          {member.name.split(' ').map((n) => n[0]).join('').substring(0, 2).toUpperCase()}
+                          {member.name
+                            .split(' ')
+                            .map((n) => n[0])
+                            .join('')
+                            .substring(0, 2)
+                            .toUpperCase()}
                         </div>
                         <span className="font-medium">{member.name}</span>
                       </div>
@@ -140,7 +143,9 @@ export function MemberManagementList({
                           onChange={(e) => {
                             onChangeRole(member.id, e.target.value as GroupRole);
                             setEditingMemberId(null);
-                            onActionTriggered(`Simulated: Updated ${member.name}'s role to ${e.target.value}.`);
+                            onActionTriggered(
+                              `Simulated: Updated ${member.name}'s role to ${e.target.value}.`,
+                            );
                           }}
                           aria-label="Change member role dropdown"
                         >
@@ -152,7 +157,9 @@ export function MemberManagementList({
                           <option value="guest">Guest</option>
                         </select>
                       ) : (
-                        <span className={`inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${getRoleBadgeStyles(member.role)}`}>
+                        <span
+                          className={`inline-block rounded-full px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider ${getRoleBadgeStyles(member.role)}`}
+                        >
                           {member.role.replace('_', ' ')}
                         </span>
                       )}
@@ -203,7 +210,9 @@ export function MemberManagementList({
                           </Button>
                         )}
                         {!canRemove && !canBlock && !canAssignRoles && (
-                          <span className="text-body-xs text-muted-foreground italic">Read-only</span>
+                          <span className="text-body-xs text-muted-foreground italic">
+                            Read-only
+                          </span>
                         )}
                       </div>
                     </td>
@@ -216,11 +225,19 @@ export function MemberManagementList({
           {/* Mobile View: Fluid Cards List */}
           <div className="grid grid-cols-1 gap-4 md:hidden">
             {members.map((member) => (
-              <div key={member.id} className="rounded-xl border border-border bg-card p-4 space-y-3 shadow-xs">
+              <div
+                key={member.id}
+                className="rounded-xl border border-border bg-card p-4 space-y-3 shadow-xs"
+              >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <div className="flex size-9 items-center justify-center rounded-full bg-primary/10 font-medium text-primary text-body-xs">
-                      {member.name.split(' ').map((n) => n[0]).join('').substring(0, 2).toUpperCase()}
+                      {member.name
+                        .split(' ')
+                        .map((n) => n[0])
+                        .join('')
+                        .substring(0, 2)
+                        .toUpperCase()}
                     </div>
                     <div>
                       <h4 className="font-semibold text-foreground">{member.name}</h4>
@@ -233,7 +250,9 @@ export function MemberManagementList({
                         member.status === 'online' ? 'bg-green-500' : 'bg-gray-400'
                       }`}
                     />
-                    <span className={`inline-block rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${getRoleBadgeStyles(member.role)}`}>
+                    <span
+                      className={`inline-block rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wider ${getRoleBadgeStyles(member.role)}`}
+                    >
                       {member.role.replace('_', ' ')}
                     </span>
                   </div>
@@ -250,7 +269,9 @@ export function MemberManagementList({
                           onChange={(e) => {
                             onChangeRole(member.id, e.target.value as GroupRole);
                             setEditingMemberId(null);
-                            onActionTriggered(`Simulated: Updated ${member.name}'s role to ${e.target.value}.`);
+                            onActionTriggered(
+                              `Simulated: Updated ${member.name}'s role to ${e.target.value}.`,
+                            );
                           }}
                           aria-label="Change member role dropdown"
                         >
@@ -296,7 +317,9 @@ export function MemberManagementList({
                     </Button>
                   )}
                   {!canRemove && !canBlock && !canAssignRoles && (
-                    <span className="text-body-xs text-muted-foreground italic">Read-only view</span>
+                    <span className="text-body-xs text-muted-foreground italic">
+                      Read-only view
+                    </span>
                   )}
                 </div>
               </div>

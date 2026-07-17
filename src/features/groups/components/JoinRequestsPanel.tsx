@@ -58,16 +58,21 @@ export function JoinRequestsPanel({
       ) : (
         <ul className="divide-y divide-border" aria-label="Pending join requests">
           {requests.map((request) => (
-            <li key={request.id} className="py-4 first:pt-0 last:pb-0 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <li
+              key={request.id}
+              className="py-4 first:pt-0 last:pb-0 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3"
+            >
               <div>
                 <p className="font-semibold text-foreground text-body-sm">{request.memberName}</p>
                 <p className="text-body-xs text-muted-foreground">
                   Requested on {formatDate(request.requestedAt)}
                 </p>
                 {request.status !== 'pending' && (
-                  <span className={`inline-block mt-1 text-[10px] font-bold uppercase tracking-wider ${
-                    request.status === 'approved' ? 'text-green-500' : 'text-red-500'
-                  }`}>
+                  <span
+                    className={`inline-block mt-1 text-[10px] font-bold uppercase tracking-wider ${
+                      request.status === 'approved' ? 'text-green-500' : 'text-red-500'
+                    }`}
+                  >
                     {request.status}
                   </span>
                 )}

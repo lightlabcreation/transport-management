@@ -48,9 +48,7 @@ export function StepInfo({ form, onChange, errors = {} }: StepProps) {
             onChange={(e) => onChange('name', e.target.value)}
             placeholder="e.g., Midnight Fleet Patrol"
           />
-          {errors.name && (
-            <p className="mt-1 text-body-xs text-red-500">{errors.name}</p>
-          )}
+          {errors.name && <p className="mt-1 text-body-xs text-red-500">{errors.name}</p>}
         </div>
 
         <div>
@@ -138,7 +136,8 @@ export function StepPrivacy({ form, onChange }: StepProps) {
         >
           <span className="font-bold text-foreground text-body-sm">Private Group</span>
           <p className="mt-1.5 text-body-xs text-muted-foreground">
-            Hidden from public directory. Joining is restricted strictly via invitation links or QR code.
+            Hidden from public directory. Joining is restricted strictly via invitation links or QR
+            code.
           </p>
         </button>
       </div>
@@ -150,9 +149,10 @@ export function StepTracking({ form, onChange }: StepProps) {
   return (
     <div className="rounded-xl border border-border bg-card p-6 space-y-4">
       <h2 className="text-body-md font-bold text-foreground">Tracking Settings</h2>
-      
+
       <div className="rounded-lg bg-yellow-500/10 text-yellow-600 border border-yellow-500/20 p-3 text-body-xs">
-        ⚠️ <strong>Notice:</strong> Location updates are simulated locally. No real browser location permissions will be requested.
+        ⚠️ <strong>Notice:</strong> Location updates are simulated locally. No real browser location
+        permissions will be requested.
       </div>
 
       <div className="space-y-4">
@@ -163,7 +163,9 @@ export function StepTracking({ form, onChange }: StepProps) {
               <label
                 key={mode}
                 className={`flex items-center gap-2 rounded-lg border p-3 cursor-pointer capitalize text-body-xs ${
-                  form.trackingMode === mode ? 'border-primary bg-primary/5' : 'border-border bg-card'
+                  form.trackingMode === mode
+                    ? 'border-primary bg-primary/5'
+                    : 'border-border bg-card'
                 }`}
               >
                 <input
@@ -181,8 +183,12 @@ export function StepTracking({ form, onChange }: StepProps) {
 
         <div className="flex items-center justify-between p-3 rounded-lg border border-border bg-muted/20">
           <div>
-            <span className="block text-body-xs font-semibold text-foreground">Background Tracking</span>
-            <p className="text-[11px] text-muted-foreground">Keep tracking location when the application is minimized.</p>
+            <span className="block text-body-xs font-semibold text-foreground">
+              Background Tracking
+            </span>
+            <p className="text-[11px] text-muted-foreground">
+              Keep tracking location when the application is minimized.
+            </p>
           </div>
           <input
             type="checkbox"
@@ -195,14 +201,19 @@ export function StepTracking({ form, onChange }: StepProps) {
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           <div>
-            <label htmlFor="gps-accuracy" className="block text-body-xs font-semibold text-foreground">
+            <label
+              htmlFor="gps-accuracy"
+              className="block text-body-xs font-semibold text-foreground"
+            >
               Location Accuracy
             </label>
             <select
               id="gps-accuracy"
               className="mt-1 w-full rounded-md border border-border bg-card px-3 py-1.5 text-body-sm focus:outline-none"
               value={form.locationAccuracy}
-              onChange={(e) => onChange('locationAccuracy', e.target.value as GroupFormState['locationAccuracy'])}
+              onChange={(e) =>
+                onChange('locationAccuracy', e.target.value as GroupFormState['locationAccuracy'])
+              }
             >
               <option value="high">High (GPS Telemetry)</option>
               <option value="medium">Medium (Wi-Fi & Cellular)</option>
@@ -211,14 +222,19 @@ export function StepTracking({ form, onChange }: StepProps) {
           </div>
 
           <div>
-            <label htmlFor="refresh-time" className="block text-body-xs font-semibold text-foreground">
+            <label
+              htmlFor="refresh-time"
+              className="block text-body-xs font-semibold text-foreground"
+            >
               Refresh Interval
             </label>
             <select
               id="refresh-time"
               className="mt-1 w-full rounded-md border border-border bg-card px-3 py-1.5 text-body-sm focus:outline-none"
               value={form.refreshInterval}
-              onChange={(e) => onChange('refreshInterval', e.target.value as GroupFormState['refreshInterval'])}
+              onChange={(e) =>
+                onChange('refreshInterval', e.target.value as GroupFormState['refreshInterval'])
+              }
             >
               <option value="10s">10 Seconds</option>
               <option value="30s">30 Seconds</option>
@@ -238,25 +254,36 @@ export function StepVisibility({ form, onChange }: StepProps) {
       <h2 className="text-body-md font-bold text-foreground">Visibility Policy</h2>
 
       <div>
-        <label htmlFor="visibility-policy" className="block text-body-xs font-semibold text-foreground">
+        <label
+          htmlFor="visibility-policy"
+          className="block text-body-xs font-semibold text-foreground"
+        >
           Who can view member positions?
         </label>
         <select
           id="visibility-policy"
           className="mt-1 w-full rounded-md border border-border bg-card px-3 py-1.5 text-body-sm focus:outline-none focus:ring-1 focus:ring-primary"
           value={form.visibilityPolicy}
-          onChange={(e) => onChange('visibilityPolicy', e.target.value as GroupFormState['visibilityPolicy'])}
+          onChange={(e) =>
+            onChange('visibilityPolicy', e.target.value as GroupFormState['visibilityPolicy'])
+          }
         >
           <option value="everyone">Everyone can see everyone</option>
           <option value="admins_only">Administrators only (Members hidden from each other)</option>
           <option value="nearby_only">Nearby members only (Subject to geographic proximity)</option>
-          <option value="invisible">Invisible member mode (Location coordinates cached privately)</option>
-          <option value="hidden_admin">Hidden administrator presentation (Admin pins hidden from members)</option>
+          <option value="invisible">
+            Invisible member mode (Location coordinates cached privately)
+          </option>
+          <option value="hidden_admin">
+            Hidden administrator presentation (Admin pins hidden from members)
+          </option>
         </select>
       </div>
 
       <div className="rounded-lg bg-muted/30 p-4 text-body-xs text-muted-foreground space-y-2">
-        <p><strong>Visibility Rules:</strong></p>
+        <p>
+          <strong>Visibility Rules:</strong>
+        </p>
         <ul className="list-disc pl-4 space-y-1">
           <li>Admins retain access to view all active pins under tracking policy bounds.</li>
           <li>Geofencing updates are computed on telemetry logs locally.</li>
@@ -279,37 +306,39 @@ export function StepRoles({ form, onToggleCapability }: StepRolesProps) {
       </p>
 
       <div className="space-y-4 divide-y divide-border">
-        {(['delegated_admin', 'admin', 'moderator', 'member', 'guest'] as GroupRole[]).map((role) => (
-          <div key={role} className="pt-4 first:pt-0">
-            <span className="block text-body-xs font-semibold text-foreground capitalize">
-              {role.replace('_', ' ')} Permissions
-            </span>
-            
-            <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {ALL_CAPABILITIES.map((cap) => {
-                const isChecked = form.roleCapabilities[role].includes(cap);
-                return (
-                  <label
-                    key={cap}
-                    className={`flex items-center gap-2 p-2 border rounded-md text-[10px] cursor-pointer transition-all ${
-                      isChecked
-                        ? 'bg-primary/5 border-primary/20 text-primary'
-                        : 'bg-card border-border text-muted-foreground'
-                    }`}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={isChecked}
-                      onChange={() => onToggleCapability(role, cap)}
-                      className="accent-primary"
-                    />
-                    {cap.replace('_', ' ')}
-                  </label>
-                );
-              })}
+        {(['delegated_admin', 'admin', 'moderator', 'member', 'guest'] as GroupRole[]).map(
+          (role) => (
+            <div key={role} className="pt-4 first:pt-0">
+              <span className="block text-body-xs font-semibold text-foreground capitalize">
+                {role.replace('_', ' ')} Permissions
+              </span>
+
+              <div className="mt-2 grid grid-cols-2 sm:grid-cols-3 gap-2">
+                {ALL_CAPABILITIES.map((cap) => {
+                  const isChecked = form.roleCapabilities[role].includes(cap);
+                  return (
+                    <label
+                      key={cap}
+                      className={`flex items-center gap-2 p-2 border rounded-md text-[10px] cursor-pointer transition-all ${
+                        isChecked
+                          ? 'bg-primary/5 border-primary/20 text-primary'
+                          : 'bg-card border-border text-muted-foreground'
+                      }`}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={() => onToggleCapability(role, cap)}
+                        className="accent-primary"
+                      />
+                      {cap.replace('_', ' ')}
+                    </label>
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        ))}
+          ),
+        )}
       </div>
     </div>
   );
@@ -322,28 +351,54 @@ export function StepReview({ form, onChange, errors = {} }: StepProps) {
 
       <div className="space-y-4 divide-y divide-border text-body-sm text-foreground">
         <div className="space-y-1.5">
-          <h3 className="font-bold text-body-xs text-muted-foreground uppercase">1. General Information</h3>
-          <p><strong>Name:</strong> {form.name}</p>
-          <p><strong>Description:</strong> {form.description}</p>
-          <p><strong>Category:</strong> {form.category}</p>
+          <h3 className="font-bold text-body-xs text-muted-foreground uppercase">
+            1. General Information
+          </h3>
+          <p>
+            <strong>Name:</strong> {form.name}
+          </p>
+          <p>
+            <strong>Description:</strong> {form.description}
+          </p>
+          <p>
+            <strong>Category:</strong> {form.category}
+          </p>
         </div>
 
         <div className="pt-3 space-y-1.5">
-          <h3 className="font-bold text-body-xs text-muted-foreground uppercase">2. Privacy Settings</h3>
-          <p className="capitalize"><strong>Mode:</strong> {form.visibility}</p>
+          <h3 className="font-bold text-body-xs text-muted-foreground uppercase">
+            2. Privacy Settings
+          </h3>
+          <p className="capitalize">
+            <strong>Mode:</strong> {form.visibility}
+          </p>
         </div>
 
         <div className="pt-3 space-y-1.5">
-          <h3 className="font-bold text-body-xs text-muted-foreground uppercase">3. Tracking Policies</h3>
-          <p className="capitalize"><strong>Mode:</strong> {form.trackingMode} tracking</p>
-          <p><strong>Background Updates:</strong> {form.backgroundTracking ? 'Enabled' : 'Disabled'}</p>
-          <p className="capitalize"><strong>Accuracy:</strong> {form.locationAccuracy}</p>
-          <p><strong>Refresh Interval:</strong> {form.refreshInterval}</p>
+          <h3 className="font-bold text-body-xs text-muted-foreground uppercase">
+            3. Tracking Policies
+          </h3>
+          <p className="capitalize">
+            <strong>Mode:</strong> {form.trackingMode} tracking
+          </p>
+          <p>
+            <strong>Background Updates:</strong> {form.backgroundTracking ? 'Enabled' : 'Disabled'}
+          </p>
+          <p className="capitalize">
+            <strong>Accuracy:</strong> {form.locationAccuracy}
+          </p>
+          <p>
+            <strong>Refresh Interval:</strong> {form.refreshInterval}
+          </p>
         </div>
 
         <div className="pt-3 space-y-1.5">
-          <h3 className="font-bold text-body-xs text-muted-foreground uppercase">4. Visibility Scope</h3>
-          <p className="capitalize"><strong>Policy:</strong> {form.visibilityPolicy.replace('_', ' ')}</p>
+          <h3 className="font-bold text-body-xs text-muted-foreground uppercase">
+            4. Visibility Scope
+          </h3>
+          <p className="capitalize">
+            <strong>Policy:</strong> {form.visibilityPolicy.replace('_', ' ')}
+          </p>
         </div>
 
         <div className="pt-4 space-y-2">
@@ -368,9 +423,7 @@ export function StepReview({ form, onChange, errors = {} }: StepProps) {
               and consent to location sharing policies specified in the setup wizard.
             </span>
           </label>
-          {errors.acceptTerms && (
-            <p className="text-body-xs text-red-500">{errors.acceptTerms}</p>
-          )}
+          {errors.acceptTerms && <p className="text-body-xs text-red-500">{errors.acceptTerms}</p>}
         </div>
       </div>
     </div>
@@ -410,12 +463,15 @@ export function StepSuccess({ name, onReset, onBack }: StepSuccessProps) {
           Group Registration Pending Approval
         </h2>
         <p className="mx-auto max-w-md text-body-sm text-muted-foreground">
-          Your group registration request for <strong>{name}</strong> has been successfully submitted and is under platform review.
+          Your group registration request for <strong>{name}</strong> has been successfully
+          submitted and is under platform review.
         </p>
       </div>
 
       <div className="rounded-lg bg-primary/5 text-primary border border-primary/10 p-4 mx-auto max-w-md text-body-xs text-left">
-        📌 <strong>Simulation Check:</strong> This is a frontend simulation. Real-world payment gateways, server databases, and activation procedures will be connected in future integration phases.
+        📌 <strong>Simulation Check:</strong> This is a frontend simulation. Real-world payment
+        gateways, server databases, and activation procedures will be connected in future
+        integration phases.
       </div>
 
       <div className="flex justify-center gap-3">

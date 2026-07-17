@@ -15,4 +15,3 @@ export type {
   GroupMember,
   JoinRequest,
 } from './groups.types';
-
