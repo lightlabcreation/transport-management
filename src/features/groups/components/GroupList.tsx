@@ -8,6 +8,7 @@ interface GroupListProps {
   groups: Group[];
   onClearFilters: () => void;
   hasActiveFilters: boolean;
+  onGroupClick?: (group: Group) => void;
 }
 
 function formatDate(iso: string): string {
@@ -59,7 +60,12 @@ function EmptyState({
   );
 }
 
-export function GroupList({ groups, onClearFilters, hasActiveFilters }: GroupListProps) {
+export function GroupList({
+  groups,
+  onClearFilters,
+  hasActiveFilters,
+  onGroupClick,
+}: GroupListProps) {
   if (groups.length === 0) {
     return <EmptyState hasActiveFilters={hasActiveFilters} onClearFilters={onClearFilters} />;
   }
@@ -69,7 +75,7 @@ export function GroupList({ groups, onClearFilters, hasActiveFilters }: GroupLis
       {/* Mobile / Tablet: card list */}
       <ul className="flex flex-col gap-3 lg:hidden" aria-label="Groups list" role="list">
         {groups.map((group) => (
-          <GroupCard key={group.id} group={group} />
+          <GroupCard key={group.id} group={group} onClick={() => onGroupClick?.(group)} />
         ))}
       </ul>
 
@@ -113,12 +119,24 @@ export function GroupList({ groups, onClearFilters, hasActiveFilters }: GroupLis
 
               const visibilityLabel = group.visibility === 'public' ? 'Public' : 'Private';
 
+              function handleKeyDown(e: React.KeyboardEvent) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  onGroupClick?.(group);
+                }
+              }
+
               return (
                 <tr
                   key={group.id}
-                  className={`border-b border-border last:border-0 ${
+                  className={`border-b border-border last:border-0 cursor-pointer transition-colors hover:bg-muted/20 focus-within:bg-muted/20 ${
                     index % 2 === 0 ? 'bg-card' : 'bg-surface'
                   }`}
+                  onClick={() => onGroupClick?.(group)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={handleKeyDown}
+                  aria-label={`Group ${group.name}, click to view details`}
                 >
                   {/* Group name + description */}
                   <td className="px-4 py-3">
@@ -164,3 +182,4 @@ export function GroupList({ groups, onClearFilters, hasActiveFilters }: GroupLis
     </>
   );
 }
+
