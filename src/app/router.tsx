@@ -16,16 +16,12 @@ import {
   WelcomePage,
 } from '@/features/onboarding';
 import { DashboardPage } from '@/features/dashboard';
+import { HomePage } from '@/features/home';
 
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: (
-      <main className="min-h-screen bg-background p-page text-foreground">
-        <h1 className="text-heading-lg font-semibold">Transport Management</h1>
-        <p className="text-body text-muted-foreground">Frontend foundation</p>
-      </main>
-    ),
+    element: <HomePage />,
   },
   {
     path: '/auth/login',
