@@ -150,8 +150,8 @@ export function HomePage() {
                 Transport operations, coordinated with clarity.
               </h1>
               <p className="mt-5 max-w-2xl text-body-lg text-muted-foreground">
-                Kiyaan Transport brings fleet visibility, driver coordination, trip oversight, and
-                speed-assistance experiences into one modern frontend.
+                GPS Track &amp; Speed brings fleet visibility, driver coordination, trip oversight,
+                and speed-assistance experiences into one modern frontend.
               </p>
               <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                 <Link className={primaryLinkClasses} to="/onboarding/language">
@@ -398,9 +398,9 @@ function Brand({ inverse = false }: { inverse?: boolean }) {
         aria-hidden="true"
         className={`grid size-10 place-items-center rounded-lg font-semibold ${inverse ? 'bg-background text-foreground' : 'bg-primary text-primary-foreground'}`}
       >
-        KT
+        GTS
       </span>
-      <span className="font-semibold">Kiyaan Transport</span>
+      <span className="font-semibold">GPS Track &amp; Speed</span>
     </Link>
   );
 }

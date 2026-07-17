@@ -27,7 +27,7 @@ describe('HomePage', () => {
     expect(screen.getByRole('banner')).toBeInTheDocument();
     expect(screen.getByRole('main')).toBeInTheDocument();
     expect(screen.getByRole('contentinfo')).toBeInTheDocument();
-    expect(screen.getAllByText('Kiyaan Transport').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('GPS Track & Speed').length).toBeGreaterThan(0);
     expect(screen.getAllByRole('heading', { level: 1 })).toHaveLength(1);
     expect(
       screen.getByRole('heading', { name: /transport operations, coordinated with clarity/i }),
