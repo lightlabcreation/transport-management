@@ -192,13 +192,17 @@ describe('GroupsPage', () => {
     expect(screen.getAllByLabelText(/visibility: private/i).length).toBeGreaterThan(0);
   });
 
-  it('Create Group button is disabled', async () => {
+  it('Create Group button is enabled and opens wizard', async () => {
+    const user = userEvent.setup();
     await renderAndWait();
-    const createButtons = screen.getAllByRole('button', { name: /create group/i });
-    // At least one Create Group button exists and is disabled
-    const disabledButton = createButtons.find((btn) => btn.hasAttribute('disabled'));
-    expect(disabledButton).toBeTruthy();
+    const createButton = screen.getByRole('button', { name: 'Create new group' });
+    expect(createButton).not.toBeDisabled();
+    await user.click(createButton);
+    expect(screen.getByRole('heading', { level: 2, name: /Group Information/i })).toBeInTheDocument();
   });
+
+
+
 
   it('GroupsPage can be imported from the index barrel', () => {
     expect(GroupsPageFromIndex).toBeDefined();

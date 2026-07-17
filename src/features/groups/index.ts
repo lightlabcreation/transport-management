@@ -1,5 +1,7 @@
 export { GroupsPage } from './GroupsPage';
 export { GroupDetailsPage } from './GroupDetailsPage';
+export { CreateGroupPage } from './CreateGroupPage';
+
 export type {
   Group,
   GroupFiltersState,

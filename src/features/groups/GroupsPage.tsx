@@ -7,6 +7,7 @@ import { GroupList } from './components/GroupList';
 import { GroupSummary } from './components/GroupSummary';
 import { mockGroups } from './groups.mock';
 import { GroupDetailsPage } from './GroupDetailsPage';
+import { CreateGroupPage } from './CreateGroupPage';
 import type {
   Group,
   GroupFiltersState,
@@ -19,6 +20,7 @@ const LOADING_DELAY_MS = 600;
 
 export function GroupsPage() {
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
+  const [isCreatingGroup, setIsCreatingGroup] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [filters, setFilters] = useState<GroupFiltersState>({
     search: '',
@@ -78,6 +80,10 @@ export function GroupsPage() {
     setFilters({ search: '', visibility: 'all', status: 'all' });
   }
 
+  if (isCreatingGroup) {
+    return <CreateGroupPage onBack={() => setIsCreatingGroup(false)} />;
+  }
+
   if (selectedGroup) {
     return <GroupDetailsPage group={selectedGroup} onBack={() => setSelectedGroup(null)} />;
   }
@@ -97,7 +103,7 @@ export function GroupsPage() {
             </p>
           </div>
 
-          <Button disabled aria-label="Create group — coming soon" className="shrink-0">
+          <Button onClick={() => setIsCreatingGroup(true)} aria-label="Create new group" className="shrink-0">
             Create Group
           </Button>
         </div>
@@ -146,4 +152,5 @@ export function GroupsPage() {
     </main>
   );
 }
+
 
