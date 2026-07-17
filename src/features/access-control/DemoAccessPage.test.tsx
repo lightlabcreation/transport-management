@@ -6,6 +6,7 @@ import { createMemoryRouter, RouterProvider } from 'react-router';
 import type { AuthSessionStore } from '@/features/auth';
 
 import { createDemoAccessStore } from './demo-access-store';
+import { createPendingDemoAccessStore } from './demo-access-pending-store';
 import { demoAccessProfiles } from './demo-access.profiles';
 import { DemoAccessPage, DemoAccessReset } from './DemoAccessPage';
 import { ProtectedApplicationRoute } from './ProtectedApplicationRoute';
@@ -185,14 +186,17 @@ describe('ProtectedApplicationRoute', () => {
 describe('DemoAccessReset', () => {
   it('clears a selected demo profile when the Login boundary mounts', async () => {
     const accessStore = createDemoAccessStore(window.sessionStorage);
+    const pendingDemoAccessStore = createPendingDemoAccessStore(window.sessionStorage);
     accessStore.setProfile(demoAccessProfiles[0]!);
+    pendingDemoAccessStore.setProfileId('member');
 
     render(
-      <DemoAccessReset accessStore={accessStore}>
+      <DemoAccessReset accessStore={accessStore} pendingDemoAccessStore={pendingDemoAccessStore}>
         <h1>Login</h1>
       </DemoAccessReset>,
     );
 
     await waitFor(() => expect(accessStore.getProfile()).toBeNull());
+    expect(pendingDemoAccessStore.getProfileId()).toBeNull();
   });
 });
