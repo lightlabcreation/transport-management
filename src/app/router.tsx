@@ -7,6 +7,8 @@ import {
   DemoAccessReset,
   ProtectedApplicationRoute,
 } from '@/features/access-control';
+import { AppPagePlaceholder, appPageDefinitions } from '@/features/app-pages';
+import { browserApplicationModeStore } from '@/features/application-mode';
 
 import {
   browserAuthSessionStore,
@@ -57,7 +59,7 @@ export const router = createBrowserRouter([
   },
   {
     path: '/onboarding/mode',
-    element: <ModeSelectionPage />,
+    element: <ModeSelectionPage modeStore={browserApplicationModeStore} />,
   },
   {
     path: '/onboarding/permissions',
@@ -131,4 +133,15 @@ export const router = createBrowserRouter([
       </ProtectedApplicationRoute>
     ),
   },
+  ...appPageDefinitions.map(({ path, title }) => ({
+    path,
+    element: (
+      <ProtectedApplicationRoute
+        sessionStore={browserAuthSessionStore}
+        accessStore={browserDemoAccessStore}
+      >
+        <AppPagePlaceholder title={title} />
+      </ProtectedApplicationRoute>
+    ),
+  })),
 ]);

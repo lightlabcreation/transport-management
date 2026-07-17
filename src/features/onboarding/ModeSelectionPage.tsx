@@ -3,11 +3,16 @@ import { useRef, useState, type FormEvent } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router';
 
 import { Button } from '@/components/ui/button';
+import type { ApplicationMode, ApplicationModeStore } from '@/features/application-mode';
 
-import { hasLanguageState, type ApplicationMode } from './onboardingState';
+import { hasLanguageState } from './onboardingState';
 import { OnboardingFrame } from './OnboardingFrame';
 
-export function ModeSelectionPage() {
+interface ModeSelectionPageProps {
+  modeStore: ApplicationModeStore;
+}
+
+export function ModeSelectionPage({ modeStore }: ModeSelectionPageProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const groupRef = useRef<HTMLFieldSetElement>(null);
@@ -26,6 +31,7 @@ export function ModeSelectionPage() {
       groupRef.current?.focus();
       return;
     }
+    modeStore.setMode(mode);
     void navigate('/onboarding/permissions', { state: { ...languageState, mode } });
   }
 

@@ -1,19 +1,25 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createMemoryRouter, RouterProvider } from 'react-router';
-import { describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it } from 'vitest';
+
+import { createApplicationModeStore } from '@/features/application-mode';
+import type { ApplicationModeStore } from '@/features/application-mode';
 
 import { LanguageSelectionPage } from './LanguageSelectionPage';
 import { ModeSelectionPage } from './ModeSelectionPage';
 import { PermissionIntroductionPage } from './PermissionIntroductionPage';
 import { WelcomePage } from './WelcomePage';
 
-function createOnboardingRouter(initialEntry: string | { pathname: string; state: unknown }) {
+function createOnboardingRouter(
+  initialEntry: string | { pathname: string; state: unknown },
+  modeStore: ApplicationModeStore = createApplicationModeStore(window.sessionStorage),
+) {
   return createMemoryRouter(
     [
       { path: '/onboarding/language', element: <LanguageSelectionPage /> },
       { path: '/onboarding/welcome', element: <WelcomePage /> },
-      { path: '/onboarding/mode', element: <ModeSelectionPage /> },
+      { path: '/onboarding/mode', element: <ModeSelectionPage modeStore={modeStore} /> },
       { path: '/onboarding/permissions', element: <PermissionIntroductionPage /> },
       { path: '/auth/login', element: <h1>Sign in boundary</h1> },
       { path: '/auth/register', element: <h1>Registration boundary</h1> },
@@ -21,6 +27,10 @@ function createOnboardingRouter(initialEntry: string | { pathname: string; state
     { initialEntries: [initialEntry] },
   );
 }
+
+beforeEach(() => {
+  window.sessionStorage.clear();
+});
 
 function renderRouter(router: ReturnType<typeof createOnboardingRouter>) {
   render(<RouterProvider router={router} />);
@@ -30,7 +40,8 @@ function renderRouter(router: ReturnType<typeof createOnboardingRouter>) {
 describe('onboarding flow', () => {
   it('completes the language, welcome, tracking mode, and permission-introduction journey', async () => {
     const user = userEvent.setup();
-    const router = renderRouter(createOnboardingRouter('/onboarding/language'));
+    const modeStore = createApplicationModeStore(window.sessionStorage);
+    const router = renderRouter(createOnboardingRouter('/onboarding/language', modeStore));
 
     expect(screen.getByLabelText('Language')).toHaveValue('en');
     await user.click(screen.getByRole('button', { name: 'Continue' }));
@@ -49,6 +60,7 @@ describe('onboarding flow', () => {
     await user.click(screen.getByRole('button', { name: 'Continue' }));
 
     expect(await screen.findByRole('heading', { name: 'Before you continue' })).toBeInTheDocument();
+    expect(modeStore.getMode()).toBe('tracking');
     expect(
       screen.getByText(/subject to your device consent and group policy/i),
     ).toBeInTheDocument();

@@ -1,5 +1,7 @@
+import type { ApplicationMode } from '@/features/application-mode';
+
 export type OnboardingLanguage = 'en';
-export type ApplicationMode = 'tracking' | 'speed';
+export type { ApplicationMode } from '@/features/application-mode';
 
 export interface LanguageStepState {
   language: OnboardingLanguage;
