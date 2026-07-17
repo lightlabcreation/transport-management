@@ -4,6 +4,7 @@ import type { Group } from '../groups.types';
 
 interface GroupCardProps {
   group: Group;
+  onClick?: () => void;
 }
 
 function formatDate(iso: string): string {
@@ -15,7 +16,7 @@ function formatDate(iso: string): string {
   });
 }
 
-export function GroupCard({ group }: GroupCardProps) {
+export function GroupCard({ group, onClick }: GroupCardProps) {
   const statusVariant =
     group.status === 'active' ? 'success' : group.status === 'pending' ? 'warning' : 'danger';
 
@@ -24,8 +25,25 @@ export function GroupCard({ group }: GroupCardProps) {
 
   const visibilityLabel = group.visibility === 'public' ? 'Public' : 'Private';
 
+  function handleKeyDown(e: React.KeyboardEvent) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      onClick?.();
+    }
+  }
+
   return (
-    <li className="flex flex-col gap-3 rounded-lg border border-border bg-card p-4 shadow-sm">
+    <li
+      className={`flex flex-col gap-3 rounded-lg border border-border bg-card p-4 shadow-sm ${
+        onClick ? 'cursor-pointer hover:border-primary/40 hover:bg-muted/5 transition-all' : ''
+      }`}
+      onClick={onClick}
+      role={onClick ? 'button' : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      onKeyDown={onClick ? handleKeyDown : undefined}
+      aria-label={`Group ${group.name}, click to view details`}
+    >
+
       {/* Top row: Avatar + Name + Badges */}
       <div className="flex items-start gap-3">
         {/* Avatar initials */}

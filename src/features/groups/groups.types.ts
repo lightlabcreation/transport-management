@@ -6,6 +6,41 @@ export type VisibilityFilter = GroupVisibility | 'all';
 
 export type StatusFilter = GroupStatus | 'all';
 
+export type GroupRole =
+  | 'owner'
+  | 'delegated_admin'
+  | 'admin'
+  | 'moderator'
+  | 'member'
+  | 'guest';
+
+export type GroupCapability =
+  | 'edit_group'
+  | 'invite_members'
+  | 'remove_members'
+  | 'block_members'
+  | 'approve_join_requests'
+  | 'reject_join_requests'
+  | 'assign_roles'
+  | 'edit_permissions'
+  | 'view_live_map'
+  | 'export_reports';
+
+export interface GroupMember {
+  id: string;
+  name: string;
+  role: GroupRole;
+  status: 'online' | 'offline';
+  lastSeen: string;
+}
+
+export interface JoinRequest {
+  id: string;
+  memberName: string;
+  requestedAt: string;
+  status: 'pending' | 'approved' | 'rejected';
+}
+
 export interface Group {
   id: string;
   name: string;
@@ -16,6 +51,10 @@ export interface Group {
   lastUpdated: string; // ISO 8601 date string
   initials: string; // Derived from group name for avatar display
   category?: string;
+  trackingPolicy?: string;
+  visibilityPolicy?: string;
+  members?: GroupMember[];
+  joinRequests?: JoinRequest[];
 }
 
 export interface GroupFiltersState {
@@ -30,3 +69,4 @@ export interface GroupSummaryStats {
   pending: number;
   suspended: number;
 }
+

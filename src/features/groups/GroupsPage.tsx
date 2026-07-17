@@ -6,7 +6,9 @@ import { GroupFilters } from './components/GroupFilters';
 import { GroupList } from './components/GroupList';
 import { GroupSummary } from './components/GroupSummary';
 import { mockGroups } from './groups.mock';
+import { GroupDetailsPage } from './GroupDetailsPage';
 import type {
+  Group,
   GroupFiltersState,
   GroupSummaryStats,
   StatusFilter,
@@ -16,6 +18,7 @@ import type {
 const LOADING_DELAY_MS = 600;
 
 export function GroupsPage() {
+  const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [filters, setFilters] = useState<GroupFiltersState>({
     search: '',
@@ -75,6 +78,10 @@ export function GroupsPage() {
     setFilters({ search: '', visibility: 'all', status: 'all' });
   }
 
+  if (selectedGroup) {
+    return <GroupDetailsPage group={selectedGroup} onBack={() => setSelectedGroup(null)} />;
+  }
+
   return (
     <main
       className="min-h-screen bg-background px-4 py-6 md:px-6 lg:px-8"
@@ -131,6 +138,7 @@ export function GroupsPage() {
               groups={filteredGroups}
               onClearFilters={handleClearFilters}
               hasActiveFilters={hasActiveFilters}
+              onGroupClick={(group) => setSelectedGroup(group)}
             />
           </>
         )}
@@ -138,3 +146,4 @@ export function GroupsPage() {
     </main>
   );
 }
+
