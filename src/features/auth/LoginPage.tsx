@@ -6,6 +6,8 @@ import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { demoAccessProfiles } from '@/features/access-control';
+import type { DemoAccessProfileId, PendingDemoAccessStore } from '@/features/access-control';
 
 import { AuthServiceError, type AuthService, type AuthServiceErrorCode } from './authService';
 import { AuthPageFrame } from './AuthPageFrame';
@@ -24,6 +26,7 @@ const mobileSchema = z.object({
 
 interface LoginPageProps {
   authService: AuthService;
+  pendingDemoAccessStore?: PendingDemoAccessStore;
 }
 
 interface FieldErrors {
@@ -42,13 +45,23 @@ const serviceErrorMessages: Record<AuthServiceErrorCode, string> = {
   unknown: 'Something went wrong. Please try again.',
 };
 
-export function LoginPage({ authService }: LoginPageProps) {
+const countryOptions = [
+  { value: '+91', label: 'India (+91)' },
+  { value: '+1', label: 'United States (+1)' },
+  { value: '+44', label: 'United Kingdom (+44)' },
+  { value: '+971', label: 'United Arab Emirates (+971)' },
+  { value: '+61', label: 'Australia (+61)' },
+  { value: '+65', label: 'Singapore (+65)' },
+] as const;
+
+export function LoginPage({ authService, pendingDemoAccessStore }: LoginPageProps) {
   const navigate = useNavigate();
-  const countryCodeRef = useRef<HTMLInputElement>(null);
+  const countryCodeRef = useRef<HTMLSelectElement>(null);
   const nationalNumberRef = useRef<HTMLInputElement>(null);
   const serviceErrorRef = useRef<HTMLDivElement>(null);
   const [countryCode, setCountryCode] = useState('');
   const [nationalNumber, setNationalNumber] = useState('');
+  const [selectedProfileId, setSelectedProfileId] = useState<DemoAccessProfileId | ''>('');
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [serviceError, setServiceError] = useState<string>();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -73,7 +86,7 @@ export function LoginPage({ authService }: LoginPageProps) {
       const invalidFields = new Set(result.error.issues.map((issue) => issue.path[0]));
 
       if (invalidFields.has('countryCode')) {
-        nextErrors.countryCode = 'Enter a country code beginning with + followed by digits.';
+        nextErrors.countryCode = 'Select a country code beginning with + followed by digits.';
       }
 
       if (invalidFields.has('nationalNumber')) {
@@ -95,6 +108,12 @@ export function LoginPage({ authService }: LoginPageProps) {
     setServiceError(undefined);
     setIsSubmitting(true);
 
+    if (selectedProfileId) {
+      pendingDemoAccessStore?.setProfileId(selectedProfileId);
+    } else {
+      pendingDemoAccessStore?.clearProfile();
+    }
+
     try {
       const response = await authService.requestOtp({
         mobileNumber: normalizePhoneNumber(result.data.countryCode, result.data.nationalNumber),
@@ -109,6 +128,7 @@ export function LoginPage({ authService }: LoginPageProps) {
         },
       });
     } catch (error) {
+      pendingDemoAccessStore?.clearProfile();
       const message =
         error instanceof AuthServiceError
           ? serviceErrorMessages[error.code]
@@ -124,7 +144,7 @@ export function LoginPage({ authService }: LoginPageProps) {
       compact
       eyebrow="Passwordless access"
       title="Welcome back"
-      description="Enter your mobile number and we’ll send a one-time verification code. No password to remember."
+      description="Choose an optional demo role, then enter your mobile number to generate a one-time verification code."
       footer={
         <nav aria-label="Authentication links" className="flex justify-center gap-5">
           <Link
@@ -143,42 +163,89 @@ export function LoginPage({ authService }: LoginPageProps) {
       }
     >
       <form className="space-y-5" noValidate onSubmit={(event) => void handleSubmit(event)}>
+        <fieldset className="space-y-3">
+          <legend className="text-body-sm font-semibold text-foreground">
+            Choose demo role <span className="font-normal text-muted-foreground">(optional)</span>
+          </legend>
+          <p className="text-body-sm text-muted-foreground">
+            This role selector is for frontend demo access preview only. Production roles will be
+            managed by backend authorization.
+          </p>
+          <div className="grid gap-2 sm:grid-cols-2" role="radiogroup" aria-label="Demo roles">
+            {demoAccessProfiles.map((profile) => {
+              const isSelected = selectedProfileId === profile.id;
+              return (
+                <label
+                  key={profile.id}
+                  className={`flex cursor-pointer items-start gap-3 rounded-md border p-3 transition-colors focus-within:ring-2 focus-within:ring-primary ${
+                    isSelected
+                      ? 'border-primary bg-primary/5'
+                      : 'border-border bg-surface hover:border-primary/50'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="demoProfile"
+                    value={profile.id}
+                    checked={isSelected}
+                    onChange={() => setSelectedProfileId(profile.id)}
+                    className="mt-1 size-4 accent-primary"
+                  />
+                  <span className="min-w-0">
+                    <span className="block text-body-sm font-semibold text-foreground">
+                      {profile.name}
+                    </span>
+                    <span className="mt-1 block text-body-sm text-muted-foreground">
+                      {profile.description}
+                    </span>
+                  </span>
+                </label>
+              );
+            })}
+          </div>
+        </fieldset>
+
         <div className="space-y-2">
-          <Label htmlFor="country-code">Country code</Label>
-          <Input
-            ref={countryCodeRef}
-            id="country-code"
-            name="countryCode"
-            type="tel"
-            inputMode="tel"
-            autoComplete="tel-country-code"
-            value={countryCode}
-            onChange={(event) => setCountryCode(event.currentTarget.value)}
-            aria-invalid={fieldErrors.countryCode ? true : undefined}
-            aria-describedby={fieldErrors.countryCode ? 'country-code-error' : undefined}
-            placeholder="+"
-          />
+          <Label htmlFor="mobile-number">Mobile number</Label>
+          <div className="grid gap-3 sm:grid-cols-[minmax(10rem,0.42fr)_minmax(0,1fr)]">
+            <select
+              ref={countryCodeRef}
+              id="country-code"
+              name="countryCode"
+              autoComplete="tel-country-code"
+              value={countryCode}
+              onChange={(event) => setCountryCode(event.currentTarget.value)}
+              aria-label="Country code"
+              aria-invalid={fieldErrors.countryCode ? true : undefined}
+              aria-describedby={fieldErrors.countryCode ? 'country-code-error' : undefined}
+              className="min-h-control w-full rounded-md border border-input bg-surface px-3 py-2 text-body text-foreground transition-colors duration-fast ease-standard focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-surface-muted aria-invalid:border-danger"
+            >
+              <option value="">Country code</option>
+              {countryOptions.map((country) => (
+                <option key={country.value} value={country.value}>
+                  {country.label}
+                </option>
+              ))}
+            </select>
+            <Input
+              ref={nationalNumberRef}
+              id="mobile-number"
+              name="mobileNumber"
+              type="tel"
+              inputMode="tel"
+              autoComplete="tel-national"
+              value={nationalNumber}
+              onChange={(event) => setNationalNumber(event.currentTarget.value)}
+              aria-invalid={fieldErrors.nationalNumber ? true : undefined}
+              aria-describedby={fieldErrors.nationalNumber ? 'mobile-number-error' : undefined}
+              placeholder="Mobile number"
+            />
+          </div>
           {fieldErrors.countryCode ? (
             <p id="country-code-error" className="text-body-sm text-danger">
               {fieldErrors.countryCode}
             </p>
           ) : null}
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="mobile-number">Mobile number</Label>
-          <Input
-            ref={nationalNumberRef}
-            id="mobile-number"
-            name="mobileNumber"
-            type="tel"
-            inputMode="tel"
-            autoComplete="tel-national"
-            value={nationalNumber}
-            onChange={(event) => setNationalNumber(event.currentTarget.value)}
-            aria-invalid={fieldErrors.nationalNumber ? true : undefined}
-            aria-describedby={fieldErrors.nationalNumber ? 'mobile-number-error' : undefined}
-          />
           {fieldErrors.nationalNumber ? (
             <p id="mobile-number-error" className="text-body-sm text-danger">
               {fieldErrors.nationalNumber}
@@ -199,12 +266,12 @@ export function LoginPage({ authService }: LoginPageProps) {
 
         {isSubmitting ? (
           <p role="status" className="text-body-sm text-muted-foreground">
-            Requesting verification…
+            Generating verification code...
           </p>
         ) : null}
 
         <Button className="mt-2" type="submit" size="lg" fullWidth isLoading={isSubmitting}>
-          Continue
+          Generate OTP
         </Button>
       </form>
     </AuthPageFrame>

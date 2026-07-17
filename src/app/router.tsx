@@ -2,6 +2,7 @@ import { createBrowserRouter, Navigate } from 'react-router';
 
 import {
   browserDemoAccessStore,
+  browserPendingDemoAccessStore,
   DemoAccessPage,
   DemoAccessReset,
   ProtectedApplicationRoute,
@@ -35,8 +36,14 @@ export const router = createBrowserRouter([
   {
     path: '/auth/login',
     element: (
-      <DemoAccessReset accessStore={browserDemoAccessStore}>
-        <LoginPage authService={mockAuthService} />
+      <DemoAccessReset
+        accessStore={browserDemoAccessStore}
+        pendingDemoAccessStore={browserPendingDemoAccessStore}
+      >
+        <LoginPage
+          authService={mockAuthService}
+          pendingDemoAccessStore={browserPendingDemoAccessStore}
+        />
       </DemoAccessReset>
     ),
   },
@@ -67,6 +74,8 @@ export const router = createBrowserRouter([
         authService={mockAuthService}
         sessionFactory={createMockAuthSession}
         sessionStore={browserAuthSessionStore}
+        accessStore={browserDemoAccessStore}
+        pendingDemoAccessStore={browserPendingDemoAccessStore}
       />
     ),
   },

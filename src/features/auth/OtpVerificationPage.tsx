@@ -5,6 +5,8 @@ import { Link, Navigate, useLocation, useNavigate } from 'react-router';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { demoAccessProfiles } from '@/features/access-control';
+import type { DemoAccessStore, PendingDemoAccessStore } from '@/features/access-control';
 
 import {
   AuthServiceError,
@@ -20,6 +22,8 @@ interface OtpVerificationPageProps {
   authService: AuthService;
   sessionFactory: SessionFactory;
   sessionStore: AuthSessionStore;
+  accessStore?: DemoAccessStore;
+  pendingDemoAccessStore?: PendingDemoAccessStore;
 }
 
 interface VerificationState {
@@ -55,6 +59,8 @@ export function OtpVerificationPage({
   authService,
   sessionFactory,
   sessionStore,
+  accessStore,
+  pendingDemoAccessStore,
 }: OtpVerificationPageProps) {
   const location = useLocation();
   const navigate = useNavigate();
@@ -95,7 +101,25 @@ export function OtpVerificationPage({
     try {
       await authService.verifyOtp({ challengeId: activeChallenge.challengeId, code });
       sessionStore.setSession(sessionFactory());
-      void navigate('/auth/authenticated', { replace: true });
+
+      let destination = '/auth/authenticated';
+      if (accessStore && pendingDemoAccessStore) {
+        const pendingProfileId = pendingDemoAccessStore.getProfileId();
+        const pendingProfile = demoAccessProfiles.find(
+          (profile) => profile.id === pendingProfileId,
+        );
+
+        if (pendingProfile) {
+          accessStore.setProfile(pendingProfile);
+          destination = '/auth/authenticated';
+        } else {
+          destination = '/app/access-preview';
+        }
+
+        pendingDemoAccessStore.clearProfile();
+      }
+
+      void navigate(destination, { replace: true });
     } catch (error) {
       const message =
         error instanceof AuthServiceError ? errorMessages[error.code] : errorMessages.unknown;

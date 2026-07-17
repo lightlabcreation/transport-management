@@ -6,6 +6,7 @@ import type { AuthSessionStore } from '@/features/auth';
 
 import { demoAccessProfiles } from './demo-access.profiles';
 import type { DemoAccessProfile, DemoAccessStore } from './demo-access.types';
+import type { PendingDemoAccessStore } from './demo-access-pending-store';
 
 interface DemoAccessPageProps {
   sessionStore: AuthSessionStore;
@@ -14,13 +15,19 @@ interface DemoAccessPageProps {
 
 interface DemoAccessResetProps {
   accessStore: DemoAccessStore;
+  pendingDemoAccessStore?: PendingDemoAccessStore;
   children: ReactNode;
 }
 
-export function DemoAccessReset({ accessStore, children }: DemoAccessResetProps) {
+export function DemoAccessReset({
+  accessStore,
+  pendingDemoAccessStore,
+  children,
+}: DemoAccessResetProps) {
   useEffect(() => {
     accessStore.clearProfile();
-  }, [accessStore]);
+    pendingDemoAccessStore?.clearProfile();
+  }, [accessStore, pendingDemoAccessStore]);
 
   return children;
 }

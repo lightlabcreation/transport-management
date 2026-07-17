@@ -1,7 +1,10 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { createMemoryRouter, RouterProvider } from 'react-router';
-import { describe, expect, it, vi } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+
+import { createDemoAccessStore, createPendingDemoAccessStore } from '@/features/access-control';
+import type { DemoAccessStore, PendingDemoAccessStore } from '@/features/access-control';
 
 import { AuthServiceError, type AuthService } from './authService';
 import { createMockAuthSession } from './authSession';
@@ -14,6 +17,10 @@ const challengeState = {
   maskedMobile: '+•• ••••••3210',
   expiresAt: '2030-01-01T00:05:00.000Z',
 };
+
+beforeEach(() => {
+  window.sessionStorage.clear();
+});
 
 function createAuthService(verifyOtp: AuthService['verifyOtp']): AuthService {
   return {
@@ -36,11 +43,14 @@ function renderVerification(
   authService: AuthService,
   withState = true,
   sessionStore = createSessionStore(),
+  accessStore?: DemoAccessStore,
+  pendingDemoAccessStore?: PendingDemoAccessStore,
 ) {
   const router = createMemoryRouter(
     [
       { path: '/auth/login', element: <h1>Sign in boundary</h1> },
       { path: '/auth/register', element: <h1>Registration boundary</h1> },
+      { path: '/app/access-preview', element: <h1>Access Preview boundary</h1> },
       {
         path: '/auth/verify',
         element: (
@@ -48,6 +58,8 @@ function renderVerification(
             authService={authService}
             sessionFactory={() => createMockAuthSession(new Date('2026-07-17T12:00:00.000Z'))}
             sessionStore={sessionStore}
+            {...(accessStore ? { accessStore } : {})}
+            {...(pendingDemoAccessStore ? { pendingDemoAccessStore } : {})}
           />
         ),
       },
@@ -155,5 +167,88 @@ describe('OtpVerificationPage', () => {
     const alert = await screen.findByRole('alert');
     expect(alert).toHaveTextContent(message);
     expect(alert).toHaveFocus();
+  });
+
+  it('activates the selected demo profile only after successful OTP verification', async () => {
+    const user = userEvent.setup();
+    const verifyOtp = vi.fn<AuthService['verifyOtp']>().mockResolvedValue({
+      status: 'authenticated',
+    });
+    const accessStore = createDemoAccessStore(window.sessionStorage);
+    const pendingDemoAccessStore = createPendingDemoAccessStore(window.sessionStorage);
+    pendingDemoAccessStore.setProfileId('group-owner');
+    const sessionStore = createAuthSessionStore(
+      window.sessionStorage,
+      () => new Date('2026-07-17T12:00:00.000Z'),
+    );
+    const { router } = renderVerification(
+      createAuthService(verifyOtp),
+      true,
+      sessionStore,
+      accessStore,
+      pendingDemoAccessStore,
+    );
+
+    expect(accessStore.getProfile()).toBeNull();
+    await user.type(screen.getByLabelText('Verification code'), '123456');
+    await user.click(screen.getByRole('button', { name: 'Verify' }));
+
+    await waitFor(() => expect(router.state.location.pathname).toBe('/auth/authenticated'));
+    expect(accessStore.getProfile()?.id).toBe('group-owner');
+    expect(pendingDemoAccessStore.getProfileId()).toBeNull();
+    expect(verifyOtp).toHaveBeenCalledWith({ challengeId: 'challenge-1', code: '123456' });
+  });
+
+  it('routes to access preview after successful OTP when no role is selected', async () => {
+    const user = userEvent.setup();
+    const verifyOtp = vi.fn<AuthService['verifyOtp']>().mockResolvedValue({
+      status: 'authenticated',
+    });
+    const accessStore = createDemoAccessStore(window.sessionStorage);
+    const pendingDemoAccessStore = createPendingDemoAccessStore(window.sessionStorage);
+    const sessionStore = createAuthSessionStore(
+      window.sessionStorage,
+      () => new Date('2026-07-17T12:00:00.000Z'),
+    );
+    const { router } = renderVerification(
+      createAuthService(verifyOtp),
+      true,
+      sessionStore,
+      accessStore,
+      pendingDemoAccessStore,
+    );
+
+    await user.type(screen.getByLabelText('Verification code'), '123456');
+    await user.click(screen.getByRole('button', { name: 'Verify' }));
+
+    await waitFor(() => expect(router.state.location.pathname).toBe('/app/access-preview'));
+    expect(accessStore.getProfile()).toBeNull();
+  });
+
+  it('does not activate a pending role when OTP verification fails', async () => {
+    const user = userEvent.setup();
+    const verifyOtp = vi
+      .fn<AuthService['verifyOtp']>()
+      .mockRejectedValue(new AuthServiceError('invalid_otp'));
+    const accessStore = createDemoAccessStore(window.sessionStorage);
+    const pendingDemoAccessStore = createPendingDemoAccessStore(window.sessionStorage);
+    pendingDemoAccessStore.setProfileId('member');
+    const { router } = renderVerification(
+      createAuthService(verifyOtp),
+      true,
+      createSessionStore(),
+      accessStore,
+      pendingDemoAccessStore,
+    );
+
+    await user.type(screen.getByLabelText('Verification code'), '123456');
+    await user.click(screen.getByRole('button', { name: 'Verify' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent(
+      'That verification code is incorrect. Try again.',
+    );
+    expect(router.state.location.pathname).toBe('/auth/verify');
+    expect(accessStore.getProfile()).toBeNull();
+    expect(pendingDemoAccessStore.getProfileId()).toBe('member');
   });
 });
