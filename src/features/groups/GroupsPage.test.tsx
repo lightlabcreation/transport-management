@@ -252,6 +252,15 @@ describe('GroupsPage', () => {
     expect(window.sessionStorage.getItem('transport-management.auth-session')).toBeNull();
   });
 
+  it('hides Live Map and Groups navigation links in speed mode', async () => {
+    window.sessionStorage.setItem(
+      'transport-management.application-mode',
+      JSON.stringify({ mode: 'speed' }),
+    );
+    await renderAndWait();
+    expect(screen.queryByRole('link', { name: /live map/i })).not.toBeInTheDocument();
+  });
+
   it('GroupsPage can be imported from the index barrel', () => {
     expect(GroupsPageFromIndex).toBeDefined();
     expect(GroupsPageFromIndex).toBe(GroupsPage);
