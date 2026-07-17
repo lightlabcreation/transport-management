@@ -4,7 +4,8 @@ import { Navigate, useLocation, useNavigate } from 'react-router';
 import { Button } from '@/components/ui/button';
 import { browserDemoAccessStore } from '@/features/access-control';
 import { browserAuthSessionStore } from '@/features/auth';
-import { ApplicationShell, navigationItems } from '@/features/shell';
+import { ApplicationShell, getNavigationItems } from '@/features/shell';
+import { browserApplicationModeStore } from '@/features/application-mode';
 
 import { GroupFilters } from './components/GroupFilters';
 import { GroupList } from './components/GroupList';
@@ -107,9 +108,12 @@ export function GroupsPage() {
     profileId === 'group-admin' ||
     profileId === 'delegated-group-administrator';
 
+  const applicationMode = browserApplicationModeStore.getMode();
+  const navItems = getNavigationItems({ profile, applicationMode });
+
   return (
     <ApplicationShell
-      navigationItems={navigationItems}
+      navigationItems={navItems}
       currentPath={location.pathname}
       userSummary={{
         name: 'Demo Operator',

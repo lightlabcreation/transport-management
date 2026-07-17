@@ -3,7 +3,9 @@ import { Navigate, useLocation, useNavigate } from 'react-router';
 
 import { Input } from '@/components/ui/input';
 import type { AuthSessionStore } from '@/features/auth';
-import { ApplicationShell, navigationItems } from '@/features/shell';
+import { ApplicationShell, getNavigationItems } from '@/features/shell';
+import { browserDemoAccessStore } from '@/features/access-control';
+import { browserApplicationModeStore } from '@/features/application-mode';
 
 import { MapCanvas } from './components/MapCanvas';
 import { MapStatusBar } from './components/MapStatusBar';
@@ -60,11 +62,19 @@ export function LiveMapPage({ sessionStore, viewState = 'ready' }: LiveMapPagePr
     setStatusFilter('all');
   }
 
+  const profile = browserDemoAccessStore.getProfile();
+  const applicationMode = browserApplicationModeStore.getMode();
+  const navItems = getNavigationItems({ profile, applicationMode });
+
   return (
     <ApplicationShell
-      navigationItems={navigationItems}
+      navigationItems={navItems}
       currentPath={location.pathname}
-      userSummary={{ name: 'Demo Operator', mobile: '+•• ••••••3210', roleLabel: 'Operations' }}
+      userSummary={{
+        name: 'Demo Operator',
+        mobile: '+•• ••••••3210',
+        roleLabel: profile?.name || 'Operations',
+      }}
       onLogout={handleLogout}
     >
       <div className="space-y-section">

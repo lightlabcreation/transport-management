@@ -4,7 +4,8 @@ import { Navigate, useLocation, useNavigate } from 'react-router';
 import { Button } from '@/components/ui/button';
 import type { DemoAccessProfile } from '@/features/access-control';
 import type { AuthSessionStore } from '@/features/auth';
-import { ApplicationShell, navigationItems } from '@/features/shell';
+import { ApplicationShell, getNavigationItems } from '@/features/shell';
+import { browserApplicationModeStore } from '@/features/application-mode';
 
 import { getDashboardPresentation } from './dashboard.access';
 import {
@@ -30,6 +31,8 @@ export function DashboardPage({ sessionStore, accessProfile }: DashboardPageProp
   if (!accessProfile) return <Navigate to="/app/access-preview" replace />;
 
   const presentation = getDashboardPresentation(accessProfile);
+  const applicationMode = browserApplicationModeStore.getMode();
+  const navItems = getNavigationItems({ profile: accessProfile, applicationMode });
 
   function handleLogout() {
     sessionStore.clearSession();
@@ -42,7 +45,7 @@ export function DashboardPage({ sessionStore, accessProfile }: DashboardPageProp
 
   return (
     <ApplicationShell
-      navigationItems={navigationItems}
+      navigationItems={navItems}
       currentPath={location.pathname}
       userSummary={{
         name: 'Demo Operator',
