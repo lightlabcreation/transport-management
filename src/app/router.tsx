@@ -18,6 +18,7 @@ import {
 } from '@/features/onboarding';
 import { DashboardPage } from '@/features/dashboard';
 import { HomePage } from '@/features/home';
+import { LiveMapPage } from '@/features/live-map';
 
 export const router = createBrowserRouter([
   {
@@ -67,6 +68,10 @@ export const router = createBrowserRouter([
     element: <DashboardPage sessionStore={browserAuthSessionStore} />,
   },
   {
+    path: '/app/live-map',
+    element: <LiveMapPage sessionStore={browserAuthSessionStore} />,
+  },
+  {
     path: '/legal/terms',
     element: <TermsPlaceholderPage />,
   },
@@ -77,4 +82,3 @@ export const router = createBrowserRouter([
     element: <GroupsPage />,
   },
 ]);
-
