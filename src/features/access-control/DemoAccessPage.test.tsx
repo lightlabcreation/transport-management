@@ -124,9 +124,12 @@ describe('DemoAccessPage', () => {
   });
 
   it('redirects an unauthenticated visitor to Login', async () => {
-    const { router } = renderAccessPage(createSessionStore(false));
+    const clearSession = vi.fn();
+    const sessionStore = { ...createSessionStore(false), clearSession };
+    const { router } = renderAccessPage(sessionStore);
 
     await waitFor(() => expect(router.state.location.pathname).toBe('/auth/login'));
+    expect(clearSession).toHaveBeenCalled();
     expect(screen.getByRole('heading', { name: 'Sign in boundary' })).toBeInTheDocument();
   });
 });

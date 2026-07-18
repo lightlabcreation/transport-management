@@ -14,11 +14,14 @@ const validSession = {
   expiresAt: '2030-01-01T00:00:00.000Z',
 };
 
-function createSessionStore(hasSession: boolean): AuthSessionStore {
+function createSessionStore(
+  hasSession: boolean,
+  clearSession: () => void = vi.fn(),
+): AuthSessionStore {
   return {
     getSession: vi.fn(() => (hasSession ? validSession : null)),
     setSession: vi.fn(),
-    clearSession: vi.fn(),
+    clearSession,
     isSessionValid: vi.fn(() => hasSession),
   };
 }
@@ -27,6 +30,8 @@ function renderProtectedRoute(path: string, hasSession: boolean, hasProfile: boo
   const accessStore = createDemoAccessStore(window.sessionStorage);
   if (hasProfile) accessStore.setProfile(demoAccessProfiles[0]!);
 
+  const clearSession = vi.fn();
+  const sessionStore = createSessionStore(hasSession, clearSession);
   const router = createMemoryRouter(
     [
       { path: '/auth/login', element: <h1>Login boundary</h1> },
@@ -34,10 +39,7 @@ function renderProtectedRoute(path: string, hasSession: boolean, hasProfile: boo
       {
         path,
         element: (
-          <ProtectedApplicationRoute
-            sessionStore={createSessionStore(hasSession)}
-            accessStore={accessStore}
-          >
+          <ProtectedApplicationRoute sessionStore={sessionStore} accessStore={accessStore}>
             <h1>Protected content</h1>
           </ProtectedApplicationRoute>
         ),
@@ -46,7 +48,7 @@ function renderProtectedRoute(path: string, hasSession: boolean, hasProfile: boo
     { initialEntries: [path] },
   );
   render(<RouterProvider router={router} />);
-  return { accessStore, router };
+  return { accessStore, clearSession, router };
 }
 
 beforeEach(() => {
@@ -55,9 +57,14 @@ beforeEach(() => {
 
 describe('ProtectedApplicationRoute routing rules', () => {
   it('redirects a missing authentication session to Login and clears demo access', async () => {
-    const { accessStore, router } = renderProtectedRoute('/app/dashboard', false, true);
+    const { accessStore, clearSession, router } = renderProtectedRoute(
+      '/app/dashboard',
+      false,
+      true,
+    );
 
     await waitFor(() => expect(router.state.location.pathname).toBe('/auth/login'));
+    expect(clearSession).toHaveBeenCalled();
     expect(accessStore.getProfile()).toBeNull();
   });
 
