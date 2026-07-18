@@ -157,13 +157,14 @@ export function LoginPage({ authService, pendingDemoAccessStore }: LoginPageProp
       title="Welcome back"
       description="Choose an optional demo role, then enter your mobile number to generate a one-time verification code."
       footer={
-        <nav aria-label="Authentication links" className="flex justify-center gap-5">
+        <nav aria-label="Authentication links" className="flex justify-center gap-4">
           <Link
-            className="font-medium text-primary underline-offset-4 hover:underline"
+            className="font-semibold text-primary underline-offset-4 hover:underline"
             to="/auth/register"
           >
             Create an account
           </Link>
+          <span className="text-border">•</span>
           <Link
             className="text-muted-foreground underline-offset-4 hover:text-primary hover:underline"
             to="/legal/terms"
@@ -173,23 +174,22 @@ export function LoginPage({ authService, pendingDemoAccessStore }: LoginPageProp
         </nav>
       }
     >
-      <form className="space-y-5" noValidate onSubmit={(event) => void handleSubmit(event)}>
-        <fieldset className="space-y-2.5 rounded-lg border border-border/80 bg-surface/50 p-3.5">
-          <legend className="text-body-sm font-semibold text-foreground px-1">
+      <form className="space-y-3.5" noValidate onSubmit={(event) => void handleSubmit(event)}>
+        <fieldset className="space-y-2 rounded-lg border border-border/80 bg-surface/40 p-2.5">
+          <legend className="text-body-xs font-semibold text-foreground px-1">
             Choose demo role <span className="font-normal text-muted-foreground">(optional)</span>
           </legend>
-          <p className="text-body-xs text-muted-foreground px-1">
-            This role selector is for frontend demo access preview only. Production roles will be
-            managed by backend authorization.
+          <p className="text-[10px] text-muted-foreground px-1 leading-tight">
+            This role selector is for frontend demo access preview only. Production roles will be managed by backend authorization.
           </p>
-          <div className="grid gap-2 sm:grid-cols-2 pt-1" role="radiogroup" aria-label="Demo roles">
+          <div className="grid gap-1.5 sm:grid-cols-2" role="radiogroup" aria-label="Demo roles">
             {demoAccessProfiles.map((profile) => {
               const isSelected = selectedProfileId === profile.id;
               const info = shortProfileInfo[profile.id];
               return (
                 <label
                   key={profile.id}
-                  className={`flex cursor-pointer items-start gap-2.5 rounded-md border px-3 py-2 transition-colors focus-within:ring-2 focus-within:ring-primary ${
+                  className={`flex cursor-pointer items-center gap-2 rounded-md border px-2.5 py-1.5 transition-colors focus-within:ring-2 focus-within:ring-primary ${
                     isSelected
                       ? 'border-primary bg-primary/10 shadow-2xs font-semibold'
                       : 'border-border bg-card hover:border-primary/40'
@@ -201,13 +201,13 @@ export function LoginPage({ authService, pendingDemoAccessStore }: LoginPageProp
                     value={profile.id}
                     checked={isSelected}
                     onChange={() => setSelectedProfileId(profile.id)}
-                    className="mt-0.5 size-3.5 accent-primary shrink-0"
+                    className="size-3.5 accent-primary shrink-0"
                   />
-                  <span className="min-w-0 flex-1">
-                    <span className="block text-body-xs font-bold text-foreground truncate">
+                  <span className="min-w-0 flex-1 truncate">
+                    <span className="block text-[11px] font-bold text-foreground truncate">
                       {info.icon} {profile.name}
                     </span>
-                    <span className="mt-0.5 block text-body-xs text-muted-foreground line-clamp-1 leading-snug">
+                    <span className="block text-[10px] text-muted-foreground truncate leading-tight">
                       {info.shortDesc}
                     </span>
                   </span>
@@ -217,9 +217,9 @@ export function LoginPage({ authService, pendingDemoAccessStore }: LoginPageProp
           </div>
         </fieldset>
 
-        <div className="space-y-2">
-          <Label htmlFor="mobile-number">Mobile number</Label>
-          <div className="grid gap-3 sm:grid-cols-[minmax(10rem,0.42fr)_minmax(0,1fr)]">
+        <div className="space-y-1.5">
+          <Label htmlFor="mobile-number" className="text-body-xs font-semibold">Mobile number</Label>
+          <div className="grid gap-2 sm:grid-cols-[minmax(8rem,0.38fr)_minmax(0,1fr)]">
             <select
               ref={countryCodeRef}
               id="country-code"
@@ -230,9 +230,9 @@ export function LoginPage({ authService, pendingDemoAccessStore }: LoginPageProp
               aria-label="Country code"
               aria-invalid={fieldErrors.countryCode ? true : undefined}
               aria-describedby={fieldErrors.countryCode ? 'country-code-error' : undefined}
-              className="min-h-control w-full rounded-md border border-input bg-surface px-3 py-2 text-body text-foreground transition-colors duration-fast ease-standard focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-surface-muted aria-invalid:border-danger"
+              className="h-9 w-full rounded-md border border-input bg-surface px-2.5 py-1 text-body-xs font-medium text-foreground transition-colors duration-fast ease-standard focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-surface-muted aria-invalid:border-danger"
             >
-              <option value="">Country code</option>
+              <option value="">Code</option>
               {countryOptions.map((country) => (
                 <option key={country.value} value={country.value}>
                   {country.label}
@@ -244,29 +244,31 @@ export function LoginPage({ authService, pendingDemoAccessStore }: LoginPageProp
               id="mobile-number"
               name="mobileNumber"
               type="tel"
-              inputMode="tel"
+              inputMode="numeric"
+              pattern="[0-9]*"
               autoComplete="tel-national"
               value={nationalNumber}
-              onChange={(event) => setNationalNumber(event.currentTarget.value)}
+              onChange={(event) => setNationalNumber(event.currentTarget.value.replace(/\D/g, ''))}
               aria-invalid={fieldErrors.nationalNumber ? true : undefined}
               aria-describedby={fieldErrors.nationalNumber ? 'mobile-number-error' : undefined}
-              placeholder="Mobile number"
+              placeholder="9876543210 (Digits only)"
+              className="h-9 text-body-xs font-medium"
             />
           </div>
           {fieldErrors.countryCode ? (
-            <p id="country-code-error" className="text-body-sm text-danger">
+            <p id="country-code-error" className="text-[11px] text-danger font-medium">
               {fieldErrors.countryCode}
             </p>
           ) : null}
           {fieldErrors.nationalNumber ? (
-            <p id="mobile-number-error" className="text-body-sm text-danger">
+            <p id="mobile-number-error" className="text-[11px] text-danger font-medium">
               {fieldErrors.nationalNumber}
             </p>
           ) : null}
         </div>
 
-        <div className="space-y-1.5 pt-0.5">
-          <Label htmlFor="password">
+        <div className="space-y-1 pt-0.5">
+          <Label htmlFor="password" className="text-body-xs font-semibold">
             Password <span className="font-normal text-muted-foreground">(optional)</span>
           </Label>
           <Input
@@ -277,6 +279,7 @@ export function LoginPage({ authService, pendingDemoAccessStore }: LoginPageProp
             value={password}
             onChange={(event) => setPassword(event.currentTarget.value)}
             placeholder="Enter password if already set (optional)"
+            className="h-9 text-body-xs font-medium"
           />
         </div>
 
@@ -285,19 +288,19 @@ export function LoginPage({ authService, pendingDemoAccessStore }: LoginPageProp
             ref={serviceErrorRef}
             role="alert"
             tabIndex={-1}
-            className="rounded-md border border-danger p-3 text-body-sm text-danger"
+            className="rounded-md border border-danger p-2 text-[11px] font-semibold text-danger"
           >
             {serviceError}
           </div>
         ) : null}
 
         {isSubmitting ? (
-          <p role="status" className="text-body-sm text-muted-foreground">
+          <p role="status" className="text-[11px] text-muted-foreground">
             Generating verification code...
           </p>
         ) : null}
 
-        <Button className="mt-2" type="submit" size="lg" fullWidth isLoading={isSubmitting}>
+        <Button className="mt-1" type="submit" size="md" fullWidth isLoading={isSubmitting}>
           Generate OTP
         </Button>
       </form>

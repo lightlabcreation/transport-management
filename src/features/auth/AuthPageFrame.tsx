@@ -15,55 +15,56 @@ export function AuthPageFrame({
   description,
   children,
   footer,
-  compact = false,
 }: AuthPageFrameProps) {
   return (
-    <main className="min-h-screen bg-background text-foreground lg:grid lg:grid-cols-[minmax(20rem,0.9fr)_minmax(32rem,1.1fr)]">
-      <aside className="relative hidden overflow-hidden bg-primary p-section text-primary-foreground lg:flex lg:flex-col lg:justify-between">
-        <div className="relative z-10">
+    <main className="min-h-screen bg-background text-foreground lg:grid lg:grid-cols-[44%_56%] lg:max-h-screen lg:overflow-hidden">
+      <aside className="relative hidden overflow-hidden bg-primary p-8 xl:p-12 text-primary-foreground lg:flex lg:flex-col lg:justify-center lg:gap-6">
+        <div className="relative z-10 space-y-4">
           <BrandMark inverse />
-          <p className="mt-16 max-w-md text-heading-lg font-semibold leading-tight">
+          <div className="inline-flex items-center gap-2 rounded-full border border-primary-foreground/30 bg-primary-foreground/10 px-3 py-1 text-body-xs font-semibold uppercase tracking-wider text-primary-foreground shadow-2xs">
+            <span className="size-2 rounded-full bg-success animate-pulse" /> Live Telemetry & GPS Tracking Active
+          </div>
+          <h1 className="text-heading-lg font-bold leading-tight tracking-tight">
             Move people, journeys, and operations with confidence.
-          </p>
-          <p className="mt-4 max-w-md text-body-lg text-primary-foreground/80">
-            One secure starting point for transport coordination, speed assistance, and safer
-            journeys.
+          </h1>
+          <p className="max-w-md text-body-sm text-primary-foreground/85 leading-relaxed">
+            One secure, passwordless starting point for transport coordination, real-time speed assistance, and road safety oversight.
           </p>
         </div>
 
-        <div className="relative z-10 grid gap-3 text-body-sm">
-          <Benefit>Secure passwordless access</Benefit>
-          <Benefit>Purpose-built for transport workflows</Benefit>
-          <Benefit>Privacy-aware experiences for every mode</Benefit>
+        <div className="relative z-10 max-w-md grid gap-2.5 text-body-xs font-medium pt-2">
+          <Benefit>Secure passwordless mobile OTP authentication</Benefit>
+          <Benefit>Real-time TomTom speed detection & HUD routing</Benefit>
+          <Benefit>Role-gated workspaces for Owners, Admins & Fleet Drivers</Benefit>
         </div>
 
-        <div aria-hidden="true" className="absolute inset-0 opacity-25">
+        <div aria-hidden="true" className="absolute inset-0 pointer-events-none opacity-20">
           <div className="absolute -right-20 top-24 size-72 rounded-full border border-primary-foreground/50" />
           <div className="absolute -right-8 top-36 size-48 rounded-full border border-primary-foreground/40" />
-          <div className="absolute bottom-24 left-20 h-28 w-72 -rotate-12 rounded-full border-2 border-dashed border-primary-foreground/50" />
+          <div className="absolute bottom-16 left-16 h-28 w-72 -rotate-12 rounded-full border-2 border-dashed border-primary-foreground/50" />
         </div>
       </aside>
 
-      <section className="flex min-h-screen flex-col px-gutter py-6 sm:px-page lg:px-section lg:py-section">
-        <div className="lg:hidden">
+      <section className="flex flex-col justify-center px-4 py-4 sm:px-6 lg:px-8 lg:py-3 lg:max-h-screen lg:overflow-y-auto">
+        <div className="lg:hidden mb-4">
           <BrandMark />
         </div>
 
-        <div className="flex flex-1 items-center justify-center py-section">
-          <div className={compact ? 'w-full max-w-form' : 'w-full max-w-readable'}>
-            <div className="mb-7">
-              <p className="text-body-sm font-semibold uppercase tracking-wide text-primary">
-                {eyebrow}
-              </p>
-              <h1 className="mt-2 text-heading-lg font-semibold tracking-tight">{title}</h1>
-              <p className="mt-3 max-w-xl text-body text-muted-foreground">{description}</p>
-            </div>
-
-            <div className="rounded-xl border border-border bg-surface p-page shadow-md sm:p-section">
-              {children}
-            </div>
-            {footer ? <div className="mt-5 text-center text-body-sm">{footer}</div> : null}
+        <div className="w-full max-w-md mx-auto my-auto">
+          <div className="mb-3.5">
+            <p className="text-body-xs font-bold uppercase tracking-wider text-primary">
+              {eyebrow}
+            </p>
+            <h2 className="mt-0.5 text-heading-md font-bold tracking-tight text-foreground">
+              {title}
+            </h2>
+            <p className="mt-1 text-body-xs text-muted-foreground leading-snug">{description}</p>
           </div>
+
+          <div className="rounded-xl border border-border bg-surface p-4 sm:p-5 shadow-sm">
+            {children}
+          </div>
+          {footer ? <div className="mt-3 text-center text-body-xs">{footer}</div> : null}
         </div>
       </section>
     </main>
@@ -72,26 +73,26 @@ export function AuthPageFrame({
 
 function BrandMark({ inverse = false }: { inverse?: boolean }) {
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex items-center gap-2.5">
       <span
         aria-hidden="true"
-        className={`grid size-10 place-items-center rounded-lg font-semibold ${
+        className={`grid size-9 place-items-center rounded-lg font-bold text-body-sm ${
           inverse ? 'bg-primary-foreground text-primary' : 'bg-primary text-primary-foreground'
         }`}
       >
         TM
       </span>
-      <span className="text-body font-semibold">Transport Management</span>
+      <span className="text-body-sm font-bold tracking-tight">Transport Management</span>
     </div>
   );
 }
 
 function Benefit({ children }: { children: ReactNode }) {
   return (
-    <div className="flex items-center gap-3 rounded-lg border border-primary-foreground/20 bg-primary-foreground/10 p-3">
+    <div className="flex items-center gap-2.5 rounded-lg border border-primary-foreground/20 bg-primary-foreground/10 px-3 py-2">
       <span
         aria-hidden="true"
-        className="grid size-6 place-items-center rounded-full bg-primary-foreground/20"
+        className="grid size-5 place-items-center rounded-full bg-primary-foreground/20 text-[11px] font-bold shrink-0"
       >
         ✓
       </span>
