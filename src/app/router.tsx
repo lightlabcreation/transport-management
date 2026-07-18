@@ -24,7 +24,6 @@ import {
   OtpVerificationPage,
   RegistrationPage,
   TermsPlaceholderPage,
-  type AuthSessionStore,
 } from '@/features/auth';
 import { GroupsPage } from '@/features/groups';
 import {
@@ -37,22 +36,19 @@ import { DashboardRoute } from '@/features/dashboard';
 import { HomePage } from '@/features/home';
 import { LiveMapPage } from '@/features/live-map';
 
-const accessPreviewSessionStore: AuthSessionStore = {
-  getSession: () => browserAuthSessionStore.getSession(),
-  setSession: (session) => browserAuthSessionStore.setSession(session),
-  clearSession: () => {
-    browserAuthSessionStore.clearSession();
-    browserDemoAccessStore.clearProfile();
-    browserPendingDemoAccessStore.clearProfile();
-    browserApplicationModeStore.clearMode();
-  },
-  isSessionValid: (session) => browserAuthSessionStore.isSessionValid(session),
-};
+import { createApplicationSessionStore } from './application-session-store';
+
+const browserApplicationSessionStore = createApplicationSessionStore({
+  authSessionStore: browserAuthSessionStore,
+  accessStore: browserDemoAccessStore,
+  pendingAccessStore: browserPendingDemoAccessStore,
+  modeStore: browserApplicationModeStore,
+});
 
 function protectApplicationPage(children: ReactNode, requireMode = true) {
   return (
     <ProtectedApplicationRoute
-      sessionStore={browserAuthSessionStore}
+      sessionStore={browserApplicationSessionStore}
       accessStore={browserDemoAccessStore}
     >
       {requireMode ? (
@@ -130,20 +126,20 @@ export const router = createBrowserRouter([
     path: '/app/dashboard',
     element: protectApplicationPage(
       <DashboardRoute
-        sessionStore={browserAuthSessionStore}
+        sessionStore={browserApplicationSessionStore}
         accessStore={browserDemoAccessStore}
       />,
     ),
   },
   {
     path: '/app/live-map',
-    element: protectApplicationPage(<LiveMapPage sessionStore={browserAuthSessionStore} />),
+    element: protectApplicationPage(<LiveMapPage sessionStore={browserApplicationSessionStore} />),
   },
   {
     path: '/app/access-preview',
     element: (
       <DemoAccessPage
-        sessionStore={accessPreviewSessionStore}
+        sessionStore={browserApplicationSessionStore}
         accessStore={browserDemoAccessStore}
       />
     ),
@@ -157,7 +153,7 @@ export const router = createBrowserRouter([
     element: protectApplicationPage(
       <ApplicationModeSelectionPage
         modeStore={browserApplicationModeStore}
-        onLogout={() => browserAuthSessionStore.clearSession()}
+        onLogout={() => browserApplicationSessionStore.clearSession()}
       />,
       false,
     ),
@@ -173,7 +169,7 @@ export const router = createBrowserRouter([
     element: protectApplicationPage(
       <AppPagePlaceholder
         title={title}
-        sessionStore={browserAuthSessionStore}
+        sessionStore={browserApplicationSessionStore}
         accessStore={browserDemoAccessStore}
         modeStore={browserApplicationModeStore}
       />,

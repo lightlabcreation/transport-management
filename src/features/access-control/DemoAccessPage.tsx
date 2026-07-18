@@ -39,6 +39,7 @@ export function DemoAccessPage({ sessionStore, accessStore }: DemoAccessPageProp
   );
 
   if (!sessionStore.getSession()) {
+    sessionStore.clearSession();
     accessStore.clearProfile();
     return <Navigate to="/auth/login" replace />;
   }

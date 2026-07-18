@@ -44,6 +44,12 @@ describe('application navigation', () => {
     expect(speedNavigation.map(({ label }) => label).join(' ')).not.toMatch(/member tracking/i);
   });
 
+  it.each(['tracking', 'speed'] as const)('includes Notifications in %s mode', (mode) => {
+    expect(getApplicationNavigation(mode)).toEqual(
+      expect.arrayContaining([expect.objectContaining({ href: '/app/notifications' })]),
+    );
+  });
+
   it('returns a new collection so consumers cannot mutate the shared registry', () => {
     const firstResult = getApplicationNavigation('tracking');
     firstResult[0]!.label = 'Changed';

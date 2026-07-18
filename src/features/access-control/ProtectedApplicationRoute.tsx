@@ -17,6 +17,7 @@ export function ProtectedApplicationRoute({
   children,
 }: ProtectedApplicationRouteProps) {
   if (!sessionStore.getSession()) {
+    sessionStore.clearSession();
     accessStore.clearProfile();
     return <Navigate to="/auth/login" replace />;
   }
