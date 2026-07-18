@@ -7,7 +7,7 @@ export {
   browserPendingDemoAccessStore,
   createPendingDemoAccessStore,
 } from './demo-access-pending-store';
-export { demoAccessProfiles } from './demo-access.profiles';
+export { demoAccessProfiles, findDemoAccessProfile } from './demo-access.profiles';
 export { getDemoCapabilities, hasDemoCapability } from './demo-capabilities';
 export type { DemoCapability } from './demo-capabilities';
 export type { DemoAccessProfile, DemoAccessProfileId, DemoAccessStore } from './demo-access.types';

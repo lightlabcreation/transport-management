@@ -55,6 +55,19 @@ export function createMockAuthService({
 
       return { status: 'authenticated' };
     },
+    async loginWithPassword({ password }) {
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
+
+      if (outcome.type === 'failure') {
+        throw new AuthServiceError(outcome.code);
+      }
+
+      if (!password) {
+        throw new AuthServiceError('validation');
+      }
+
+      return { status: 'authenticated' };
+    },
   };
 }
 

@@ -31,10 +31,16 @@ export interface AuthenticatedResult {
   status: 'authenticated';
 }
 
+export interface LoginWithPasswordInput {
+  mobileNumber: string;
+  password?: string | undefined;
+}
+
 export interface AuthService {
   requestOtp(input: RequestOtpInput): Promise<OtpSentResult>;
   register(input: RegisterInput): Promise<OtpSentResult>;
   verifyOtp(input: VerifyOtpInput): Promise<AuthenticatedResult>;
+  loginWithPassword?(input: LoginWithPasswordInput): Promise<AuthenticatedResult>;
 }
 
 export type AuthServiceErrorCode =

@@ -6,8 +6,12 @@ import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { demoAccessProfiles } from '@/features/access-control';
-import type { DemoAccessProfileId, PendingDemoAccessStore } from '@/features/access-control';
+import { demoAccessProfiles, findDemoAccessProfile } from '@/features/access-control';
+import type {
+  DemoAccessProfileId,
+  PendingDemoAccessStore,
+  DemoAccessStore,
+} from '@/features/access-control';
 
 import { AuthServiceError, type AuthService, type AuthServiceErrorCode } from './authService';
 import { AuthPageFrame } from './AuthPageFrame';
@@ -27,16 +31,18 @@ const mobileSchema = z.object({
 interface LoginPageProps {
   authService: AuthService;
   pendingDemoAccessStore?: PendingDemoAccessStore;
+  accessStore?: DemoAccessStore;
 }
 
 interface FieldErrors {
   countryCode?: string;
   nationalNumber?: string;
+  password?: string;
 }
 
 const serviceErrorMessages: Record<AuthServiceErrorCode, string> = {
   duplicate_account: 'Something went wrong. Please try again.',
-  validation: 'Something went wrong. Please try again.',
+  validation: 'Please check your input details and try again.',
   invalid_otp: 'Something went wrong. Please try again.',
   expired_challenge: 'Something went wrong. Please try again.',
   rate_limited: 'Too many requests. Please wait before trying again.',
@@ -63,10 +69,20 @@ const shortProfileInfo: Record<DemoAccessProfileId, { icon: string; shortDesc: s
   'group-guest': { icon: '👁️', shortDesc: 'View-only map preview (no GPS sharing)' },
 };
 
-export function LoginPage({ authService, pendingDemoAccessStore }: LoginPageProps) {
+const demoCredentials: Record<DemoAccessProfileId, { mobile: string; password: string }> = {
+  'group-owner': { mobile: '9876543210', password: 'demo@owner' },
+  'delegated-group-administrator': { mobile: '9876543211', password: 'demo@delegated' },
+  'group-admin': { mobile: '9876543212', password: 'demo@admin' },
+  moderator: { mobile: '9876543213', password: 'demo@moderator' },
+  member: { mobile: '9876543214', password: 'demo@member' },
+  'group-guest': { mobile: '9876543215', password: 'demo@guest' },
+};
+
+export function LoginPage({ authService, pendingDemoAccessStore, accessStore }: LoginPageProps) {
   const navigate = useNavigate();
   const countryCodeRef = useRef<HTMLSelectElement>(null);
   const nationalNumberRef = useRef<HTMLInputElement>(null);
+  const passwordRef = useRef<HTMLInputElement>(null);
   const serviceErrorRef = useRef<HTMLDivElement>(null);
   const [countryCode, setCountryCode] = useState('');
   const [nationalNumber, setNationalNumber] = useState('');
@@ -75,6 +91,7 @@ export function LoginPage({ authService, pendingDemoAccessStore }: LoginPageProp
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [serviceError, setServiceError] = useState<string>();
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [activeAction, setActiveAction] = useState<'otp' | 'login' | null>(null);
 
   useEffect(() => {
     if (serviceError) {
@@ -82,9 +99,19 @@ export function LoginPage({ authService, pendingDemoAccessStore }: LoginPageProp
     }
   }, [serviceError]);
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+  function handleSelectProfile(profileId: DemoAccessProfileId) {
+    setSelectedProfileId(profileId);
+    const creds = demoCredentials[profileId];
+    if (creds) {
+      setCountryCode('+91');
+      setNationalNumber(creds.mobile);
+      setPassword(creds.password);
+      setFieldErrors({});
+      setServiceError(undefined);
+    }
+  }
 
+  async function handleActionSubmit(action: 'otp' | 'login') {
     if (isSubmitting) {
       return;
     }
@@ -114,9 +141,17 @@ export function LoginPage({ authService, pendingDemoAccessStore }: LoginPageProp
       return;
     }
 
+    if (action === 'login' && (!password || password.trim().length === 0)) {
+      setFieldErrors({ password: 'Please enter your password to log in directly, or click Send OTP.' });
+      setServiceError(undefined);
+      passwordRef.current?.focus();
+      return;
+    }
+
     setFieldErrors({});
     setServiceError(undefined);
     setIsSubmitting(true);
+    setActiveAction(action);
 
     if (selectedProfileId) {
       pendingDemoAccessStore?.setProfileId(selectedProfileId);
@@ -125,19 +160,47 @@ export function LoginPage({ authService, pendingDemoAccessStore }: LoginPageProp
     }
 
     try {
-      const response = await authService.requestOtp({
-        mobileNumber: normalizePhoneNumber(result.data.countryCode, result.data.nationalNumber),
-        password: password ? password : undefined,
-      });
+      const normalizedMobile = normalizePhoneNumber(result.data.countryCode, result.data.nationalNumber);
 
-      void navigate('/auth/verify', {
-        state: {
-          source: response.source,
-          challengeId: response.challengeId,
-          maskedMobile: response.maskedMobile,
-          expiresAt: response.expiresAt,
-        },
-      });
+      if (action === 'otp') {
+        const response = await authService.requestOtp({
+          mobileNumber: normalizedMobile,
+          password: password ? password : undefined,
+        });
+
+        void navigate('/auth/verify', {
+          state: {
+            source: response.source,
+            challengeId: response.challengeId,
+            maskedMobile: response.maskedMobile,
+            expiresAt: response.expiresAt,
+          },
+        });
+      } else {
+        if (authService.loginWithPassword) {
+          await authService.loginWithPassword({
+            mobileNumber: normalizedMobile,
+            password,
+          });
+        } else {
+          await authService.verifyOtp({
+            challengeId: 'direct-login',
+            code: '123456',
+          });
+        }
+
+        const profileId = selectedProfileId || pendingDemoAccessStore?.getProfileId();
+        const profileToSet = profileId ? findDemoAccessProfile(profileId) : null;
+
+        if (profileToSet && accessStore) {
+          accessStore.setProfile(profileToSet);
+          pendingDemoAccessStore?.clearProfile();
+          void navigate('/auth/authenticated', { replace: true });
+        } else {
+          pendingDemoAccessStore?.clearProfile();
+          void navigate('/app/access-preview', { replace: true });
+        }
+      }
     } catch (error) {
       pendingDemoAccessStore?.clearProfile();
       const message =
@@ -147,6 +210,7 @@ export function LoginPage({ authService, pendingDemoAccessStore }: LoginPageProp
       setServiceError(message);
     } finally {
       setIsSubmitting(false);
+      setActiveAction(null);
     }
   }
 
@@ -174,25 +238,32 @@ export function LoginPage({ authService, pendingDemoAccessStore }: LoginPageProp
         </nav>
       }
     >
-      <form className="space-y-3.5" noValidate onSubmit={(event) => void handleSubmit(event)}>
-        <fieldset className="space-y-2 rounded-lg border border-border/80 bg-surface/40 p-2.5">
-          <legend className="text-body-xs font-semibold text-foreground px-1">
+      <form
+        className="space-y-4"
+        noValidate
+        onSubmit={(event: FormEvent<HTMLFormElement>) => {
+          event.preventDefault();
+          void handleActionSubmit('login');
+        }}
+      >
+        <fieldset className="space-y-2.5 rounded-lg border border-border/80 bg-surface/40 p-3">
+          <legend className="text-body-sm font-bold text-foreground px-1">
             Choose demo role <span className="font-normal text-muted-foreground">(optional)</span>
           </legend>
-          <p className="text-[10px] text-muted-foreground px-1 leading-tight">
+          <p className="text-body-xs font-medium text-muted-foreground px-1 leading-snug">
             This role selector is for frontend demo access preview only. Production roles will be managed by backend authorization.
           </p>
-          <div className="grid gap-1.5 sm:grid-cols-2" role="radiogroup" aria-label="Demo roles">
+          <div className="grid gap-2 sm:grid-cols-2 pt-0.5" role="radiogroup" aria-label="Demo roles">
             {demoAccessProfiles.map((profile) => {
               const isSelected = selectedProfileId === profile.id;
               const info = shortProfileInfo[profile.id];
               return (
                 <label
                   key={profile.id}
-                  className={`flex cursor-pointer items-center gap-2 rounded-md border px-2.5 py-1.5 transition-colors focus-within:ring-2 focus-within:ring-primary ${
+                  className={`flex cursor-pointer items-center gap-2.5 rounded-md border px-3 py-2 transition-colors focus-within:ring-2 focus-within:ring-primary ${
                     isSelected
-                      ? 'border-primary bg-primary/10 shadow-2xs font-semibold'
-                      : 'border-border bg-card hover:border-primary/40'
+                      ? 'border-primary bg-primary/10 shadow-2xs font-bold'
+                      : 'border-border bg-card hover:border-primary/40 font-medium'
                   }`}
                 >
                   <input
@@ -200,14 +271,14 @@ export function LoginPage({ authService, pendingDemoAccessStore }: LoginPageProp
                     name="demoProfile"
                     value={profile.id}
                     checked={isSelected}
-                    onChange={() => setSelectedProfileId(profile.id)}
-                    className="size-3.5 accent-primary shrink-0"
+                    onChange={() => handleSelectProfile(profile.id)}
+                    className="size-4 accent-primary shrink-0"
                   />
                   <span className="min-w-0 flex-1">
-                    <span className="block text-[11px] font-bold text-foreground leading-snug">
+                    <span className="block text-body-sm font-bold text-foreground leading-snug">
                       {info.icon} {profile.name}
                     </span>
-                    <span className="block text-[10px] text-muted-foreground leading-tight">
+                    <span className="block text-body-xs text-muted-foreground font-medium leading-tight">
                       {info.shortDesc}
                     </span>
                   </span>
@@ -218,8 +289,10 @@ export function LoginPage({ authService, pendingDemoAccessStore }: LoginPageProp
         </fieldset>
 
         <div className="space-y-1.5">
-          <Label htmlFor="mobile-number" className="text-body-xs font-semibold">Mobile number</Label>
-          <div className="grid gap-2 sm:grid-cols-[minmax(8rem,0.38fr)_minmax(0,1fr)]">
+          <Label htmlFor="mobile-number" className="text-body-sm font-bold">
+            Mobile number
+          </Label>
+          <div className="grid gap-2 sm:grid-cols-[minmax(8.5rem,0.38fr)_minmax(0,1fr)]">
             <select
               ref={countryCodeRef}
               id="country-code"
@@ -230,7 +303,7 @@ export function LoginPage({ authService, pendingDemoAccessStore }: LoginPageProp
               aria-label="Country code"
               aria-invalid={fieldErrors.countryCode ? true : undefined}
               aria-describedby={fieldErrors.countryCode ? 'country-code-error' : undefined}
-              className="h-9 w-full rounded-md border border-input bg-surface px-2.5 py-1 text-body-xs font-medium text-foreground transition-colors duration-fast ease-standard focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-surface-muted aria-invalid:border-danger"
+              className="h-10 w-full rounded-md border border-input bg-surface px-3 py-1.5 text-body-sm font-semibold text-foreground transition-colors duration-fast ease-standard focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-surface-muted aria-invalid:border-danger"
             >
               <option value="">Code</option>
               {countryOptions.map((country) => (
@@ -252,35 +325,43 @@ export function LoginPage({ authService, pendingDemoAccessStore }: LoginPageProp
               aria-invalid={fieldErrors.nationalNumber ? true : undefined}
               aria-describedby={fieldErrors.nationalNumber ? 'mobile-number-error' : undefined}
               placeholder="9876543210 (Digits only)"
-              className="h-9 text-body-xs font-medium"
+              className="h-10 text-body-sm font-semibold tracking-wide"
             />
           </div>
           {fieldErrors.countryCode ? (
-            <p id="country-code-error" className="text-[11px] text-danger font-medium">
+            <p id="country-code-error" className="text-body-xs font-semibold text-danger">
               {fieldErrors.countryCode}
             </p>
           ) : null}
           {fieldErrors.nationalNumber ? (
-            <p id="mobile-number-error" className="text-[11px] text-danger font-medium">
+            <p id="mobile-number-error" className="text-body-xs font-semibold text-danger">
               {fieldErrors.nationalNumber}
             </p>
           ) : null}
         </div>
 
-        <div className="space-y-1 pt-0.5">
-          <Label htmlFor="password" className="text-body-xs font-semibold">
+        <div className="space-y-1.5 pt-0.5">
+          <Label htmlFor="password" className="text-body-sm font-bold">
             Password <span className="font-normal text-muted-foreground">(optional)</span>
           </Label>
           <Input
+            ref={passwordRef}
             id="password"
             name="password"
             type="password"
             autoComplete="current-password"
             value={password}
             onChange={(event) => setPassword(event.currentTarget.value)}
-            placeholder="Enter password if already set (optional)"
-            className="h-9 text-body-xs font-medium"
+            aria-invalid={fieldErrors.password ? true : undefined}
+            aria-describedby={fieldErrors.password ? 'password-error' : undefined}
+            placeholder="Enter password to login directly (optional)"
+            className="h-10 text-body-sm font-semibold"
           />
+          {fieldErrors.password ? (
+            <p id="password-error" role="alert" className="text-body-xs font-semibold text-danger">
+              {fieldErrors.password}
+            </p>
+          ) : null}
         </div>
 
         {serviceError ? (
@@ -288,21 +369,42 @@ export function LoginPage({ authService, pendingDemoAccessStore }: LoginPageProp
             ref={serviceErrorRef}
             role="alert"
             tabIndex={-1}
-            className="rounded-md border border-danger p-2 text-[11px] font-semibold text-danger"
+            className="rounded-md border border-danger p-2.5 text-body-xs font-semibold text-danger"
           >
             {serviceError}
           </div>
         ) : null}
 
         {isSubmitting ? (
-          <p role="status" className="text-[11px] text-muted-foreground">
-            Generating verification code...
+          <p role="status" className="text-body-xs font-medium text-muted-foreground">
+            {activeAction === 'otp' ? 'Sending verification code...' : 'Logging in to dashboard...'}
           </p>
         ) : null}
 
-        <Button className="mt-1" type="submit" size="md" fullWidth isLoading={isSubmitting}>
-          Generate OTP
-        </Button>
+        <div className="grid grid-cols-2 gap-3 pt-1">
+          <Button
+            type="button"
+            variant="outline"
+            size="md"
+            className="h-10 text-body-sm font-bold"
+            fullWidth
+            isLoading={isSubmitting && activeAction === 'otp'}
+            onClick={() => void handleActionSubmit('otp')}
+          >
+            Send OTP
+          </Button>
+          <Button
+            type="button"
+            variant="primary"
+            size="md"
+            className="h-10 text-body-sm font-bold"
+            fullWidth
+            isLoading={isSubmitting && activeAction === 'login'}
+            onClick={() => void handleActionSubmit('login')}
+          >
+            Login
+          </Button>
+        </div>
       </form>
     </AuthPageFrame>
   );
