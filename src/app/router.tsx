@@ -10,6 +10,7 @@ import {
   ProtectedApplicationRoute,
 } from '@/features/access-control';
 import { AlertsPage } from '@/features/alerts';
+import { CostMonitoringPage } from '@/features/cost-monitoring';
 import { NavigationPage } from '@/features/navigation';
 import { ReportsPage } from '@/features/reports';
 import { TripsPage } from '@/features/trips';
@@ -238,5 +239,9 @@ export const router = createBrowserRouter([
   {
     path: '/app/reports',
     element: renderFramedApplicationPage('view-reports', <ReportsPage />),
+  },
+  {
+    path: '/app/cost-monitoring',
+    element: renderFramedApplicationPage('view-settings', <CostMonitoringPage />),
   },
 ]);
