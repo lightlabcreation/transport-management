@@ -45,12 +45,12 @@ export function AuthPageFrame({
         </div>
       </aside>
 
-      <section className="flex flex-col justify-center px-4 py-4 sm:px-6 lg:px-8 lg:py-3 lg:max-h-screen lg:overflow-y-auto">
+      <section className="flex flex-col justify-center px-4 py-4 sm:px-8 lg:px-12 lg:py-4 lg:max-h-screen lg:overflow-y-auto">
         <div className="lg:hidden mb-4">
           <BrandMark />
         </div>
 
-        <div className="w-full max-w-md mx-auto my-auto">
+        <div className="w-full max-w-[560px] mx-auto my-auto">
           <div className="mb-3.5">
             <p className="text-body-xs font-bold uppercase tracking-wider text-primary">
               {eyebrow}
@@ -61,10 +61,10 @@ export function AuthPageFrame({
             <p className="mt-1 text-body-xs text-muted-foreground leading-snug">{description}</p>
           </div>
 
-          <div className="rounded-xl border border-border bg-surface p-4 sm:p-5 shadow-sm">
+          <div className="rounded-xl border border-border bg-surface p-5 sm:p-6 shadow-md">
             {children}
           </div>
-          {footer ? <div className="mt-3 text-center text-body-xs">{footer}</div> : null}
+          {footer ? <div className="mt-3.5 text-center text-body-xs">{footer}</div> : null}
         </div>
       </section>
     </main>

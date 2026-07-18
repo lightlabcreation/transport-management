@@ -203,11 +203,11 @@ export function LoginPage({ authService, pendingDemoAccessStore }: LoginPageProp
                     onChange={() => setSelectedProfileId(profile.id)}
                     className="size-3.5 accent-primary shrink-0"
                   />
-                  <span className="min-w-0 flex-1 truncate">
-                    <span className="block text-[11px] font-bold text-foreground truncate">
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-[11px] font-bold text-foreground leading-snug">
                       {info.icon} {profile.name}
                     </span>
-                    <span className="block text-[10px] text-muted-foreground truncate leading-tight">
+                    <span className="block text-[10px] text-muted-foreground leading-tight">
                       {info.shortDesc}
                     </span>
                   </span>
