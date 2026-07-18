@@ -9,7 +9,10 @@ import {
   DemoAccessReset,
   ProtectedApplicationRoute,
 } from '@/features/access-control';
-import { AppPagePlaceholder, appPageDefinitions } from '@/features/app-pages';
+import { AlertsPage } from '@/features/alerts';
+import { NavigationPage } from '@/features/navigation';
+import { ReportsPage } from '@/features/reports';
+import { TripsPage } from '@/features/trips';
 import {
   ApplicationModeGate,
   ApplicationModeReset,
@@ -220,17 +223,20 @@ export const router = createBrowserRouter([
       />,
     ),
   },
-  ...appPageDefinitions.map(({ path, title, capability }) => ({
-    path,
-    element: protectApplicationPage(
-      <DemoCapabilityGate accessStore={browserDemoAccessStore} capability={capability}>
-        <AppPagePlaceholder
-          title={title}
-          sessionStore={browserApplicationSessionStore}
-          accessStore={browserDemoAccessStore}
-          modeStore={browserApplicationModeStore}
-        />
-      </DemoCapabilityGate>,
-    ),
-  })),
+  {
+    path: '/app/navigation',
+    element: renderFramedApplicationPage('view-navigation', <NavigationPage />),
+  },
+  {
+    path: '/app/trips',
+    element: renderFramedApplicationPage('view-trips', <TripsPage />),
+  },
+  {
+    path: '/app/alerts',
+    element: renderFramedApplicationPage('view-alerts', <AlertsPage />),
+  },
+  {
+    path: '/app/reports',
+    element: renderFramedApplicationPage('view-reports', <ReportsPage />),
+  },
 ]);
