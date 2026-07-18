@@ -109,6 +109,8 @@ export const router = createBrowserRouter([
             authService={mockAuthService}
             pendingDemoAccessStore={browserPendingDemoAccessStore}
             accessStore={browserDemoAccessStore}
+            sessionStore={browserAuthSessionStore}
+            sessionFactory={createMockAuthSession}
           />
         </DemoAccessReset>
       </ApplicationModeReset>

@@ -12,6 +12,8 @@ import type {
   PendingDemoAccessStore,
   DemoAccessStore,
 } from '@/features/access-control';
+import type { SessionFactory } from './authSession';
+import type { AuthSessionStore } from './authSessionStore';
 
 import { AuthServiceError, type AuthService, type AuthServiceErrorCode } from './authService';
 import { AuthPageFrame } from './AuthPageFrame';
@@ -32,6 +34,8 @@ interface LoginPageProps {
   authService: AuthService;
   pendingDemoAccessStore?: PendingDemoAccessStore;
   accessStore?: DemoAccessStore;
+  sessionStore?: AuthSessionStore;
+  sessionFactory?: SessionFactory;
 }
 
 interface FieldErrors {
@@ -78,7 +82,13 @@ const demoCredentials: Record<DemoAccessProfileId, { mobile: string; password: s
   'group-guest': { mobile: '9876543215', password: 'demo@guest' },
 };
 
-export function LoginPage({ authService, pendingDemoAccessStore, accessStore }: LoginPageProps) {
+export function LoginPage({
+  authService,
+  pendingDemoAccessStore,
+  accessStore,
+  sessionStore,
+  sessionFactory,
+}: LoginPageProps) {
   const navigate = useNavigate();
   const countryCodeRef = useRef<HTMLSelectElement>(null);
   const nationalNumberRef = useRef<HTMLInputElement>(null);
@@ -187,6 +197,10 @@ export function LoginPage({ authService, pendingDemoAccessStore, accessStore }: 
             challengeId: 'direct-login',
             code: '123456',
           });
+        }
+
+        if (sessionStore && sessionFactory) {
+          sessionStore.setSession(sessionFactory());
         }
 
         const profileId = selectedProfileId || pendingDemoAccessStore?.getProfileId();

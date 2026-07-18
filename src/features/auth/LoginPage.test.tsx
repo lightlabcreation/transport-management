@@ -10,6 +10,8 @@ import {
   type DemoAccessStore,
 } from '@/features/access-control';
 
+import type { SessionFactory } from './authSession';
+import type { AuthSessionStore } from './authSessionStore';
 import { AuthServiceError, type AuthService } from './authService';
 import { LoginPage } from './LoginPage';
 
@@ -17,6 +19,8 @@ function renderLogin(
   authService: AuthService,
   pendingDemoAccessStore?: PendingDemoAccessStore,
   accessStore?: DemoAccessStore,
+  sessionStore?: AuthSessionStore,
+  sessionFactory?: SessionFactory,
 ) {
   const router = createMemoryRouter(
     [
@@ -27,6 +31,8 @@ function renderLogin(
             authService={authService}
             {...(pendingDemoAccessStore ? { pendingDemoAccessStore } : {})}
             {...(accessStore ? { accessStore } : {})}
+            {...(sessionStore ? { sessionStore } : {})}
+            {...(sessionFactory ? { sessionFactory } : {})}
           />
         ),
       },
@@ -49,6 +55,15 @@ function createAuthService(requestOtp: AuthService['requestOtp']): AuthService {
     loginWithPassword: vi.fn<NonNullable<AuthService['loginWithPassword']>>().mockResolvedValue({
       status: 'authenticated',
     }),
+  };
+}
+
+function createSessionStore(): AuthSessionStore {
+  return {
+    getSession: vi.fn(),
+    setSession: vi.fn(),
+    clearSession: vi.fn(),
+    isSessionValid: vi.fn(() => true),
   };
 }
 
@@ -111,7 +126,15 @@ describe('LoginPage', () => {
     };
     const pendingStore = createPendingDemoAccessStore(window.sessionStorage);
     const accessStore = createDemoAccessStore(window.sessionStorage);
-    const router = renderLogin(authService, pendingStore, accessStore);
+    const sessionStore = createSessionStore();
+    const sessionFactory = vi.fn(() => ({
+      kind: 'authenticated' as const,
+      userId: 'mock-user',
+      mobileNumber: '+919876543210',
+      authenticatedAt: new Date().toISOString(),
+      expiresAt: new Date(Date.now() + 86400000).toISOString(),
+    }));
+    const router = renderLogin(authService, pendingStore, accessStore, sessionStore, sessionFactory);
 
     await user.click(screen.getByRole('radio', { name: /Platform Owner/i }));
 
@@ -127,6 +150,8 @@ describe('LoginPage', () => {
       mobileNumber: '+919876543210',
       password: 'demo@owner',
     });
+    expect(sessionFactory).toHaveBeenCalledOnce();
+    expect(sessionStore.setSession).toHaveBeenCalledOnce();
     expect(accessStore.getProfile()?.id).toBe('group-owner');
   });
 
