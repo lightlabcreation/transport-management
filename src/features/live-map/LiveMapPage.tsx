@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Navigate, useLocation, useNavigate } from 'react-router';
 
 import { Input } from '@/components/ui/input';
+import type { DemoAccessStore } from '@/features/access-control';
 import { getApplicationNavigation } from '@/features/app-navigation';
 import { browserApplicationModeStore } from '@/features/application-mode';
 import type { AuthSessionStore } from '@/features/auth';
@@ -16,6 +17,7 @@ import type { LiveMapViewState, MemberStatus, TrackedMember } from './live-map.t
 
 interface LiveMapPageProps {
   sessionStore: AuthSessionStore;
+  accessStore?: DemoAccessStore;
   viewState?: LiveMapViewState;
 }
 
@@ -23,7 +25,7 @@ type StatusFilter = 'all' | MemberStatus;
 
 const statusFilters: StatusFilter[] = ['all', 'online', 'offline', 'stale'];
 
-export function LiveMapPage({ sessionStore, viewState = 'ready' }: LiveMapPageProps) {
+export function LiveMapPage({ sessionStore, accessStore, viewState = 'ready' }: LiveMapPageProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const [search, setSearch] = useState('');
@@ -31,7 +33,10 @@ export function LiveMapPage({ sessionStore, viewState = 'ready' }: LiveMapPagePr
   const [selectedMember, setSelectedMember] = useState<TrackedMember | null>(null);
   const [announcement, setAnnouncement] = useState('');
   const applicationMode = browserApplicationModeStore.getMode();
-  const applicationNavigation = applicationMode ? getApplicationNavigation(applicationMode) : [];
+  const accessProfile = accessStore?.getProfile() ?? null;
+  const applicationNavigation = applicationMode
+    ? getApplicationNavigation(applicationMode, accessProfile)
+    : [];
 
   const filteredMembers = useMemo(() => {
     const normalizedSearch = search.trim().toLowerCase();
@@ -68,7 +73,11 @@ export function LiveMapPage({ sessionStore, viewState = 'ready' }: LiveMapPagePr
     <ApplicationShell
       navigationItems={applicationNavigation}
       currentPath={location.pathname}
-      userSummary={{ name: 'Demo Operator', mobile: '+•• ••••••3210', roleLabel: 'Operations' }}
+      userSummary={{
+        name: 'Demo Operator',
+        mobile: 'Demo account',
+        roleLabel: accessProfile?.name ?? 'Operations',
+      }}
       onLogout={handleLogout}
     >
       <div className="space-y-section">

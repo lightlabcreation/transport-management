@@ -13,12 +13,12 @@ import {
 } from './speed-dashboard.data';
 
 const VIEW_STATE_DATA_MAP: Record<DashboardViewState, SpeedDashboardData | null> = {
-  'normal': MOCK_NORMAL_DATA,
+  normal: MOCK_NORMAL_DATA,
   'over-limit': MOCK_OVER_LIMIT_DATA,
   'empty-activity': MOCK_EMPTY_ACTIVITY_DATA,
   'empty-violations': MOCK_EMPTY_VIOLATIONS_DATA,
-  'loading': null,
-  'unavailable': null,
+  loading: null,
+  unavailable: null,
 };
 
 interface SpeedDashboardPageProps {
@@ -221,11 +221,7 @@ export function SpeedDashboardPage({ initialViewState = 'normal' }: SpeedDashboa
             Unable to connect to the vehicle telemetry service. Please check your system hardware,
             OBD connection, or device GPS settings.
           </p>
-          <Button
-            variant="outline"
-            onClick={() => setViewState('normal')}
-            className="mt-2"
-          >
+          <Button variant="outline" onClick={() => setViewState('normal')} className="mt-2">
             Retry Connection
           </Button>
         </div>
@@ -250,31 +246,44 @@ export function SpeedDashboardPage({ initialViewState = 'normal' }: SpeedDashboa
           <div className="md:col-span-2 space-y-6">
             {/* Speed Summary metrics cards */}
             <section aria-labelledby="summary-metrics-heading">
-              <h2 id="summary-metrics-heading" className="sr-only">Speed Summary Metrics</h2>
+              <h2 id="summary-metrics-heading" className="sr-only">
+                Speed Summary Metrics
+              </h2>
               <div className="grid gap-4 grid-cols-2 lg:grid-cols-4">
                 <article className="rounded-xl border border-border bg-card p-4 shadow-sm hover:border-muted transition-colors">
-                  <p className="text-body-sm font-semibold text-muted-foreground uppercase tracking-wider">Average Speed</p>
+                  <p className="text-body-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                    Average Speed
+                  </p>
                   <p className="mt-2 text-heading-md font-bold tracking-tight text-foreground">
-                    {data.summary.averageSpeed} <span className="text-xs text-muted-foreground">km/h</span>
+                    {data.summary.averageSpeed}{' '}
+                    <span className="text-xs text-muted-foreground">km/h</span>
                   </p>
                 </article>
 
                 <article className="rounded-xl border border-border bg-card p-4 shadow-sm hover:border-muted transition-colors">
-                  <p className="text-body-sm font-semibold text-muted-foreground uppercase tracking-wider">Maximum Speed</p>
+                  <p className="text-body-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                    Maximum Speed
+                  </p>
                   <p className="mt-2 text-heading-md font-bold tracking-tight text-foreground">
-                    {data.summary.maxSpeed} <span className="text-xs text-muted-foreground">km/h</span>
+                    {data.summary.maxSpeed}{' '}
+                    <span className="text-xs text-muted-foreground">km/h</span>
                   </p>
                 </article>
 
                 <article className="rounded-xl border border-border bg-card p-4 shadow-sm hover:border-muted transition-colors">
-                  <p className="text-body-sm font-semibold text-muted-foreground uppercase tracking-wider">Distance Tracked</p>
+                  <p className="text-body-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                    Distance Tracked
+                  </p>
                   <p className="mt-2 text-heading-md font-bold tracking-tight text-foreground">
-                    {data.summary.distanceTracked} <span className="text-xs text-muted-foreground">km</span>
+                    {data.summary.distanceTracked}{' '}
+                    <span className="text-xs text-muted-foreground">km</span>
                   </p>
                 </article>
 
                 <article className="rounded-xl border border-border bg-card p-4 shadow-sm hover:border-muted transition-colors">
-                  <p className="text-body-sm font-semibold text-muted-foreground uppercase tracking-wider">Total Time</p>
+                  <p className="text-body-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                    Total Time
+                  </p>
                   <p className="mt-2 text-heading-md font-bold tracking-tight text-foreground">
                     {data.summary.totalDrivingTime}
                   </p>

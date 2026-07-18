@@ -47,7 +47,9 @@ export function SpeedometerGauge({
     >
       {/* Speed limit sign element */}
       <div className="absolute top-4 right-4 flex flex-col items-center justify-center w-12 h-12 rounded-full border-4 border-danger bg-white shadow-xs font-bold text-slate-900 text-lg">
-        <span className="text-[10px] leading-none uppercase tracking-tighter text-slate-500 font-semibold">LIMIT</span>
+        <span className="text-[10px] leading-none uppercase tracking-tighter text-slate-500 font-semibold">
+          LIMIT
+        </span>
         {speedLimit}
       </div>
 
@@ -55,33 +57,20 @@ export function SpeedometerGauge({
         <h2 className="text-body-sm font-bold uppercase tracking-wider text-muted-foreground">
           Current Telemetry
         </h2>
-        <p className="text-[11px] text-muted-foreground mt-0.5">
-          Last active: {lastUpdated}
-        </p>
+        <p className="text-[11px] text-muted-foreground mt-0.5">Last active: {lastUpdated}</p>
       </div>
 
       {/* Gauge Display */}
       <div className="my-8 flex flex-col items-center justify-center relative">
         {/* SVG Dial Outline */}
         <svg className="w-48 h-48 transform -rotate-90" aria-hidden="true">
-          <circle
-            cx="96"
-            cy="96"
-            r="80"
-            stroke="#1e293b"
-            strokeWidth="12"
-            fill="transparent"
-          />
+          <circle cx="96" cy="96" r="80" stroke="#1e293b" strokeWidth="12" fill="transparent" />
           <circle
             cx="96"
             cy="96"
             r="80"
             stroke={
-              status === 'over-limit'
-                ? '#ef4444'
-                : status === 'near-limit'
-                  ? '#f59e0b'
-                  : '#10b981'
+              status === 'over-limit' ? '#ef4444' : status === 'near-limit' ? '#f59e0b' : '#10b981'
             }
             strokeWidth="12"
             fill="transparent"
@@ -92,9 +81,7 @@ export function SpeedometerGauge({
         </svg>
 
         <div className="absolute flex flex-col items-center justify-center">
-          <span className="text-5xl font-black tracking-tight text-foreground">
-            {currentSpeed}
-          </span>
+          <span className="text-5xl font-black tracking-tight text-foreground">{currentSpeed}</span>
           <span className="text-xs font-bold tracking-widest text-muted-foreground uppercase mt-0.5">
             KM/H
           </span>
@@ -103,7 +90,10 @@ export function SpeedometerGauge({
 
       {/* Status Presentation Label */}
       <div className="w-full text-center space-y-2">
-        <Badge variant="outline" className={`px-3 py-1 font-semibold uppercase text-xs border ${theme.badge}`}>
+        <Badge
+          variant="outline"
+          className={`px-3 py-1 font-semibold uppercase text-xs border ${theme.badge}`}
+        >
           {status === 'over-limit'
             ? 'Speed Limit Exceeded'
             : status === 'near-limit'

@@ -41,9 +41,7 @@ export function SpeedViolationsList({ violations }: SpeedViolationsListProps) {
               />
             </svg>
           </div>
-          <p className="text-body-sm font-medium text-foreground">
-            No speed violations detected.
-          </p>
+          <p className="text-body-sm font-medium text-foreground">No speed violations detected.</p>
           <p className="text-[11px] text-muted-foreground">Keep up the safe driving practices!</p>
         </div>
       ) : (
@@ -62,9 +60,7 @@ export function SpeedViolationsList({ violations }: SpeedViolationsListProps) {
               >
                 <div className="space-y-1">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="font-semibold text-foreground">
-                      {violation.locationLabel}
-                    </span>
+                    <span className="font-semibold text-foreground">{violation.locationLabel}</span>
                     <Badge
                       variant="outline"
                       className={`text-[10px] leading-none uppercase font-bold px-2 py-0.5 border ${sevColors[violation.severity]}`}
@@ -72,9 +68,7 @@ export function SpeedViolationsList({ violations }: SpeedViolationsListProps) {
                       {violation.severity} Risk
                     </Badge>
                   </div>
-                  <p className="text-xs text-muted-foreground">
-                    Timestamp: {violation.timeLabel}
-                  </p>
+                  <p className="text-xs text-muted-foreground">Timestamp: {violation.timeLabel}</p>
                 </div>
 
                 <div className="flex items-center gap-4 border-t border-border/40 pt-3 sm:border-t-0 sm:pt-0">

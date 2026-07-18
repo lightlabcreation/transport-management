@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react';
+
 import { useLocation, useNavigate } from 'react-router';
 
 import type { DemoAccessStore } from '@/features/access-control';
@@ -6,24 +8,24 @@ import type { ApplicationModeStore } from '@/features/application-mode';
 import type { AuthSessionStore } from '@/features/auth';
 import { ApplicationShell } from '@/features/shell';
 
-interface AppPagePlaceholderProps {
-  title: string;
+interface ApplicationPageFrameProps {
   sessionStore: AuthSessionStore;
   accessStore: DemoAccessStore;
   modeStore: ApplicationModeStore;
+  children: ReactNode;
 }
 
-export function AppPagePlaceholder({
-  title,
+export function ApplicationPageFrame({
   sessionStore,
   accessStore,
   modeStore,
-}: AppPagePlaceholderProps) {
+  children,
+}: ApplicationPageFrameProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const mode = modeStore.getMode();
-  const accessProfile = accessStore.getProfile();
-  const applicationNavigation = mode ? getApplicationNavigation(mode, accessProfile) : [];
+  const profile = accessStore.getProfile();
+  const navigationItems = mode ? getApplicationNavigation(mode, profile) : [];
 
   function handleLogout() {
     sessionStore.clearSession();
@@ -32,24 +34,16 @@ export function AppPagePlaceholder({
 
   return (
     <ApplicationShell
-      navigationItems={applicationNavigation}
+      navigationItems={navigationItems}
       currentPath={location.pathname}
       userSummary={{
         name: 'Demo Operator',
         mobile: 'Demo account',
-        roleLabel: accessProfile?.name,
+        roleLabel: profile?.name,
       }}
       onLogout={handleLogout}
     >
-      <section className="rounded-xl border border-border bg-surface p-page shadow-sm sm:p-section">
-        <p className="text-body-sm font-semibold uppercase tracking-wide text-primary">
-          Planned application module
-        </p>
-        <h2 className="mt-3 text-heading-lg font-semibold tracking-tight">{title}</h2>
-        <p className="mt-3 max-w-2xl text-body text-muted-foreground">
-          Feature implementation will be added in a later batch.
-        </p>
-      </section>
+      {children}
     </ApplicationShell>
   );
 }

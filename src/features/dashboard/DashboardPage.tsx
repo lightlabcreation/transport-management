@@ -28,7 +28,9 @@ export function DashboardPage({ sessionStore, accessProfile }: DashboardPageProp
   const navigate = useNavigate();
   const [announcement, setAnnouncement] = useState('');
   const applicationMode = browserApplicationModeStore.getMode();
-  const applicationNavigation = applicationMode ? getApplicationNavigation(applicationMode) : [];
+  const applicationNavigation = applicationMode
+    ? getApplicationNavigation(applicationMode, accessProfile)
+    : [];
 
   if (!sessionStore.getSession()) return <Navigate to="/auth/login" replace />;
   if (!accessProfile) return <Navigate to="/app/access-preview" replace />;

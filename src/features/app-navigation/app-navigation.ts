@@ -1,4 +1,9 @@
 import type { ApplicationMode } from '@/features/application-mode';
+import {
+  hasDemoCapability,
+  type DemoAccessProfile,
+  type DemoCapability,
+} from '@/features/access-control';
 import type { NavigationItem } from '@/features/shell';
 
 const sharedNavigationItems: readonly NavigationItem[] = [
@@ -44,7 +49,31 @@ const speedNavigationItems: readonly NavigationItem[] = [
   ...sharedNavigationItems,
 ];
 
-export function getApplicationNavigation(mode: ApplicationMode): NavigationItem[] {
+const navigationCapabilities: Record<string, DemoCapability> = {
+  dashboard: 'view-dashboard',
+  'live-map': 'view-live-map',
+  groups: 'view-groups',
+  speed: 'view-speed',
+  'speed-dashboard': 'view-speed',
+  navigation: 'view-navigation',
+  trips: 'view-trips',
+  alerts: 'view-alerts',
+  notifications: 'view-notifications',
+  reports: 'view-reports',
+  profile: 'view-profile',
+  settings: 'view-settings',
+};
+
+export function getApplicationNavigation(
+  mode: ApplicationMode,
+  profile: DemoAccessProfile | null = null,
+): NavigationItem[] {
   const navigationItems = mode === 'tracking' ? trackingNavigationItems : speedNavigationItems;
-  return navigationItems.map((item) => ({ ...item }));
+  return navigationItems
+    .filter((item) => {
+      if (!profile) return true;
+      const capability = navigationCapabilities[item.id];
+      return capability ? hasDemoCapability(profile, capability) : false;
+    })
+    .map((item) => ({ ...item }));
 }

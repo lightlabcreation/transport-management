@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest';
 
+import { demoAccessProfiles } from '@/features/access-control';
+
 import { getApplicationNavigation } from './app-navigation';
+
+function profile(id: (typeof demoAccessProfiles)[number]['id']) {
+  return demoAccessProfiles.find((item) => item.id === id)!;
+}
 
 describe('application navigation', () => {
   it('returns the complete tracking-mode navigation in its approved order', () => {
@@ -55,5 +61,28 @@ describe('application navigation', () => {
     firstResult[0]!.label = 'Changed';
 
     expect(getApplicationNavigation('tracking')[0]?.label).toBe('Dashboard');
+  });
+
+  it('filters policy-dependent destinations through the selected demo profile', () => {
+    const moderatorNavigation = getApplicationNavigation('tracking', profile('moderator'));
+
+    expect(moderatorNavigation.map(({ label }) => label)).not.toContain('Live Map');
+    expect(moderatorNavigation.map(({ label }) => label)).not.toContain('Trips');
+    expect(moderatorNavigation.map(({ label }) => label)).toContain('Reports');
+  });
+
+  it('keeps Group Guest navigation read-only and limited', () => {
+    const guestNavigation = getApplicationNavigation('tracking', profile('group-guest'));
+
+    expect(guestNavigation.map(({ label }) => label)).toEqual([
+      'Dashboard',
+      'Groups',
+      'Speed',
+      'Navigation',
+      'Alerts',
+      'Notifications',
+      'Profile',
+      'Settings',
+    ]);
   });
 });

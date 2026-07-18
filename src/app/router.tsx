@@ -4,6 +4,7 @@ import { createBrowserRouter, Navigate } from 'react-router';
 import {
   browserDemoAccessStore,
   browserPendingDemoAccessStore,
+  DemoCapabilityGate,
   DemoAccessPage,
   DemoAccessReset,
   ProtectedApplicationRoute,
@@ -35,8 +36,13 @@ import {
 import { DashboardRoute } from '@/features/dashboard';
 import { HomePage } from '@/features/home';
 import { LiveMapPage } from '@/features/live-map';
+import { NotificationsPage } from '@/features/notifications';
+import { ProfilePage } from '@/features/profile';
+import { SpeedDashboardPage } from '@/features/speed';
 
 import { createApplicationSessionStore } from './application-session-store';
+import { ApplicationPageFrame } from './ApplicationPageFrame';
+import { SettingsRoute } from './SettingsRoute';
 
 const browserApplicationSessionStore = createApplicationSessionStore({
   authSessionStore: browserAuthSessionStore,
@@ -59,6 +65,23 @@ function protectApplicationPage(children: ReactNode, requireMode = true) {
         children
       )}
     </ProtectedApplicationRoute>
+  );
+}
+
+function renderFramedApplicationPage(
+  capability: Parameters<typeof DemoCapabilityGate>[0]['capability'],
+  children: ReactNode,
+) {
+  return protectApplicationPage(
+    <ApplicationPageFrame
+      sessionStore={browserApplicationSessionStore}
+      accessStore={browserDemoAccessStore}
+      modeStore={browserApplicationModeStore}
+    >
+      <DemoCapabilityGate accessStore={browserDemoAccessStore} capability={capability}>
+        {children}
+      </DemoCapabilityGate>
+    </ApplicationPageFrame>,
   );
 }
 
@@ -133,7 +156,14 @@ export const router = createBrowserRouter([
   },
   {
     path: '/app/live-map',
-    element: protectApplicationPage(<LiveMapPage sessionStore={browserApplicationSessionStore} />),
+    element: protectApplicationPage(
+      <DemoCapabilityGate accessStore={browserDemoAccessStore} capability="view-live-map">
+        <LiveMapPage
+          sessionStore={browserApplicationSessionStore}
+          accessStore={browserDemoAccessStore}
+        />
+      </DemoCapabilityGate>,
+    ),
   },
   {
     path: '/app/access-preview',
@@ -162,17 +192,45 @@ export const router = createBrowserRouter([
   // Temporary route for developer review. Permanent shell integration is D1's responsibility.
   {
     path: '/app/groups',
-    element: protectApplicationPage(<GroupsPage />),
-  },
-  ...appPageDefinitions.map(({ path, title }) => ({
-    path,
     element: protectApplicationPage(
-      <AppPagePlaceholder
-        title={title}
+      <DemoCapabilityGate accessStore={browserDemoAccessStore} capability="view-groups">
+        <GroupsPage sessionStore={browserApplicationSessionStore} />
+      </DemoCapabilityGate>,
+    ),
+  },
+  {
+    path: '/app/speed',
+    element: renderFramedApplicationPage('view-speed', <SpeedDashboardPage />),
+  },
+  {
+    path: '/app/notifications',
+    element: renderFramedApplicationPage('view-notifications', <NotificationsPage />),
+  },
+  {
+    path: '/app/profile',
+    element: renderFramedApplicationPage('view-profile', <ProfilePage />),
+  },
+  {
+    path: '/app/settings',
+    element: renderFramedApplicationPage(
+      'view-settings',
+      <SettingsRoute
         sessionStore={browserApplicationSessionStore}
-        accessStore={browserDemoAccessStore}
         modeStore={browserApplicationModeStore}
       />,
+    ),
+  },
+  ...appPageDefinitions.map(({ path, title, capability }) => ({
+    path,
+    element: protectApplicationPage(
+      <DemoCapabilityGate accessStore={browserDemoAccessStore} capability={capability}>
+        <AppPagePlaceholder
+          title={title}
+          sessionStore={browserApplicationSessionStore}
+          accessStore={browserDemoAccessStore}
+          modeStore={browserApplicationModeStore}
+        />
+      </DemoCapabilityGate>,
     ),
   })),
 ]);

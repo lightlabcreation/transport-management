@@ -11,7 +11,10 @@ export function WeeklyTrendChart({ trend }: WeeklyTrendChartProps) {
       className="rounded-xl border border-border bg-card p-6 shadow-sm flex flex-col justify-between"
     >
       <div className="flex items-center justify-between mb-4">
-        <h2 id="trend-heading" className="text-body-sm font-bold uppercase tracking-wider text-muted-foreground">
+        <h2
+          id="trend-heading"
+          className="text-body-sm font-bold uppercase tracking-wider text-muted-foreground"
+        >
           Weekly Speed Trend
         </h2>
         <span className="text-xs text-muted-foreground">Avg vs Max</span>
@@ -23,7 +26,8 @@ export function WeeklyTrendChart({ trend }: WeeklyTrendChartProps) {
         <ul>
           {trend.map((point) => (
             <li key={point.day}>
-              {point.day}: Average speed {point.averageSpeed} km/h, Maximum speed {point.maxSpeed} km/h
+              {point.day}: Average speed {point.averageSpeed} km/h, Maximum speed {point.maxSpeed}{' '}
+              km/h
             </li>
           ))}
         </ul>
