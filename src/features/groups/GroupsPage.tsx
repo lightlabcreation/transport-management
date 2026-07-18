@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { browserDemoAccessStore } from '@/features/access-control';
 import { getApplicationNavigation } from '@/features/app-navigation';
 import { browserApplicationModeStore } from '@/features/application-mode';
-import { browserAuthSessionStore } from '@/features/auth';
+import { browserAuthSessionStore, type AuthSessionStore } from '@/features/auth';
 import { ApplicationShell } from '@/features/shell';
 
 import { GroupFilters } from './components/GroupFilters';
@@ -24,12 +24,18 @@ import type {
 
 const LOADING_DELAY_MS = 600;
 
-export function GroupsPage() {
+interface GroupsPageProps {
+  sessionStore?: AuthSessionStore;
+}
+
+export function GroupsPage({ sessionStore = browserAuthSessionStore }: GroupsPageProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const profile = browserDemoAccessStore.getProfile();
   const applicationMode = browserApplicationModeStore.getMode();
-  const applicationNavigation = applicationMode ? getApplicationNavigation(applicationMode) : [];
+  const applicationNavigation = applicationMode
+    ? getApplicationNavigation(applicationMode, profile)
+    : [];
 
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [isCreatingGroup, setIsCreatingGroup] = useState(false);
@@ -93,11 +99,11 @@ export function GroupsPage() {
   }
 
   function handleLogout() {
-    browserAuthSessionStore.clearSession();
+    sessionStore.clearSession();
     void navigate('/auth/login', { replace: true });
   }
 
-  if (!browserAuthSessionStore.getSession()) {
+  if (!sessionStore.getSession()) {
     return <Navigate to="/auth/login" replace />;
   }
 
@@ -105,11 +111,8 @@ export function GroupsPage() {
     return <Navigate to="/app/access-preview" replace />;
   }
 
-  const profileId = profile.id;
-  const canCreateGroup =
-    profileId === 'group-owner' ||
-    profileId === 'group-admin' ||
-    profileId === 'delegated-group-administrator';
+  // A profile's membership in one group must not globally prevent creating another group.
+  const canCreateGroup = applicationMode === 'tracking';
 
   return (
     <ApplicationShell

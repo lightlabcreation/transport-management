@@ -232,14 +232,14 @@ describe('GroupsPage', () => {
     expect(activeLink).toBeDefined();
   });
 
-  it('Member profile sees read-only presentation (Create Group hidden)', async () => {
+  it('Member profile can start a separate group', async () => {
     await renderAndWait('member');
-    expect(screen.queryByRole('button', { name: 'Create new group' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Create new group' })).toBeInTheDocument();
   });
 
-  it('Guest profile sees restricted presentation (Create Group hidden)', async () => {
+  it('Guest profile can start a separate group', async () => {
     await renderAndWait('group-guest');
-    expect(screen.queryByRole('button', { name: 'Create new group' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Create new group' })).toBeInTheDocument();
   });
 
   it('Logout behavior clears session', async () => {
