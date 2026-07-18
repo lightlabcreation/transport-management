@@ -3,34 +3,33 @@ import type { DemoAccessProfile } from './demo-access.types';
 export const demoAccessProfiles: readonly DemoAccessProfile[] = [
   {
     id: 'group-owner',
-    name: 'Group Owner',
-    description: 'Preview the group creator experience and its complete management surface.',
+    name: 'Platform Owner',
+    description: 'Master platform management and complete group control.',
   },
   {
     id: 'delegated-group-administrator',
-    name: 'Delegated Group Administrator',
-    description:
-      'Preview administration with an explicitly delegated set of group responsibilities.',
+    name: 'Admin Assistant',
+    description: 'Assisted administration with delegated group permissions.',
   },
   {
     id: 'group-admin',
-    name: 'Group Admin',
-    description: 'Preview day-to-day group operations and permitted member coordination.',
+    name: 'Fleet Admin',
+    description: 'Day-to-day group operations and cluster coordination.',
   },
   {
     id: 'moderator',
-    name: 'Moderator',
-    description: 'Preview limited membership, request, content, and safety operations.',
+    name: 'Safety Moderator',
+    description: 'Speed violation monitoring and road safety checks.',
   },
   {
     id: 'member',
-    name: 'Member',
-    description: 'Preview the standard participant experience for tracking and group activity.',
+    name: 'Active Driver',
+    description: 'Live GPS telemetry tracking and emergency controls.',
   },
   {
     id: 'group-guest',
-    name: 'Group Guest',
-    description: 'Preview a restricted, temporary, and primarily read-only group experience.',
+    name: 'Guest Viewer',
+    description: 'Restricted, temporary, and read-only map preview.',
   },
 ];
 

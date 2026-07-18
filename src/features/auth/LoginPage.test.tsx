@@ -63,12 +63,12 @@ describe('LoginPage', () => {
     expect(screen.getByRole('heading', { name: 'Welcome back' })).toBeInTheDocument();
     expect(screen.getByRole('radiogroup', { name: 'Demo roles' })).toBeInTheDocument();
     expect(screen.getAllByRole('radio')).toHaveLength(6);
-    expect(screen.getByText(/frontend demo access preview only/i)).toBeInTheDocument();
+    expect(screen.getByText(/Quick demo accounts/i)).toBeInTheDocument();
     expect(screen.getByLabelText('Country code')).toHaveAttribute(
       'autocomplete',
       'tel-country-code',
     );
-    expect(screen.getByLabelText('Mobile number')).toHaveAttribute('autocomplete', 'tel-national');
+    expect(screen.getByLabelText('Mobile number')).toHaveAttribute('autocomplete', 'off');
     expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
     expect(screen.queryByText(/forgot password/i)).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Send OTP' })).toBeInTheDocument();
@@ -113,7 +113,7 @@ describe('LoginPage', () => {
     const accessStore = createDemoAccessStore(window.sessionStorage);
     const router = renderLogin(authService, pendingStore, accessStore);
 
-    await user.click(screen.getByRole('radio', { name: /Group Owner/i }));
+    await user.click(screen.getByRole('radio', { name: /Platform Owner/i }));
 
     expect(screen.getByLabelText('Country code')).toHaveValue('+91');
     expect(screen.getByLabelText('Mobile number')).toHaveValue('9876543210');
@@ -213,7 +213,7 @@ describe('LoginPage', () => {
     const pendingStore = createPendingDemoAccessStore(window.sessionStorage);
     const router = renderLogin(createAuthService(requestOtp), pendingStore);
 
-    await user.click(screen.getByRole('radio', { name: /Group Owner/i }));
+    await user.click(screen.getByRole('radio', { name: /Platform Owner/i }));
     await user.click(screen.getByRole('button', { name: 'Send OTP' }));
 
     await waitFor(() => expect(router.state.location.pathname).toBe('/auth/verify'));
@@ -232,7 +232,7 @@ describe('LoginPage', () => {
       .mockRejectedValue(new Error('request failed'));
     renderLogin(createAuthService(requestOtp), pendingStore);
 
-    await user.click(screen.getByDisplayValue('member'));
+    await user.click(screen.getByRole('radio', { name: /Active Driver/i }));
     await user.click(screen.getByRole('button', { name: 'Send OTP' }));
 
     await screen.findByRole('alert');

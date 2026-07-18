@@ -61,12 +61,12 @@ const countryOptions = [
 ] as const;
 
 const shortProfileInfo: Record<DemoAccessProfileId, { icon: string; shortDesc: string }> = {
-  'group-owner': { icon: '👑', shortDesc: 'Master control over platform & groups' },
+  'group-owner': { icon: '👑', shortDesc: 'Master platform management & group control' },
   'delegated-group-administrator': { icon: '🔑', shortDesc: 'Assisted administration & permissions' },
-  'group-admin': { icon: '🛡️', shortDesc: 'Manage cluster ops & safety policies' },
-  moderator: { icon: '👨‍💼', shortDesc: 'Monitor speed violations & road safety' },
-  member: { icon: '👥', shortDesc: 'Live GPS tracking & SOS emergency controls' },
-  'group-guest': { icon: '👁️', shortDesc: 'View-only map preview (no GPS sharing)' },
+  'group-admin': { icon: '🛡️', shortDesc: 'Day-to-day group ops & cluster coordination' },
+  moderator: { icon: '👨‍💼', shortDesc: 'Speed violation monitoring & safety checks' },
+  member: { icon: '👥', shortDesc: 'Live GPS telemetry tracking & emergency SOS' },
+  'group-guest': { icon: '👁️', shortDesc: 'Restricted, temporary read-only map preview' },
 };
 
 const demoCredentials: Record<DemoAccessProfileId, { mobile: string; password: string }> = {
@@ -219,7 +219,7 @@ export function LoginPage({ authService, pendingDemoAccessStore, accessStore }: 
       compact
       eyebrow="Passwordless access"
       title="Welcome back"
-      description="Choose an optional demo role, then enter your mobile number to generate a one-time verification code."
+      description="Enter your mobile number to get started right away, or pick a demo profile below for 1-click auto-fill."
       footer={
         <nav aria-label="Authentication links" className="flex justify-center gap-4">
           <Link
@@ -246,164 +246,177 @@ export function LoginPage({ authService, pendingDemoAccessStore, accessStore }: 
           void handleActionSubmit('login');
         }}
       >
-        <fieldset className="space-y-2.5 rounded-lg border border-border/80 bg-surface/40 p-3">
-          <legend className="text-body-sm font-bold text-foreground px-1">
-            Choose demo role <span className="font-normal text-muted-foreground">(optional)</span>
-          </legend>
-          <p className="text-body-xs font-medium text-muted-foreground px-1 leading-snug">
-            This role selector is for frontend demo access preview only. Production roles will be managed by backend authorization.
-          </p>
-          <div className="grid gap-2 sm:grid-cols-2 pt-0.5" role="radiogroup" aria-label="Demo roles">
+        {/* TOP SECTION: MAIN LOGIN INPUTS */}
+        <div className="space-y-3">
+          <div className="space-y-1.5">
+            <Label htmlFor="phone-number-input" className="text-body-sm font-bold text-foreground">
+              Mobile number
+            </Label>
+            <div className="grid gap-2 sm:grid-cols-[minmax(8.5rem,0.38fr)_minmax(0,1fr)]">
+              <select
+                ref={countryCodeRef}
+                id="country-code"
+                name="countryCode"
+                autoComplete="tel-country-code"
+                value={countryCode}
+                onChange={(event) => setCountryCode(event.currentTarget.value)}
+                aria-label="Country code"
+                aria-invalid={fieldErrors.countryCode ? true : undefined}
+                aria-describedby={fieldErrors.countryCode ? 'country-code-error' : undefined}
+                className="h-10 w-full rounded-md border border-input bg-surface px-3 py-1.5 text-body-sm font-semibold text-foreground transition-colors duration-fast ease-standard focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-surface-muted aria-invalid:border-danger"
+              >
+                <option value="">Code</option>
+                {countryOptions.map((country) => (
+                  <option key={country.value} value={country.value}>
+                    {country.label}
+                  </option>
+                ))}
+              </select>
+              <Input
+                ref={nationalNumberRef}
+                id="phone-number-input"
+                name="phone"
+                type="tel"
+                inputMode="numeric"
+                pattern="[0-9]*"
+                autoComplete="off"
+                value={nationalNumber}
+                onChange={(event) => setNationalNumber(event.currentTarget.value.replace(/\D/g, ''))}
+                aria-label="Mobile number"
+                aria-invalid={fieldErrors.nationalNumber ? true : undefined}
+                aria-describedby={fieldErrors.nationalNumber ? 'mobile-number-error' : undefined}
+                placeholder="9876543210 (Digits only)"
+                className="h-10 text-body-sm font-semibold tracking-wide"
+              />
+            </div>
+            {fieldErrors.countryCode ? (
+              <p id="country-code-error" className="text-body-xs font-semibold text-danger">
+                {fieldErrors.countryCode}
+              </p>
+            ) : null}
+            {fieldErrors.nationalNumber ? (
+              <p id="mobile-number-error" className="text-body-xs font-semibold text-danger">
+                {fieldErrors.nationalNumber}
+              </p>
+            ) : null}
+          </div>
+
+          <div className="space-y-1.5 pt-0.5">
+            <Label htmlFor="password" className="text-body-sm font-bold text-foreground">
+              Password <span className="font-normal text-muted-foreground">(optional)</span>
+            </Label>
+            <Input
+              ref={passwordRef}
+              id="password"
+              name="password"
+              type="password"
+              autoComplete="current-password"
+              value={password}
+              onChange={(event) => setPassword(event.currentTarget.value)}
+              aria-invalid={fieldErrors.password ? true : undefined}
+              aria-describedby={fieldErrors.password ? 'password-error' : undefined}
+              placeholder="Enter password to login directly (optional)"
+              className="h-10 text-body-sm font-semibold"
+            />
+            {fieldErrors.password ? (
+              <p id="password-error" role="alert" className="text-body-xs font-semibold text-danger">
+                {fieldErrors.password}
+              </p>
+            ) : null}
+          </div>
+
+          {serviceError ? (
+            <div
+              ref={serviceErrorRef}
+              role="alert"
+              tabIndex={-1}
+              className="rounded-md border border-danger p-2.5 text-body-xs font-semibold text-danger"
+            >
+              {serviceError}
+            </div>
+          ) : null}
+
+          {isSubmitting ? (
+            <p role="status" className="text-body-xs font-medium text-muted-foreground">
+              {activeAction === 'otp' ? 'Sending verification code...' : 'Logging in to dashboard...'}
+            </p>
+          ) : null}
+
+          <div className="grid grid-cols-2 gap-3 pt-1">
+            <Button
+              type="button"
+              variant="outline"
+              size="md"
+              className="h-10 text-body-sm font-bold"
+              fullWidth
+              isLoading={isSubmitting && activeAction === 'otp'}
+              onClick={() => void handleActionSubmit('otp')}
+            >
+              Send OTP
+            </Button>
+            <Button
+              type="button"
+              variant="primary"
+              size="md"
+              className="h-10 text-body-sm font-bold"
+              fullWidth
+              isLoading={isSubmitting && activeAction === 'login'}
+              onClick={() => void handleActionSubmit('login')}
+            >
+              Login
+            </Button>
+          </div>
+        </div>
+
+        {/* MIDDLE SECTION: ELEGANT DIVIDER */}
+        <div className="relative py-3">
+          <div className="absolute inset-0 flex items-center" aria-hidden="true">
+            <div className="w-full border-t border-border/80" />
+          </div>
+          <div className="relative flex justify-center">
+            <span className="bg-background px-3 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+              Quick demo accounts (Click to auto-fill)
+            </span>
+          </div>
+        </div>
+
+        {/* BOTTOM SECTION: SLEEK RENAMED ROLES CARDS GRID */}
+        <div className="space-y-2">
+          <div className="grid gap-2 sm:grid-cols-2" role="radiogroup" aria-label="Demo roles">
             {demoAccessProfiles.map((profile) => {
               const isSelected = selectedProfileId === profile.id;
               const info = shortProfileInfo[profile.id];
               return (
-                <label
+                <button
                   key={profile.id}
-                  className={`flex cursor-pointer items-center gap-2.5 rounded-md border px-3 py-2 transition-colors focus-within:ring-2 focus-within:ring-primary ${
+                  type="button"
+                  role="radio"
+                  aria-checked={isSelected}
+                  onClick={() => handleSelectProfile(profile.id)}
+                  className={`group relative flex flex-col items-start text-left rounded-lg border p-3 transition-all duration-fast ease-standard focus:outline-none focus:ring-2 focus:ring-primary ${
                     isSelected
-                      ? 'border-primary bg-primary/10 shadow-2xs font-bold'
-                      : 'border-border bg-card hover:border-primary/40 font-medium'
+                      ? 'border-primary bg-primary/10 shadow-2xs'
+                      : 'border-border/80 bg-surface/50 hover:border-primary/50 hover:bg-surface'
                   }`}
                 >
-                  <input
-                    type="radio"
-                    name="demoProfile"
-                    value={profile.id}
-                    checked={isSelected}
-                    onChange={() => handleSelectProfile(profile.id)}
-                    className="size-4 accent-primary shrink-0"
-                  />
-                  <span className="min-w-0 flex-1">
-                    <span className="block text-body-sm font-bold text-foreground leading-snug">
-                      {info.icon} {profile.name}
+                  <div className="flex w-full items-center justify-between gap-1.5">
+                    <span className="text-body-sm font-bold text-foreground flex items-center gap-1.5 leading-snug">
+                      <span>{info.icon}</span>
+                      <span>{profile.name}</span>
                     </span>
-                    <span className="block text-body-xs text-muted-foreground font-medium leading-tight">
-                      {info.shortDesc}
-                    </span>
+                    {isSelected ? (
+                      <span className="inline-flex items-center gap-1 rounded-full bg-primary/20 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-primary">
+                        ✓ Selected
+                      </span>
+                    ) : null}
+                  </div>
+                  <span className="mt-1 block text-body-xs font-medium text-muted-foreground leading-snug">
+                    {info.shortDesc}
                   </span>
-                </label>
+                </button>
               );
             })}
           </div>
-        </fieldset>
-
-        <div className="space-y-1.5">
-          <Label htmlFor="mobile-number" className="text-body-sm font-bold">
-            Mobile number
-          </Label>
-          <div className="grid gap-2 sm:grid-cols-[minmax(8.5rem,0.38fr)_minmax(0,1fr)]">
-            <select
-              ref={countryCodeRef}
-              id="country-code"
-              name="countryCode"
-              autoComplete="tel-country-code"
-              value={countryCode}
-              onChange={(event) => setCountryCode(event.currentTarget.value)}
-              aria-label="Country code"
-              aria-invalid={fieldErrors.countryCode ? true : undefined}
-              aria-describedby={fieldErrors.countryCode ? 'country-code-error' : undefined}
-              className="h-10 w-full rounded-md border border-input bg-surface px-3 py-1.5 text-body-sm font-semibold text-foreground transition-colors duration-fast ease-standard focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-surface-muted aria-invalid:border-danger"
-            >
-              <option value="">Code</option>
-              {countryOptions.map((country) => (
-                <option key={country.value} value={country.value}>
-                  {country.label}
-                </option>
-              ))}
-            </select>
-            <Input
-              ref={nationalNumberRef}
-              id="mobile-number"
-              name="mobileNumber"
-              type="tel"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              autoComplete="tel-national"
-              value={nationalNumber}
-              onChange={(event) => setNationalNumber(event.currentTarget.value.replace(/\D/g, ''))}
-              aria-invalid={fieldErrors.nationalNumber ? true : undefined}
-              aria-describedby={fieldErrors.nationalNumber ? 'mobile-number-error' : undefined}
-              placeholder="9876543210 (Digits only)"
-              className="h-10 text-body-sm font-semibold tracking-wide"
-            />
-          </div>
-          {fieldErrors.countryCode ? (
-            <p id="country-code-error" className="text-body-xs font-semibold text-danger">
-              {fieldErrors.countryCode}
-            </p>
-          ) : null}
-          {fieldErrors.nationalNumber ? (
-            <p id="mobile-number-error" className="text-body-xs font-semibold text-danger">
-              {fieldErrors.nationalNumber}
-            </p>
-          ) : null}
-        </div>
-
-        <div className="space-y-1.5 pt-0.5">
-          <Label htmlFor="password" className="text-body-sm font-bold">
-            Password <span className="font-normal text-muted-foreground">(optional)</span>
-          </Label>
-          <Input
-            ref={passwordRef}
-            id="password"
-            name="password"
-            type="password"
-            autoComplete="current-password"
-            value={password}
-            onChange={(event) => setPassword(event.currentTarget.value)}
-            aria-invalid={fieldErrors.password ? true : undefined}
-            aria-describedby={fieldErrors.password ? 'password-error' : undefined}
-            placeholder="Enter password to login directly (optional)"
-            className="h-10 text-body-sm font-semibold"
-          />
-          {fieldErrors.password ? (
-            <p id="password-error" role="alert" className="text-body-xs font-semibold text-danger">
-              {fieldErrors.password}
-            </p>
-          ) : null}
-        </div>
-
-        {serviceError ? (
-          <div
-            ref={serviceErrorRef}
-            role="alert"
-            tabIndex={-1}
-            className="rounded-md border border-danger p-2.5 text-body-xs font-semibold text-danger"
-          >
-            {serviceError}
-          </div>
-        ) : null}
-
-        {isSubmitting ? (
-          <p role="status" className="text-body-xs font-medium text-muted-foreground">
-            {activeAction === 'otp' ? 'Sending verification code...' : 'Logging in to dashboard...'}
-          </p>
-        ) : null}
-
-        <div className="grid grid-cols-2 gap-3 pt-1">
-          <Button
-            type="button"
-            variant="outline"
-            size="md"
-            className="h-10 text-body-sm font-bold"
-            fullWidth
-            isLoading={isSubmitting && activeAction === 'otp'}
-            onClick={() => void handleActionSubmit('otp')}
-          >
-            Send OTP
-          </Button>
-          <Button
-            type="button"
-            variant="primary"
-            size="md"
-            className="h-10 text-body-sm font-bold"
-            fullWidth
-            isLoading={isSubmitting && activeAction === 'login'}
-            onClick={() => void handleActionSubmit('login')}
-          >
-            Login
-          </Button>
         </div>
       </form>
     </AuthPageFrame>

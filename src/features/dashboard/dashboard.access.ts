@@ -56,9 +56,9 @@ const capabilities: Record<DemoAccessProfileId, DashboardCapabilities> = {
 const presentations: Record<DemoAccessProfileId, Omit<DashboardPresentation, 'capabilities'>> = {
   'group-owner': {
     profileId: 'group-owner',
-    profileName: 'Group Owner',
+    profileName: 'Platform Owner',
     eyebrow: 'Complete group overview',
-    heading: 'Group Owner dashboard',
+    heading: 'Platform Owner dashboard',
     description: 'Monitor group health, member activity, trips, and tracking from one preview.',
     summaryLabel: 'Owner summary',
     metrics: [
@@ -75,9 +75,9 @@ const presentations: Record<DemoAccessProfileId, Omit<DashboardPresentation, 'ca
   },
   'delegated-group-administrator': {
     profileId: 'delegated-group-administrator',
-    profileName: 'Delegated Group Administrator',
+    profileName: 'Admin Assistant',
     eyebrow: 'Delegated operations',
-    heading: 'Delegated Administrator dashboard',
+    heading: 'Admin Assistant dashboard',
     description: 'Focus on assigned groups and explicitly delegated operational responsibilities.',
     summaryLabel: 'Delegated administration summary',
     metrics: [
@@ -94,9 +94,9 @@ const presentations: Record<DemoAccessProfileId, Omit<DashboardPresentation, 'ca
   },
   'group-admin': {
     profileId: 'group-admin',
-    profileName: 'Group Admin',
+    profileName: 'Fleet Admin',
     eyebrow: 'Group operations',
-    heading: 'Group Admin dashboard',
+    heading: 'Fleet Admin dashboard',
     description: 'Coordinate active trips, group members, tracking, and moderation previews.',
     summaryLabel: 'Administration summary',
     metrics: [
@@ -113,9 +113,9 @@ const presentations: Record<DemoAccessProfileId, Omit<DashboardPresentation, 'ca
   },
   moderator: {
     profileId: 'moderator',
-    profileName: 'Moderator',
+    profileName: 'Safety Moderator',
     eyebrow: 'Review and monitoring',
-    heading: 'Moderator dashboard',
+    heading: 'Safety Moderator dashboard',
     description: 'Review requests, reports, alerts, and recent activity within the demo scope.',
     summaryLabel: 'Moderation summary',
     metrics: [
@@ -132,9 +132,9 @@ const presentations: Record<DemoAccessProfileId, Omit<DashboardPresentation, 'ca
   },
   member: {
     profileId: 'member',
-    profileName: 'Member',
+    profileName: 'Active Driver',
     eyebrow: 'Personal activity',
-    heading: 'Member dashboard',
+    heading: 'Active Driver dashboard',
     description: 'See your own trips, tracking status, activity, and alerts in one place.',
     summaryLabel: 'Personal summary',
     metrics: [
@@ -151,9 +151,9 @@ const presentations: Record<DemoAccessProfileId, Omit<DashboardPresentation, 'ca
   },
   'group-guest': {
     profileId: 'group-guest',
-    profileName: 'Group Guest',
+    profileName: 'Guest Viewer',
     eyebrow: 'Limited access',
-    heading: 'Group Guest dashboard',
+    heading: 'Guest Viewer dashboard',
     description: 'View the limited information currently shared with this demo guest profile.',
     summaryLabel: 'Guest summary',
     metrics: [
