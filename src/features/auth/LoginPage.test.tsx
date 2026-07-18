@@ -55,7 +55,7 @@ describe('LoginPage', () => {
       'tel-country-code',
     );
     expect(screen.getByLabelText('Mobile number')).toHaveAttribute('autocomplete', 'tel-national');
-    expect(screen.queryByLabelText(/password/i)).not.toBeInTheDocument();
+    expect(screen.getByLabelText(/password/i)).toBeInTheDocument();
     expect(screen.queryByText(/forgot password/i)).not.toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Generate OTP' })).toBeInTheDocument();
   });

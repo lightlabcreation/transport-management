@@ -1,5 +1,6 @@
 export interface RequestOtpInput {
   mobileNumber: string;
+  password?: string | undefined;
 }
 
 export type AuthChallengeSource = 'login' | 'registration';

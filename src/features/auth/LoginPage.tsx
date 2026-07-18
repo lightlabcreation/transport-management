@@ -54,6 +54,15 @@ const countryOptions = [
   { value: '+65', label: 'Singapore (+65)' },
 ] as const;
 
+const shortProfileInfo: Record<DemoAccessProfileId, { icon: string; shortDesc: string }> = {
+  'group-owner': { icon: '👑', shortDesc: 'Master control over platform & groups' },
+  'delegated-group-administrator': { icon: '🔑', shortDesc: 'Assisted administration & permissions' },
+  'group-admin': { icon: '🛡️', shortDesc: 'Manage cluster ops & safety policies' },
+  moderator: { icon: '👨‍💼', shortDesc: 'Monitor speed violations & road safety' },
+  member: { icon: '👥', shortDesc: 'Live GPS tracking & SOS emergency controls' },
+  'group-guest': { icon: '👁️', shortDesc: 'View-only map preview (no GPS sharing)' },
+};
+
 export function LoginPage({ authService, pendingDemoAccessStore }: LoginPageProps) {
   const navigate = useNavigate();
   const countryCodeRef = useRef<HTMLSelectElement>(null);
@@ -61,6 +70,7 @@ export function LoginPage({ authService, pendingDemoAccessStore }: LoginPageProp
   const serviceErrorRef = useRef<HTMLDivElement>(null);
   const [countryCode, setCountryCode] = useState('');
   const [nationalNumber, setNationalNumber] = useState('');
+  const [password, setPassword] = useState('');
   const [selectedProfileId, setSelectedProfileId] = useState<DemoAccessProfileId | ''>('');
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [serviceError, setServiceError] = useState<string>();
@@ -117,6 +127,7 @@ export function LoginPage({ authService, pendingDemoAccessStore }: LoginPageProp
     try {
       const response = await authService.requestOtp({
         mobileNumber: normalizePhoneNumber(result.data.countryCode, result.data.nationalNumber),
+        password: password ? password : undefined,
       });
 
       void navigate('/auth/verify', {
@@ -163,24 +174,25 @@ export function LoginPage({ authService, pendingDemoAccessStore }: LoginPageProp
       }
     >
       <form className="space-y-5" noValidate onSubmit={(event) => void handleSubmit(event)}>
-        <fieldset className="space-y-3">
-          <legend className="text-body-sm font-semibold text-foreground">
+        <fieldset className="space-y-2.5 rounded-lg border border-border/80 bg-surface/50 p-3.5">
+          <legend className="text-body-sm font-semibold text-foreground px-1">
             Choose demo role <span className="font-normal text-muted-foreground">(optional)</span>
           </legend>
-          <p className="text-body-sm text-muted-foreground">
+          <p className="text-body-xs text-muted-foreground px-1">
             This role selector is for frontend demo access preview only. Production roles will be
             managed by backend authorization.
           </p>
-          <div className="grid gap-2 sm:grid-cols-2" role="radiogroup" aria-label="Demo roles">
+          <div className="grid gap-2 sm:grid-cols-2 pt-1" role="radiogroup" aria-label="Demo roles">
             {demoAccessProfiles.map((profile) => {
               const isSelected = selectedProfileId === profile.id;
+              const info = shortProfileInfo[profile.id];
               return (
                 <label
                   key={profile.id}
-                  className={`flex cursor-pointer items-start gap-3 rounded-md border p-3 transition-colors focus-within:ring-2 focus-within:ring-primary ${
+                  className={`flex cursor-pointer items-start gap-2.5 rounded-md border px-3 py-2 transition-colors focus-within:ring-2 focus-within:ring-primary ${
                     isSelected
-                      ? 'border-primary bg-primary/5'
-                      : 'border-border bg-surface hover:border-primary/50'
+                      ? 'border-primary bg-primary/10 shadow-2xs font-semibold'
+                      : 'border-border bg-card hover:border-primary/40'
                   }`}
                 >
                   <input
@@ -189,14 +201,14 @@ export function LoginPage({ authService, pendingDemoAccessStore }: LoginPageProp
                     value={profile.id}
                     checked={isSelected}
                     onChange={() => setSelectedProfileId(profile.id)}
-                    className="mt-1 size-4 accent-primary"
+                    className="mt-0.5 size-3.5 accent-primary shrink-0"
                   />
-                  <span className="min-w-0">
-                    <span className="block text-body-sm font-semibold text-foreground">
-                      {profile.name}
+                  <span className="min-w-0 flex-1">
+                    <span className="block text-body-xs font-bold text-foreground truncate">
+                      {info.icon} {profile.name}
                     </span>
-                    <span className="mt-1 block text-body-sm text-muted-foreground">
-                      {profile.description}
+                    <span className="mt-0.5 block text-body-xs text-muted-foreground line-clamp-1 leading-snug">
+                      {info.shortDesc}
                     </span>
                   </span>
                 </label>
@@ -251,6 +263,21 @@ export function LoginPage({ authService, pendingDemoAccessStore }: LoginPageProp
               {fieldErrors.nationalNumber}
             </p>
           ) : null}
+        </div>
+
+        <div className="space-y-1.5 pt-0.5">
+          <Label htmlFor="password">
+            Password <span className="font-normal text-muted-foreground">(optional)</span>
+          </Label>
+          <Input
+            id="password"
+            name="password"
+            type="password"
+            autoComplete="current-password"
+            value={password}
+            onChange={(event) => setPassword(event.currentTarget.value)}
+            placeholder="Enter password if already set (optional)"
+          />
         </div>
 
         {serviceError ? (
