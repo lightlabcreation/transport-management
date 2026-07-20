@@ -147,7 +147,7 @@ export function CreateGroupPage({ onBack, onGroupCreated }: CreateGroupPageProps
         name: form.name.trim(),
         description: form.description.trim(),
         visibility: form.visibility,
-        status: 'active',
+        status: 'pending',
         memberCount: 1,
         lastUpdated: new Date().toISOString(),
         initials,
