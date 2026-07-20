@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { browserDemoAccessStore } from '@/features/access-control';
 import type { Group, GroupRole, GroupCapability, GroupFormState } from './groups.types';
 import { pendingGroupsStore, createdGroupsStore } from './pending-groups.store';
 import {
@@ -143,12 +144,16 @@ export function CreateGroupPage({ onBack, onGroupCreated }: CreateGroupPageProps
           ? `${nameWords[0][0]}${nameWords[1][0]}`.toUpperCase()
           : form.name.slice(0, 2).toUpperCase();
 
+      // Check active role: Platform Owner created groups are instantly ACTIVE without approval
+      const profile = browserDemoAccessStore.getProfile();
+      const isPlatformOwner = profile?.id === 'group-owner';
+
       const newGroup: Group = {
         id: `group-${Date.now()}`,
         name: form.name.trim(),
         description: form.description.trim(),
         visibility: form.visibility,
-        status: 'pending',
+        status: isPlatformOwner ? 'active' : 'pending',
         memberCount: 1,
         lastUpdated: new Date().toISOString(),
         initials,
@@ -167,19 +172,21 @@ export function CreateGroupPage({ onBack, onGroupCreated }: CreateGroupPageProps
         onGroupCreated(newGroup);
       }
 
-      // Push to shared pending approvals store for Owner dashboard
-      pendingGroupsStore.add({
-        id: `appr-${newGroup.id}`,
-        groupName: newGroup.name,
-        category: form.category,
-        requestedBy: 'Demo Operator',
-        mobile: '+•• ••••••3210',
-        requestedAt: 'Just now',
-        privacy: form.visibility === 'public' ? 'Public' : 'Private',
-        initialMembersCount: 1,
-        status: 'pending',
-        notes: newGroup.description || undefined,
-      });
+      // If created by non-owner, push to pending approvals store for Platform Owner dashboard
+      if (!isPlatformOwner) {
+        pendingGroupsStore.add({
+          id: `appr-${newGroup.id}`,
+          groupName: newGroup.name,
+          category: form.category,
+          requestedBy: profile?.name ?? 'User Request',
+          mobile: '+•• ••••••3210',
+          requestedAt: 'Just now',
+          privacy: form.visibility === 'public' ? 'Public' : 'Private',
+          initialMembersCount: 1,
+          status: 'pending',
+          notes: newGroup.description || undefined,
+        });
+      }
 
       setStep(7);
     }, 1200);
