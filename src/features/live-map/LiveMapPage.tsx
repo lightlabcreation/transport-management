@@ -33,6 +33,34 @@ export function LiveMapPage({ sessionStore, accessStore, viewState = 'ready' }: 
   const [selectedMember, setSelectedMember] = useState<TrackedMember | null>(null);
   const [announcement, setAnnouncement] = useState('');
   const [isLifeTrackingOn, setIsLifeTrackingOn] = useState(true);
+  const [mapEngine, setMapEngine] = useState<'openstreetmap' | 'googlemaps' | 'tomtom' | 'mapbox'>('openstreetmap');
+  const [activeLayers, setActiveLayers] = useState<Set<string>>(new Set());
+
+  const mapEngines = [
+    { id: 'openstreetmap' as const, label: '🗺️ OpenStreetMap', badge: 'Free' },
+    { id: 'googlemaps' as const, label: '📍 Google Maps', badge: 'SDK' },
+    { id: 'tomtom' as const, label: '⚡ TomTom Speed', badge: 'API' },
+    { id: 'mapbox' as const, label: '🧩 Mapbox', badge: 'GL' },
+  ] as const;
+
+  const mapLayers = [
+    { id: 'satellite', label: '🛰️ Satellite' },
+    { id: 'traffic', label: '🚦 Traffic' },
+    { id: 'compass', label: '🧭 Compass' },
+    { id: 'streetview', label: '🛣️ Street View' },
+  ] as const;
+
+  function toggleLayer(layerId: string) {
+    setActiveLayers((prev) => {
+      const next = new Set(prev);
+      if (next.has(layerId)) {
+        next.delete(layerId);
+      } else {
+        next.add(layerId);
+      }
+      return next;
+    });
+  }
 
   const applicationMode = browserApplicationModeStore.getMode();
   const accessProfile = accessStore?.getProfile() ?? null;
@@ -134,6 +162,53 @@ export function LiveMapPage({ sessionStore, accessStore, viewState = 'ready' }: 
           </section>
         ) : (
           <>
+            {/* Map Engine Switcher (PDF Sec 10) */}
+            <div
+              aria-label="Map engine selector"
+              className="flex flex-wrap items-center gap-2 rounded-xl border border-border bg-surface p-3"
+            >
+              <span className="text-body-xs font-bold uppercase tracking-widest text-muted-foreground mr-1">
+                Engine:
+              </span>
+              {mapEngines.map((engine) => (
+                <button
+                  key={engine.id}
+                  type="button"
+                  aria-pressed={mapEngine === engine.id}
+                  onClick={() => setMapEngine(engine.id)}
+                  className={`inline-flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-body-xs font-semibold transition-colors ${
+                    mapEngine === engine.id
+                      ? 'border-primary bg-primary text-primary-foreground shadow-sm'
+                      : 'border-border bg-surface-muted text-foreground hover:border-primary/50'
+                  }`}
+                >
+                  {engine.label}
+                  <span className="rounded bg-current/10 px-1 py-0.5 text-[9px] font-bold tracking-wider">
+                    {engine.badge}
+                  </span>
+                </button>
+              ))}
+
+              <span className="ml-auto text-body-xs font-bold uppercase tracking-widest text-muted-foreground mr-1">
+                Layers:
+              </span>
+              {mapLayers.map((layer) => (
+                <button
+                  key={layer.id}
+                  type="button"
+                  aria-pressed={activeLayers.has(layer.id)}
+                  onClick={() => toggleLayer(layer.id)}
+                  className={`inline-flex items-center gap-1 rounded-lg border px-3 py-1.5 text-body-xs font-semibold transition-colors ${
+                    activeLayers.has(layer.id)
+                      ? 'border-success bg-success/10 text-success'
+                      : 'border-border bg-surface-muted text-muted-foreground hover:border-success/50'
+                  }`}
+                >
+                  {layer.label}
+                </button>
+              ))}
+            </div>
+
             <div className="grid gap-section xl:grid-cols-[minmax(0,1.45fr)_minmax(20rem,0.55fr)]">
               <LeafletMapCanvas
                 members={filteredMembers}

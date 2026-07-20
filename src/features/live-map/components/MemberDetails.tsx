@@ -48,9 +48,13 @@ export function MemberDetails({ member, onPreviewAction }: MemberDetailsProps) {
           </div>
         ))}
       </dl>
-      <div className="mt-5 grid gap-2 sm:grid-cols-2">
-        {['View details', 'Navigate', 'Call', 'Message'].map((action) => (
-          <Button key={action} variant="outline" onClick={() => onPreviewAction(action)}>
+      <div className="mt-5 grid gap-2 sm:grid-cols-3">
+        {['View details', 'Navigate', 'Call', 'Message', 'Block', 'Remove'].map((action) => (
+          <Button
+            key={action}
+            variant={action === 'Block' || action === 'Remove' ? 'danger' : 'outline'}
+            onClick={() => onPreviewAction(action)}
+          >
             {action}
           </Button>
         ))}

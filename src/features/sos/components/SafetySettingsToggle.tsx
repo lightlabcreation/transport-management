@@ -13,19 +13,34 @@ export function SafetySettingsToggle({ settings, onChange }: SafetySettingsToggl
       desc: 'Mock triggers distress broadcast if sudden deceleration telemetry is recorded.',
     },
     {
+      key: 'gforceImpact',
+      label: 'G-Force Impact Sensor (PDF Sec 14)',
+      desc: 'Arms the vehicle G-force accelerometer to detect high-impact collisions and instantly trigger SOS.',
+    },
+    {
       key: 'speedAlerts',
       label: 'Overspeed Warnings',
       desc: 'Announces speed compliance limit exceedance alerts.',
     },
     {
       key: 'seatBeltAlarm',
-      label: 'Seat-Belt Telemetry Alarms',
+      label: 'Seat-Belt Camera Warning',
       desc: 'Triggers visual flash reminders if driver telemetry shows unbuckled belt.',
+    },
+    {
+      key: 'redLightCamera',
+      label: 'Red Light Camera Alert',
+      desc: 'Activates audible and visual warning 200m before known red-light enforcement camera zones.',
     },
     {
       key: 'schoolZoneNotify',
       label: 'School Zone Alerts',
-      desc: 'Automatic speed limit drops warning alerts when entering school zone corridors.',
+      desc: 'Automatic speed limit drop warning when entering school zone corridors.',
+    },
+    {
+      key: 'quickShareLocation',
+      label: 'Quick Share Live Location Link',
+      desc: 'Instantly dispatches a shareable live GPS link to all emergency contacts on SOS activation.',
     },
   ];
 

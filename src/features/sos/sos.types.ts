@@ -11,4 +11,7 @@ export interface SafetySettings {
   speedAlerts: boolean;
   seatBeltAlarm: boolean;
   schoolZoneNotify: boolean;
+  redLightCamera: boolean;
+  gforceImpact: boolean;
+  quickShareLocation: boolean;
 }

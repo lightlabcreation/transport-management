@@ -27,6 +27,24 @@ interface SpeedDashboardPageProps {
 
 export function SpeedDashboardPage({ initialViewState = 'normal' }: SpeedDashboardPageProps) {
   const [viewState, setViewState] = useState<DashboardViewState>(initialViewState);
+  const [voiceWarningsOn, setVoiceWarningsOn] = useState(true);
+  const [activeZones, setActiveZones] = useState<Set<string>>(new Set(['school-zone']));
+
+  const zoneAlerts = [
+    { id: 'school-zone', icon: '🏫', label: 'School Zone', limit: 'Max 25 km/h', color: 'warning' },
+    { id: 'camera-alert', icon: '📷', label: 'Speed Camera', limit: 'Enforcement Ahead', color: 'danger' },
+    { id: 'danger-zone', icon: '⚠️', label: 'Danger Zone', limit: 'High Collision Area', color: 'danger' },
+    { id: 'road-hazard', icon: '🚧', label: 'Road Hazard', limit: 'Reduce Speed', color: 'warning' },
+  ] as const;
+
+  function toggleZone(zoneId: string) {
+    setActiveZones((prev) => {
+      const next = new Set(prev);
+      if (next.has(zoneId)) next.delete(zoneId);
+      else next.add(zoneId);
+      return next;
+    });
+  }
 
   // Determine active mock data based on map lookup
   const data = VIEW_STATE_DATA_MAP[viewState];
@@ -141,6 +159,73 @@ export function SpeedDashboardPage({ initialViewState = 'normal' }: SpeedDashboa
           backend integration.
         </p>
       </div>
+
+      {/* Zone Warning Indicators & Voice Controller (PDF Sec 12) */}
+      <section
+        aria-label="Speed zone warnings and alerts"
+        className="rounded-xl border border-border bg-surface p-4 shadow-sm space-y-4"
+      >
+        <div className="flex items-center justify-between flex-wrap gap-3">
+          <div>
+            <h2 className="text-body-sm font-bold uppercase tracking-wider text-foreground">
+              Zone Warnings &amp; Alerts
+            </h2>
+            <p className="text-body-xs text-muted-foreground">
+              Active zone indicators for speed compliance and road safety.
+            </p>
+          </div>
+          {/* Voice Warning Toggle (PDF Sec 12) */}
+          <button
+            type="button"
+            aria-pressed={voiceWarningsOn}
+            onClick={() => setVoiceWarningsOn((v) => !v)}
+            className={`inline-flex items-center gap-2 rounded-xl border px-4 py-2 text-body-xs font-bold uppercase tracking-wider transition-all ${
+              voiceWarningsOn
+                ? 'border-primary bg-primary text-primary-foreground shadow-sm'
+                : 'border-border bg-surface-muted text-muted-foreground'
+            }`}
+          >
+            <span>{voiceWarningsOn ? '🔊' : '🔇'}</span>
+            {voiceWarningsOn ? 'Voice Warnings ON' : 'Voice Muted'}
+          </button>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {zoneAlerts.map((zone) => {
+            const isActive = activeZones.has(zone.id);
+            return (
+              <button
+                key={zone.id}
+                type="button"
+                aria-pressed={isActive}
+                onClick={() => toggleZone(zone.id)}
+                className={`flex flex-col items-start gap-1 rounded-xl border p-3 text-left transition-all ${
+                  isActive && zone.color === 'danger'
+                    ? 'border-danger/60 bg-danger/10 shadow-sm'
+                    : isActive && zone.color === 'warning'
+                      ? 'border-warning/60 bg-warning/10 shadow-sm'
+                      : 'border-border bg-card opacity-50'
+                }`}
+              >
+                <span className="text-xl">{zone.icon}</span>
+                <span className={`text-body-xs font-bold ${
+                  isActive && zone.color === 'danger' ? 'text-danger'
+                  : isActive && zone.color === 'warning' ? 'text-warning'
+                  : 'text-muted-foreground'
+                }`}>
+                  {zone.label}
+                </span>
+                <span className="text-[10px] text-muted-foreground">{zone.limit}</span>
+                {isActive && voiceWarningsOn && (
+                  <span className="mt-0.5 inline-flex items-center gap-0.5 rounded bg-primary/10 px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider text-primary animate-pulse">
+                    🔊 TTS ACTIVE
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </section>
 
       {/* Render states based on active viewState */}
       {viewState === 'loading' && (

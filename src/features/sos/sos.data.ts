@@ -22,4 +22,7 @@ export const DEFAULT_SAFETY_SETTINGS: SafetySettings = {
   speedAlerts: true,
   seatBeltAlarm: false,
   schoolZoneNotify: true,
+  redLightCamera: true,
+  gforceImpact: true,
+  quickShareLocation: false,
 };
