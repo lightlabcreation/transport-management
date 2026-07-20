@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { pendingGroupsStore } from '@/features/groups/pending-groups.store';
+import { pendingGroupsStore, createdGroupsStore } from '@/features/groups/pending-groups.store';
 import type { PendingGroupApproval } from '../owner.types';
 
 interface PendingApprovalsQueueProps {
@@ -41,6 +41,11 @@ export function PendingApprovalsQueue({ initialApprovals }: PendingApprovalsQueu
     if (!actionModal) return;
     const { item, action } = actionModal;
     const newStatus = action === 'approve' ? 'approved' : 'rejected';
+
+    // Persist status change to localStorage
+    pendingGroupsStore.updateStatus(item.id, newStatus, adminNote);
+    const targetGroupId = item.id.startsWith('appr-') ? item.id.replace('appr-', '') : item.id;
+    createdGroupsStore.updateStatus(targetGroupId, newStatus === 'approved' ? 'active' : 'suspended');
 
     setApprovals((prev) =>
       prev.map((a) =>

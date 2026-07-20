@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import type { Group, GroupRole, GroupCapability, GroupFormState } from './groups.types';
-import { pendingGroupsStore } from './pending-groups.store';
+import { pendingGroupsStore, createdGroupsStore } from './pending-groups.store';
 import {
   StepInfo,
   StepPrivacy,
@@ -158,6 +158,9 @@ export function CreateGroupPage({ onBack, onGroupCreated }: CreateGroupPageProps
         members: [],
         joinRequests: [],
       };
+
+      // Save to localStorage so it persists across page refreshes
+      createdGroupsStore.add(newGroup);
 
       // Notify parent to add to live list
       if (onGroupCreated) {

@@ -12,6 +12,7 @@ import { GroupFilters } from './components/GroupFilters';
 import { GroupList } from './components/GroupList';
 import { GroupSummary } from './components/GroupSummary';
 import { mockGroups } from './groups.mock';
+import { createdGroupsStore } from './pending-groups.store';
 import { GroupDetailsPage } from './GroupDetailsPage';
 import { CreateGroupPage } from './CreateGroupPage';
 import type {
@@ -40,18 +41,31 @@ export function GroupsPage({ sessionStore = browserAuthSessionStore }: GroupsPag
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [isCreatingGroup, setIsCreatingGroup] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [groups, setGroups] = useState<Group[]>(mockGroups);
+  const [groups, setGroups] = useState<Group[]>(() => {
+    const stored = createdGroupsStore.getAll();
+    const existingIds = new Set(mockGroups.map((g) => g.id));
+    const newStored = stored.filter((g) => !existingIds.has(g.id));
+    return [...newStored, ...mockGroups];
+  });
   const [filters, setFilters] = useState<GroupFiltersState>({
     search: '',
     visibility: 'all',
     status: 'all',
   });
 
-  // Simulate feature-local loading
+  // Simulate feature-local loading & sync with localStorage status changes
   useEffect(() => {
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, LOADING_DELAY_MS);
+
+    // Sync any status changes from localStorage (e.g. Admin approvals)
+    const stored = createdGroupsStore.getAll();
+    if (stored.length > 0) {
+      const storedMap = new Map(stored.map((g) => [g.id, g]));
+      setGroups((prev) => prev.map((g) => storedMap.get(g.id) ?? g));
+    }
+
     return () => clearTimeout(timer);
   }, []);
 
