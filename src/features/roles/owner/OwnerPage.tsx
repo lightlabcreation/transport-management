@@ -8,7 +8,6 @@ import {
   MOCK_PLATFORM_USERS,
   MOCK_PLATFORM_ALERTS,
 } from './owner.data';
-import { pendingGroupsStore } from '@/features/groups/pending-groups.store';
 import { PlatformStatsCards } from './components/PlatformStatsCards';
 import { PendingApprovalsQueue } from './components/PendingApprovalsQueue';
 import { UserManagementTable } from './components/UserManagementTable';
@@ -19,9 +18,7 @@ export function OwnerPage() {
     'overview',
   );
 
-  // Merge static mock approvals with any user-created groups from the shared store
-  const allApprovals = [...pendingGroupsStore.getAll(), ...MOCK_PENDING_APPROVALS];
-  const pendingCount = allApprovals.filter((a) => a.status === 'pending').length;
+  const pendingCount = MOCK_PENDING_APPROVALS.filter((a) => a.status === 'pending').length;
   const activeAlertsCount = MOCK_PLATFORM_ALERTS.filter((a) => !a.resolved).length;
 
   return (
@@ -174,7 +171,7 @@ export function OwnerPage() {
           </div>
 
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-            <PendingApprovalsQueue initialApprovals={allApprovals} />
+            <PendingApprovalsQueue initialApprovals={MOCK_PENDING_APPROVALS} />
             <PlatformAlertsFeed initialAlerts={MOCK_PLATFORM_ALERTS} />
           </div>
 
@@ -183,7 +180,7 @@ export function OwnerPage() {
       )}
 
       {activeTab === 'approvals' && (
-        <PendingApprovalsQueue initialApprovals={allApprovals} />
+        <PendingApprovalsQueue initialApprovals={MOCK_PENDING_APPROVALS} />
       )}
 
       {activeTab === 'users' && <UserManagementTable initialUsers={MOCK_PLATFORM_USERS} />}

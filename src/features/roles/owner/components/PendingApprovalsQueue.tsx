@@ -1,8 +1,9 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { pendingGroupsStore } from '@/features/groups/pending-groups.store';
 import type { PendingGroupApproval } from '../owner.types';
 
 interface PendingApprovalsQueueProps {
@@ -10,7 +11,25 @@ interface PendingApprovalsQueueProps {
 }
 
 export function PendingApprovalsQueue({ initialApprovals }: PendingApprovalsQueueProps) {
-  const [approvals, setApprovals] = useState<PendingGroupApproval[]>(initialApprovals);
+  // Lazy initializer: merge sessionStorage user-created groups with mock data on first mount
+  const [approvals, setApprovals] = useState<PendingGroupApproval[]>(() => {
+    const storeItems = pendingGroupsStore.getAll();
+    const existingIds = new Set(initialApprovals.map((a) => a.id));
+    const newFromStore = storeItems.filter((a) => !existingIds.has(a.id));
+    return [...newFromStore, ...initialApprovals];
+  });
+
+  // Sync effect: if component was already mounted, pick up any groups added after mount
+  useEffect(() => {
+    const storeItems = pendingGroupsStore.getAll();
+    setApprovals((prev) => {
+      const existingIds = new Set(prev.map((a) => a.id));
+      const newItems = storeItems.filter((a) => !existingIds.has(a.id));
+      if (newItems.length === 0) return prev;
+      return [...newItems, ...prev];
+    });
+  }, []);
+
   const [viewItem, setViewItem] = useState<PendingGroupApproval | null>(null);
   const [actionModal, setActionModal] = useState<{ item: PendingGroupApproval; action: 'approve' | 'reject' } | null>(null);
   const [adminNote, setAdminNote] = useState('');
