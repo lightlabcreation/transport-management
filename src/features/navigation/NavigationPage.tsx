@@ -17,32 +17,24 @@ export function NavigationPage({ initialViewState = 'normal' }: NavigationPagePr
     initialViewState === 'no-route' ? '' : 'St. Mary School Ground, Sector 12',
   );
   const [selectedRouteId, setSelectedRouteId] = useState('route-1');
-  const [isNavigating, setIsNavigating] = useState(false);
-  const [navMessage, setNavMessage] = useState('');
+  const [isReportModalOpen, setIsReportModalOpen] = useState(false);
+  const [selectedHazard, setSelectedHazard] = useState<string>('Accident');
+  const [reportNotes, setReportNotes] = useState('');
+  const [activeReportStatus, setActiveReportStatus] = useState<string | null>(null);
 
-  const selectedRoute = MOCK_ROUTES.find((r) => r.id === selectedRouteId) || MOCK_ROUTES[0]!;
+  const hazardTypes = [
+    { type: 'Construction', icon: '🚧', color: 'bg-amber-500/10 text-amber-600 border-amber-500/30' },
+    { type: 'Flood', icon: '🌊', color: 'bg-blue-500/10 text-blue-600 border-blue-500/30' },
+    { type: 'Accident', icon: '💥', color: 'bg-red-500/10 text-red-600 border-red-500/30' },
+    { type: 'Closed Road', icon: '⛔', color: 'bg-rose-500/10 text-rose-600 border-rose-500/30' },
+    { type: 'Police Checkpoint', icon: '🚔', color: 'bg-indigo-500/10 text-indigo-600 border-indigo-500/30' },
+    { type: 'Road Damage', icon: '⚠️', color: 'bg-orange-500/10 text-orange-600 border-orange-500/30' },
+  ];
 
-  const handleRecentClick = (recentOrigin: string, recentDest: string) => {
-    setOrigin(recentOrigin);
-    setDestination(recentDest);
-    setViewState('normal');
-    setIsNavigating(false);
-    setNavMessage('');
-  };
-
-  const handleStartNavigation = () => {
-    setIsNavigating(true);
-    setNavMessage(
-      `Simulated GPS active. Route guidance started from "${origin}" to "${destination}" via ${selectedRoute.name}.`,
-    );
-  };
-
-  const handleClearRoute = () => {
-    setOrigin('');
-    setDestination('');
-    setViewState('no-route');
-    setIsNavigating(false);
-    setNavMessage('');
+  const handleReportSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsReportModalOpen(false);
+    setActiveReportStatus(`Status: Pending Admin Verification -> Route Updated (${selectedHazard})`);
   };
 
   return (
@@ -105,15 +97,47 @@ export function NavigationPage({ initialViewState = 'normal' }: NavigationPagePr
         </div>
       </div>
 
-      {/* Header */}
-      <header>
-        <h1 className="text-heading-lg font-bold tracking-tight text-foreground">
-          Operations & Navigation Guidance
-        </h1>
-        <p className="text-body text-muted-foreground">
-          Plan trips, calculate route alternatives, and monitor live road alert telemetry.
-        </p>
+      {/* Header with Hazard Report Modal Trigger */}
+      <header className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 border-b border-border/60 pb-4">
+        <div>
+          <h1 className="text-heading-lg font-bold tracking-tight text-foreground">
+            Operations & Navigation Guidance
+          </h1>
+          <p className="text-body text-muted-foreground">
+            Plan trips, calculate route alternatives, and monitor live road alert telemetry.
+          </p>
+        </div>
+
+        <Button
+          variant="outline"
+          onClick={() => setIsReportModalOpen(true)}
+          className="font-bold text-xs border-amber-500/40 bg-amber-500/10 text-amber-600 hover:bg-amber-500/20 shrink-0"
+        >
+          🚧 Report Road Hazard / Closure
+        </Button>
       </header>
+
+      {/* Active Road Hazard Status Pill */}
+      {activeReportStatus && (
+        <div className="flex items-center justify-between gap-3 p-3.5 rounded-2xl border border-warning/40 bg-warning/10 animate-fade-in">
+          <div className="flex items-center gap-2.5">
+            <span className="relative flex h-3 w-3">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-warning opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-warning"></span>
+            </span>
+            <span className="text-xs font-extrabold tracking-wide uppercase text-warning">
+              {activeReportStatus}
+            </span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setActiveReportStatus(null)}
+            className="text-xs font-bold text-muted-foreground hover:text-foreground underline"
+          >
+            Dismiss Pill
+          </button>
+        </div>
+      )}
 
       {/* Warning Banner */}
       <div
@@ -293,7 +317,82 @@ export function NavigationPage({ initialViewState = 'normal' }: NavigationPagePr
                   Cancel Guidance
                 </Button>
               </div>
-            )}
+      {/* Report Road Hazard Modal Dialog (PDF Section 13 Compliant) */}
+      {isReportModalOpen && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="hazard-modal-title"
+          className="fixed inset-0 z-modal flex items-center justify-center p-4 bg-overlay backdrop-blur-sm animate-fade-in"
+        >
+          <div className="relative w-full max-w-lg rounded-2xl border border-border bg-card p-6 shadow-2xl space-y-6">
+            <div className="flex items-center justify-between border-b border-border/60 pb-4">
+              <div className="flex items-center gap-2.5">
+                <span className="text-2xl">🚧</span>
+                <div>
+                  <h3 id="hazard-modal-title" className="text-heading-sm font-bold text-foreground">
+                    Report Road Hazard / Closure
+                  </h3>
+                  <p className="text-body-xs text-muted-foreground">
+                    PDF Section 13 Hazard Telemetry & Route Recalculation
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsReportModalOpen(false)}
+                className="rounded-full p-1.5 text-muted-foreground hover:bg-surface-muted hover:text-foreground"
+              >
+                ✕
+              </button>
+            </div>
+
+            <form onSubmit={handleReportSubmit} className="space-y-5">
+              <div className="space-y-2">
+                <label className="text-body-xs font-bold uppercase tracking-wider text-muted-foreground">
+                  Select Hazard Type (*Required)
+                </label>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2.5">
+                  {hazardTypes.map((item) => (
+                    <button
+                      key={item.type}
+                      type="button"
+                      onClick={() => setSelectedHazard(item.type)}
+                      className={`flex flex-col items-center justify-center p-3 rounded-xl border transition-all text-center ${
+                        selectedHazard === item.type
+                          ? 'border-primary bg-primary/10 text-primary shadow-sm ring-2 ring-primary/30 font-bold scale-102'
+                          : 'border-border bg-surface-muted/30 text-muted-foreground hover:text-foreground'
+                      }`}
+                    >
+                      <span className="text-xl mb-1">{item.icon}</span>
+                      <span className="text-body-xs font-bold">{item.type}</span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-body-xs font-bold uppercase tracking-wider text-muted-foreground">
+                  Additional Notes (Optional)
+                </label>
+                <textarea
+                  rows={2}
+                  value={reportNotes}
+                  onChange={(e) => setReportNotes(e.target.value)}
+                  placeholder="e.g. Left lane blocked near Sector 12 junction."
+                  className="w-full rounded-xl border border-input bg-surface px-3 py-2 text-body-sm text-foreground focus:border-primary focus:ring-2 focus:ring-primary/20"
+                />
+              </div>
+
+              <div className="flex items-center justify-end gap-3 pt-3 border-t border-border/60">
+                <Button variant="outline" size="sm" type="button" onClick={() => setIsReportModalOpen(false)}>
+                  Cancel
+                </Button>
+                <Button variant="primary" size="sm" type="submit" className="font-bold">
+                  Submit Report to Admin
+                </Button>
+              </div>
+            </form>
           </div>
         </div>
       )}
