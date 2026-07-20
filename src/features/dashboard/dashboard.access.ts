@@ -22,7 +22,7 @@ const capabilities: Record<DemoAccessProfileId, DashboardCapabilities> = {
   'group-admin': {
     canViewTrips: true,
     canManageMembers: true,
-    canApproveRequests: false,
+    canApproveRequests: true,
     canReviewAlerts: true,
     canUseManagementShortcuts: true,
     isReadOnly: false,
@@ -30,7 +30,7 @@ const capabilities: Record<DemoAccessProfileId, DashboardCapabilities> = {
   moderator: {
     canViewTrips: false,
     canManageMembers: false,
-    canApproveRequests: true,
+    canApproveRequests: false,
     canReviewAlerts: true,
     canUseManagementShortcuts: false,
     isReadOnly: false,

@@ -15,15 +15,15 @@ describe('application navigation', () => {
       'Live Map',
       'Groups',
       'Speed',
-      '💳 Payments',
-      '💬 WhatsApp',
-      '📊 API Costs',
+      'Payments',
+      'WhatsApp',
+      'API Costs',
       'Navigation',
       'Trips',
       'Alerts',
       'Notifications',
       'Reports',
-      '🚨 SOS Safety',
+      'SOS Safety',
       'Profile',
       'Settings',
     ]);
@@ -32,7 +32,7 @@ describe('application navigation', () => {
   it('returns the approved speed-mode navigation', () => {
     expect(getApplicationNavigation('speed').map(({ label }) => label)).toEqual([
       'Speed Dashboard',
-      '🚨 SOS Safety',
+      'SOS Safety',
       'Navigation',
       'Trips',
       'Alerts',
@@ -86,7 +86,7 @@ describe('application navigation', () => {
       'Navigation',
       'Alerts',
       'Notifications',
-      '🚨 SOS Safety',
+      'SOS Safety',
       'Profile',
       'Settings',
     ]);

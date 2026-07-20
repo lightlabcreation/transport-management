@@ -16,42 +16,35 @@ export function DesktopSidebar({
   onLogout,
 }: DesktopSidebarProps) {
   return (
-    <aside className="hidden lg:flex w-64 flex-col border-r border-border bg-surface h-screen sticky top-0">
+    <aside className="hidden lg:flex w-64 flex-col border-r border-border bg-surface h-screen sticky top-0 z-sticky shrink-0">
       {/* Brand logo/section */}
       <div className="flex h-16 items-center border-b border-border px-page">
         <Link
           to="/"
-          className="flex items-center gap-2 rounded-md focus-visible:outline-2 focus-visible:outline-focus-ring focus-visible:outline-offset-2"
+          className="flex items-center gap-2.5 rounded-md focus-visible:outline-2 focus-visible:outline-focus-ring focus-visible:outline-offset-2"
         >
-          {/* Logo SVG */}
-          <svg
-            className="h-6 w-6 text-primary"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
+          <span
             aria-hidden="true"
+            className="grid size-10 place-items-center rounded-xl bg-primary text-primary-foreground font-bold shadow-xs text-lg shrink-0"
           >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 17a2 2 0 11-4 0 2 2 0 014 0zM19 17a2 2 0 11-4 0 2 2 0 014 0z"
-            />
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l2.414 2.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17h2m10 0h2"
-            />
-          </svg>
-          <span className="text-body font-bold tracking-tight text-foreground">
-            Kiyaan Transport
+            🚚
           </span>
+          <div className="flex flex-col text-left">
+            <span className="text-body font-extrabold tracking-tight leading-tight text-foreground">
+              GPS Track &amp; Speed
+            </span>
+            <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider leading-tight">
+              Fleet &amp; Driver Operations
+            </span>
+          </div>
         </Link>
       </div>
 
       {/* Navigation items list */}
-      <nav className="flex-1 overflow-y-auto px-4 py-6" aria-label="Desktop Navigation">
+      <nav
+        className="flex-1 overflow-y-auto px-4 py-4 [scrollbar-width:thin] [scrollbar-color:var(--color-border)_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border/60 hover:[&::-webkit-scrollbar-thumb]:bg-border"
+        aria-label="Desktop Navigation"
+      >
         <ul className="space-y-1">
           {navigationItems.map((item) => {
             const isActive = currentPath === item.href;

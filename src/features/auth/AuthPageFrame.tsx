@@ -76,13 +76,16 @@ function BrandMark({ inverse = false }: { inverse?: boolean }) {
     <div className="flex items-center gap-2.5">
       <span
         aria-hidden="true"
-        className={`grid size-9 place-items-center rounded-lg font-bold text-body-sm ${
+        className={`grid size-10 place-items-center rounded-xl font-bold text-lg shadow-xs ${
           inverse ? 'bg-primary-foreground text-primary' : 'bg-primary text-primary-foreground'
         }`}
       >
-        TM
+        🚚
       </span>
-      <span className="text-body-sm font-bold tracking-tight">Transport Management</span>
+      <div className="flex flex-col text-left">
+        <span className="text-body font-extrabold tracking-tight leading-tight">GPS Track &amp; Speed</span>
+        <span className="text-[10px] font-semibold opacity-80 uppercase tracking-wider leading-tight">Fleet &amp; Driver Operations</span>
+      </div>
     </div>
   );
 }

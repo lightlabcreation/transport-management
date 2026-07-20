@@ -6,9 +6,10 @@ import { MOCK_API_SERVICES, MOCK_BUDGET_CONFIG, MOCK_API_LOGS } from './cost-mon
 import { ApiUsageCards } from './components/ApiUsageCards';
 import { BudgetThresholdCard } from './components/BudgetThresholdCard';
 import { ApiRequestLogTable } from './components/ApiRequestLogTable';
+import { ApiKeysConfigTable } from './components/ApiKeysConfigTable';
 
 export function CostMonitoringPage() {
-  const [activeTab, setActiveTab] = useState<'overview' | 'budget' | 'logs'>('overview');
+  const [activeTab, setActiveTab] = useState<'overview' | 'keys' | 'budget' | 'logs'>('overview');
 
   return (
     <section aria-labelledby="cost-monitoring-title" className="space-y-6 pb-12">
@@ -61,6 +62,13 @@ export function CostMonitoringPage() {
         </Button>
         <Button
           size="sm"
+          variant={activeTab === 'keys' ? 'primary' : 'ghost'}
+          onClick={() => setActiveTab('keys')}
+        >
+          🔑 API Keys & Secrets Setup
+        </Button>
+        <Button
+          size="sm"
           variant={activeTab === 'budget' ? 'primary' : 'ghost'}
           onClick={() => setActiveTab('budget')}
         >
@@ -83,6 +91,8 @@ export function CostMonitoringPage() {
           <ApiRequestLogTable initialLogs={MOCK_API_LOGS} />
         </div>
       )}
+
+      {activeTab === 'keys' && <ApiKeysConfigTable />}
 
       {activeTab === 'budget' && <BudgetThresholdCard initialConfig={MOCK_BUDGET_CONFIG} />}
 

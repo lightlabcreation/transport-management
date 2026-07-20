@@ -392,15 +392,18 @@ function Brand({ inverse = false }: { inverse?: boolean }) {
   return (
     <Link
       to="/"
-      className="inline-flex min-h-control items-center gap-3 rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
+      className="inline-flex min-h-control items-center gap-2.5 rounded-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring"
     >
       <span
         aria-hidden="true"
-        className={`grid size-10 place-items-center rounded-lg font-semibold ${inverse ? 'bg-background text-foreground' : 'bg-primary text-primary-foreground'}`}
+        className={`grid size-10 place-items-center rounded-xl font-bold shadow-xs text-lg ${inverse ? 'bg-background text-foreground' : 'bg-primary text-primary-foreground'}`}
       >
-        GTS
+        🚚
       </span>
-      <span className="font-semibold">GPS Track &amp; Speed</span>
+      <div className="flex flex-col text-left">
+        <span className="font-extrabold text-body leading-tight tracking-tight">GPS Track &amp; Speed</span>
+        <span className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider leading-tight">Fleet &amp; Driver Operations</span>
+      </div>
     </Link>
   );
 }

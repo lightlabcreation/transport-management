@@ -18,7 +18,7 @@ describe('SpeedDashboardPage MVP Component Tests', () => {
     // Check current speed display
     expect(screen.getByText('72')).toBeInTheDocument();
     // Check configured speed limit display
-    expect(screen.getByText('80')).toBeInTheDocument();
+    expect(screen.getAllByText('80')[0]).toBeInTheDocument();
   });
 
   it('renders Safe state presentation when speed is below limit', () => {

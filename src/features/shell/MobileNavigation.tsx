@@ -176,7 +176,26 @@ export function MobileNavigation({
         >
           {/* Drawer Header */}
           <div className="flex h-16 items-center justify-between border-b border-border px-page shrink-0">
-            <span className="text-body font-bold text-foreground">Menu Navigation</span>
+            <Link
+              to="/"
+              onClick={onCloseMenu}
+              className="flex items-center gap-2.5 rounded-md focus-visible:outline-2 focus-visible:outline-focus-ring focus-visible:outline-offset-2"
+            >
+              <span
+                aria-hidden="true"
+                className="grid size-9 place-items-center rounded-xl bg-primary text-primary-foreground font-bold shadow-xs text-base shrink-0"
+              >
+                🚚
+              </span>
+              <div className="flex flex-col text-left">
+                <span className="text-body-sm font-extrabold tracking-tight leading-tight text-foreground">
+                  GPS Track &amp; Speed
+                </span>
+                <span className="text-[9px] font-semibold text-muted-foreground uppercase tracking-wider leading-tight">
+                  Fleet &amp; Driver Operations
+                </span>
+              </div>
+            </Link>
             <button
               onClick={onCloseMenu}
               aria-label="Close menu drawer"
@@ -200,7 +219,10 @@ export function MobileNavigation({
           </div>
 
           {/* Full Navigation list inside Drawer */}
-          <nav className="flex-1 overflow-y-auto px-4 py-6" aria-label="Mobile Drawer Navigation">
+          <nav
+            className="flex-1 overflow-y-auto px-4 py-4 [scrollbar-width:thin] [scrollbar-color:var(--color-border)_transparent] [&::-webkit-scrollbar]:w-1.5 [&::-webkit-scrollbar-track]:bg-transparent [&::-webkit-scrollbar-thumb]:rounded-full [&::-webkit-scrollbar-thumb]:bg-border/60 hover:[&::-webkit-scrollbar-thumb]:bg-border"
+            aria-label="Mobile Drawer Navigation"
+          >
             <ul className="space-y-1">
               {navigationItems.map((item) => {
                 const isActive = currentPath === item.href;
