@@ -40,6 +40,7 @@ export function GroupsPage({ sessionStore = browserAuthSessionStore }: GroupsPag
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [isCreatingGroup, setIsCreatingGroup] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [groups, setGroups] = useState<Group[]>(mockGroups);
   const [filters, setFilters] = useState<GroupFiltersState>({
     search: '',
     visibility: 'all',
@@ -54,19 +55,19 @@ export function GroupsPage({ sessionStore = browserAuthSessionStore }: GroupsPag
     return () => clearTimeout(timer);
   }, []);
 
-  // Compute summary stats from full mock data
+  // Compute summary stats from live group list (including newly created groups)
   const stats = useMemo<GroupSummaryStats>(() => {
     return {
-      total: mockGroups.length,
-      active: mockGroups.filter((g) => g.status === 'active').length,
-      pending: mockGroups.filter((g) => g.status === 'pending').length,
-      suspended: mockGroups.filter((g) => g.status === 'suspended').length,
+      total: groups.length,
+      active: groups.filter((g) => g.status === 'active').length,
+      pending: groups.filter((g) => g.status === 'pending').length,
+      suspended: groups.filter((g) => g.status === 'suspended').length,
     };
-  }, []);
+  }, [groups]);
 
-  // Compute filtered results
+  // Compute filtered results from live group list
   const filteredGroups = useMemo(() => {
-    return mockGroups.filter((group) => {
+    return groups.filter((group) => {
       const matchesSearch =
         filters.search === '' || group.name.toLowerCase().includes(filters.search.toLowerCase());
 
@@ -77,7 +78,7 @@ export function GroupsPage({ sessionStore = browserAuthSessionStore }: GroupsPag
 
       return matchesSearch && matchesVisibility && matchesStatus;
     });
-  }, [filters]);
+  }, [filters, groups]);
 
   const hasActiveFilters =
     filters.search !== '' || filters.visibility !== 'all' || filters.status !== 'all';
@@ -126,7 +127,13 @@ export function GroupsPage({ sessionStore = browserAuthSessionStore }: GroupsPag
       onLogout={handleLogout}
     >
       {isCreatingGroup ? (
-        <CreateGroupPage onBack={() => setIsCreatingGroup(false)} />
+        <CreateGroupPage
+          onBack={() => setIsCreatingGroup(false)}
+          onGroupCreated={(newGroup) => {
+            setGroups((prev) => [newGroup, ...prev]);
+            setIsCreatingGroup(false);
+          }}
+        />
       ) : selectedGroup ? (
         <GroupDetailsPage group={selectedGroup} onBack={() => setSelectedGroup(null)} />
       ) : (

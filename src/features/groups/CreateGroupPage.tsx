@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import type { GroupRole, GroupCapability, GroupFormState } from './groups.types';
+import type { Group, GroupRole, GroupCapability, GroupFormState } from './groups.types';
 import {
   StepInfo,
   StepPrivacy,
@@ -13,6 +13,7 @@ import {
 
 interface CreateGroupPageProps {
   onBack: () => void;
+  onGroupCreated?: (group: Group) => void;
 }
 
 type WizardStep = 1 | 2 | 3 | 4 | 5 | 6 | 7;
@@ -64,7 +65,7 @@ const INITIAL_FORM_STATE: GroupFormState = {
   acceptTerms: false,
 };
 
-export function CreateGroupPage({ onBack }: CreateGroupPageProps) {
+export function CreateGroupPage({ onBack, onGroupCreated }: CreateGroupPageProps) {
   const [step, setStep] = useState<WizardStep>(1);
   const [form, setForm] = useState<GroupFormState>({ ...INITIAL_FORM_STATE });
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
@@ -133,6 +134,35 @@ export function CreateGroupPage({ onBack }: CreateGroupPageProps) {
     setIsSubmitting(true);
     setTimeout(() => {
       setIsSubmitting(false);
+
+      // Build the new Group object from wizard form data
+      const nameWords = form.name.trim().split(/\s+/);
+      const initials =
+        nameWords.length >= 2
+          ? `${nameWords[0][0]}${nameWords[1][0]}`.toUpperCase()
+          : form.name.slice(0, 2).toUpperCase();
+
+      const newGroup: Group = {
+        id: `group-${Date.now()}`,
+        name: form.name.trim(),
+        description: form.description.trim(),
+        visibility: form.visibility,
+        status: 'active',
+        memberCount: 1,
+        lastUpdated: new Date().toISOString(),
+        initials,
+        category: form.category,
+        trackingPolicy: form.trackingMode,
+        visibilityPolicy: form.visibilityPolicy,
+        members: [],
+        joinRequests: [],
+      };
+
+      // Notify parent to add to live list
+      if (onGroupCreated) {
+        onGroupCreated(newGroup);
+      }
+
       setStep(7);
     }, 1200);
   }
