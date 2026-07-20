@@ -51,7 +51,7 @@ export function SubscriptionPlansCard({ currentPlanId, onSelectPlan }: Subscript
               onClick={() => setBillingCycle('monthly')}
               className="rounded-full text-xs min-h-8 px-3.5 font-semibold"
             >
-              Monthly
+              Monthly Billing
             </Button>
             <Button
               variant={billingCycle === 'yearly' ? 'primary' : 'ghost'}
@@ -59,7 +59,7 @@ export function SubscriptionPlansCard({ currentPlanId, onSelectPlan }: Subscript
               onClick={() => setBillingCycle('yearly')}
               className="rounded-full text-xs min-h-8 px-3.5 font-semibold"
             >
-              Yearly (Save 25%)
+              Yearly Billing (Save 25%)
             </Button>
             <Button
               variant={billingCycle === 'lifetime' ? 'primary' : 'ghost'}
@@ -67,7 +67,7 @@ export function SubscriptionPlansCard({ currentPlanId, onSelectPlan }: Subscript
               onClick={() => setBillingCycle('lifetime')}
               className="rounded-full text-xs min-h-8 px-3.5 font-semibold"
             >
-              Lifetime
+              Lifetime Billing
             </Button>
           </div>
 
