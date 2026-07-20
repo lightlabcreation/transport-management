@@ -4,9 +4,9 @@ import { useEffect, useState, type ReactNode } from 'react';
 import { Link } from 'react-router';
 
 const primaryLinkClasses =
-  'inline-flex min-h-control items-center justify-center rounded-md bg-primary px-5 py-3 text-body font-semibold text-primary-foreground transition-colors hover:bg-primary/90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring';
+  'inline-flex min-h-control items-center justify-center rounded-xl bg-primary px-6 py-3.5 text-body font-bold text-primary-foreground shadow-md transition-all duration-200 ease-standard hover:bg-primary/90 hover:-translate-y-0.5 hover:shadow-lg active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring cursor-pointer';
 const secondaryLinkClasses =
-  'inline-flex min-h-control items-center justify-center rounded-md border border-border bg-surface px-5 py-3 text-body font-semibold text-foreground transition-colors hover:bg-surface-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring';
+  'inline-flex min-h-control items-center justify-center rounded-xl border border-border/80 bg-surface/90 backdrop-blur-xs px-6 py-3.5 text-body font-bold text-foreground shadow-2xs transition-all duration-200 ease-standard hover:bg-surface-muted hover:border-primary/50 hover:-translate-y-0.5 hover:shadow-md active:scale-95 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-focus-ring cursor-pointer';
 
 const features = [
   {
@@ -143,20 +143,20 @@ export function HomePage() {
           </div>
           <div className="relative mx-auto grid max-w-content items-center gap-12 lg:grid-cols-[1fr_0.9fr]">
             <div>
-              <p className="text-body-sm font-semibold uppercase tracking-wide text-primary">
+              <p className="text-body font-bold uppercase tracking-wider text-primary">
                 Built for every journey
               </p>
-              <h1 className="mt-4 max-w-3xl text-heading-xl font-semibold tracking-tight">
+              <h1 className="mt-4 max-w-3xl text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight leading-[1.15]">
                 Transport operations, coordinated with clarity.
               </h1>
-              <p className="mt-5 max-w-2xl text-body-lg text-muted-foreground">
+              <p className="mt-5 max-w-2xl text-lg sm:text-xl font-medium text-muted-foreground leading-relaxed">
                 GPS Track &amp; Speed brings fleet visibility, driver coordination, trip oversight,
                 and speed-assistance experiences into one modern frontend.
               </p>
-              <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <div className="mt-8 flex flex-col gap-4 sm:flex-row">
                 <Link className={primaryLinkClasses} to="/onboarding/language">
                   Get started{' '}
-                  <span aria-hidden="true" className="ml-2">
+                  <span aria-hidden="true" className="ml-2 transition-transform duration-200 group-hover:translate-x-1">
                     →
                   </span>
                 </Link>
@@ -164,10 +164,10 @@ export function HomePage() {
                   Sign in
                 </Link>
               </div>
-              <div className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-body-sm text-muted-foreground">
-                <span>✓ Passwordless access</span>
-                <span>✓ Consent-first onboarding</span>
-                <span>✓ Responsive from 360px</span>
+              <div className="mt-8 flex flex-wrap gap-x-6 gap-y-3 text-body font-medium text-muted-foreground">
+                <span className="flex items-center gap-1.5"><span className="text-success font-bold">✓</span> Passwordless access</span>
+                <span className="flex items-center gap-1.5"><span className="text-success font-bold">✓</span> Consent-first onboarding</span>
+                <span className="flex items-center gap-1.5"><span className="text-success font-bold">✓</span> Responsive from 360px</span>
               </div>
             </div>
             <OperationsVisual />
@@ -189,16 +189,16 @@ export function HomePage() {
             {features.map((feature) => (
               <article
                 key={feature.title}
-                className="rounded-xl border border-border bg-surface p-page shadow-sm"
+                className="rounded-xl border border-border/80 bg-surface p-page shadow-2xs transition-all duration-200 hover:-translate-y-1 hover:border-primary/40 hover:shadow-md"
               >
                 <span
                   aria-hidden="true"
-                  className="grid size-11 place-items-center rounded-lg bg-primary/10 text-heading-sm font-semibold text-primary"
+                  className="grid size-12 place-items-center rounded-xl bg-primary/10 text-heading-md font-bold text-primary"
                 >
                   {feature.symbol}
                 </span>
-                <h3 className="mt-5 text-heading-sm font-semibold">{feature.title}</h3>
-                <p className="mt-2 text-body text-muted-foreground">{feature.description}</p>
+                <h3 className="mt-5 text-heading-md font-bold">{feature.title}</h3>
+                <p className="mt-2 text-body text-muted-foreground leading-relaxed">{feature.description}</p>
               </article>
             ))}
           </div>
@@ -215,7 +215,7 @@ export function HomePage() {
             description="Choose collaborative tracking and groups or a private speed-only experience."
             id="solutions-heading"
           />
-          <div className="mx-auto mt-10 grid max-w-5xl gap-5 lg:grid-cols-2">
+          <div className="mx-auto mt-10 grid max-w-5xl gap-6 lg:grid-cols-2">
             <ModeCard
               title="Tracking and Groups"
               description="Coordinate groups, permitted member visibility, trips, and speed assistance through one governed experience."
@@ -252,13 +252,13 @@ export function HomePage() {
             {steps.map((step, index) => (
               <li
                 key={step.title}
-                className="rounded-xl border border-border bg-surface p-page shadow-sm"
+                className="rounded-xl border border-border/80 bg-surface p-page shadow-2xs transition-all duration-200 hover:-translate-y-1 hover:border-primary/40 hover:shadow-md"
               >
-                <span className="grid size-9 place-items-center rounded-full bg-primary text-body-sm font-semibold text-primary-foreground">
+                <span className="grid size-10 place-items-center rounded-full bg-primary text-body font-bold text-primary-foreground shadow-xs">
                   {index + 1}
                 </span>
-                <h3 className="mt-5 text-heading-sm font-semibold">{step.title}</h3>
-                <p className="mt-2 text-body-sm text-muted-foreground">{step.description}</p>
+                <h3 className="mt-5 text-heading-md font-bold">{step.title}</h3>
+                <p className="mt-2 text-body-sm text-muted-foreground leading-relaxed">{step.description}</p>
               </li>
             ))}
           </ol>
@@ -438,11 +438,11 @@ function SectionHeading({
 }) {
   return (
     <div className="mx-auto max-w-readable text-center">
-      <p className="text-body-sm font-semibold uppercase tracking-wide text-primary">{eyebrow}</p>
-      <h2 id={id} className="mt-3 text-heading-lg font-semibold tracking-tight">
+      <p className="text-body font-bold uppercase tracking-wider text-primary">{eyebrow}</p>
+      <h2 id={id} className="mt-3 text-3xl sm:text-4xl font-extrabold tracking-tight">
         {title}
       </h2>
-      <p className="mx-auto mt-3 max-w-2xl text-body text-muted-foreground">{description}</p>
+      <p className="mx-auto mt-4 max-w-2xl text-lg text-muted-foreground leading-relaxed">{description}</p>
     </div>
   );
 }
@@ -451,15 +451,15 @@ function OperationsVisual() {
   return (
     <div
       aria-label="Transport operations preview"
-      className="relative rounded-2xl border border-border bg-background p-4 shadow-lg sm:p-6"
+      className="relative rounded-2xl border border-border/80 bg-background/95 backdrop-blur-xs p-4 shadow-xl sm:p-6 transition-all duration-300 hover:shadow-2xl hover:border-primary/30"
     >
       <div className="flex items-center justify-between border-b border-border pb-4">
         <div>
-          <p className="font-semibold">Operations overview</p>
-          <p className="text-body-sm text-muted-foreground">Frontend preview</p>
+          <p className="text-body font-bold">Operations overview</p>
+          <p className="text-body-sm font-medium text-muted-foreground">Frontend preview</p>
         </div>
-        <span className="rounded-full bg-success/10 px-3 py-1 text-body-sm font-medium text-success">
-          Ready
+        <span className="rounded-full bg-success/15 px-3.5 py-1 text-body-sm font-bold text-success animate-pulse">
+          ● Ready
         </span>
       </div>
       <div className="mt-4 grid grid-cols-2 gap-3">
@@ -468,18 +468,18 @@ function OperationsVisual() {
         <PreviewMetric label="Drivers active" value="79" />
         <PreviewMetric label="Open alerts" value="3" />
       </div>
-      <div className="mt-4 rounded-xl bg-surface p-4">
+      <div className="mt-4 rounded-xl border border-border/60 bg-surface/80 p-4 shadow-2xs">
         <div className="flex items-center justify-between">
           <div>
-            <p className="font-medium">Trip TR-2048</p>
-            <p className="text-body-sm text-muted-foreground">Noida → Gurugram</p>
+            <p className="font-bold">Trip TR-2048</p>
+            <p className="text-body-sm font-medium text-muted-foreground">Noida → Gurugram</p>
           </div>
-          <span className="rounded-full bg-primary/10 px-3 py-1 text-body-sm font-medium text-primary">
+          <span className="rounded-full bg-primary/15 px-3 py-1 text-body-sm font-bold text-primary">
             Running
           </span>
         </div>
-        <div className="mt-4 h-2 overflow-hidden rounded-full bg-muted">
-          <div className="h-full w-2/3 rounded-full bg-primary" />
+        <div className="mt-4 h-2.5 overflow-hidden rounded-full bg-muted">
+          <div className="h-full w-2/3 rounded-full bg-primary shadow-xs" />
         </div>
       </div>
     </div>
@@ -488,9 +488,9 @@ function OperationsVisual() {
 
 function PreviewMetric({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-lg border border-border bg-surface p-3">
-      <p className="text-body-sm text-muted-foreground">{label}</p>
-      <p className="mt-1 text-heading-sm font-semibold">{value}</p>
+    <div className="rounded-xl border border-border/80 bg-surface p-3.5 shadow-2xs transition-all duration-200 hover:border-primary/30">
+      <p className="text-body-sm font-medium text-muted-foreground">{label}</p>
+      <p className="mt-1 text-heading-md font-extrabold text-foreground">{value}</p>
     </div>
   );
 }
@@ -505,27 +505,27 @@ function ModeCard({
   capabilities: readonly string[];
 }) {
   return (
-    <article className="flex flex-col rounded-2xl border border-border bg-surface p-page shadow-sm sm:p-section">
+    <article className="flex flex-col rounded-2xl border border-border/80 bg-surface p-page shadow-sm sm:p-section transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl">
       <span
         aria-hidden="true"
-        className="grid size-12 place-items-center rounded-xl bg-primary/10 text-heading-sm font-semibold text-primary"
+        className="grid size-14 place-items-center rounded-2xl bg-primary/10 text-heading-md font-extrabold text-primary shadow-2xs"
       >
         {title.charAt(0)}
       </span>
-      <h3 className="mt-5 text-heading-md font-semibold">{title}</h3>
-      <p className="mt-3 text-body text-muted-foreground">{description}</p>
-      <ul className="mt-6 flex-1 space-y-3">
+      <h3 className="mt-5 text-heading-lg font-extrabold">{title}</h3>
+      <p className="mt-3 text-body text-muted-foreground leading-relaxed">{description}</p>
+      <ul className="mt-6 flex-1 space-y-3.5">
         {capabilities.map((item) => (
-          <li key={item} className="flex gap-3 text-body-sm">
-            <span aria-hidden="true" className="text-success">
+          <li key={item} className="flex gap-3 text-body font-medium">
+            <span aria-hidden="true" className="text-success font-bold">
               ✓
             </span>
             {item}
           </li>
         ))}
       </ul>
-      <Link className={`${primaryLinkClasses} mt-7`} to="/onboarding/language">
-        Choose this experience
+      <Link className={`${primaryLinkClasses} mt-8`} to="/onboarding/language">
+        Choose this experience →
       </Link>
     </article>
   );
