@@ -58,7 +58,7 @@ describe('DemoAccessPage', () => {
     for (const profile of demoAccessProfiles) {
       expect(screen.getByRole('heading', { name: profile.name })).toBeInTheDocument();
     }
-    expect(screen.queryByText('Platform Owner')).not.toBeInTheDocument();
+    expect(screen.queryByText('System Admin')).not.toBeInTheDocument();
   });
 
   it('selects and persists a profile while enabling Continue', async () => {
@@ -67,7 +67,7 @@ describe('DemoAccessPage', () => {
     const continueButton = screen.getByRole('button', { name: 'Continue to Dashboard' });
 
     expect(continueButton).toBeDisabled();
-    const ownerButton = screen.getByRole('button', { name: 'Select Group Owner profile' });
+    const ownerButton = screen.getByRole('button', { name: 'Select Platform Owner profile' });
     await user.click(ownerButton);
 
     expect(ownerButton).toHaveAttribute('aria-pressed', 'true');
@@ -79,7 +79,7 @@ describe('DemoAccessPage', () => {
     const user = userEvent.setup();
     const { router } = renderAccessPage();
 
-    await user.click(screen.getByRole('button', { name: 'Select Member profile' }));
+    await user.click(screen.getByRole('button', { name: 'Select Active Driver profile' }));
     await user.click(screen.getByRole('button', { name: 'Continue to Dashboard' }));
 
     await waitFor(() => expect(router.state.location.pathname).toBe('/app/dashboard'));
@@ -91,7 +91,7 @@ describe('DemoAccessPage', () => {
 
     renderAccessPage();
 
-    expect(screen.getByRole('button', { name: 'Select Moderator profile' })).toHaveAttribute(
+    expect(screen.getByRole('button', { name: 'Select Safety Moderator profile' })).toHaveAttribute(
       'aria-pressed',
       'true',
     );
@@ -114,7 +114,7 @@ describe('DemoAccessPage', () => {
     const sessionStore = { ...createSessionStore(), clearSession };
     const { accessStore, router } = renderAccessPage(sessionStore);
 
-    await user.click(screen.getByRole('button', { name: 'Select Group Admin profile' }));
+    await user.click(screen.getByRole('button', { name: 'Select Fleet Admin profile' }));
     expect(accessStore.getProfile()).not.toBeNull();
     await user.click(screen.getByRole('button', { name: 'Log out' }));
 

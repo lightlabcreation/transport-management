@@ -110,6 +110,66 @@ export function OwnerPage() {
         <div className="space-y-6">
           <PlatformStatsCards stats={MOCK_PLATFORM_STATS} />
 
+          {/* Platform Owner Quick Actions */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div className="rounded-xl border border-border bg-surface p-5 shadow-sm transition-shadow hover:shadow-md">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-xl">
+                  💳
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground">Payments & Billing</h3>
+                  <p className="text-body-sm text-muted-foreground">Manage subscriptions</p>
+                </div>
+              </div>
+              <Button
+                variant="outline"
+                className="mt-4 w-full"
+                onClick={() => window.location.assign('/app/payments')}
+              >
+                Go to Billing
+              </Button>
+            </div>
+
+            <div className="rounded-xl border border-border bg-surface p-5 shadow-sm transition-shadow hover:shadow-md">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-info/10 text-xl">
+                  📊
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground">API Cost Monitoring</h3>
+                  <p className="text-body-sm text-muted-foreground">Review map usage</p>
+                </div>
+              </div>
+              <Button
+                variant="outline"
+                className="mt-4 w-full"
+                onClick={() => window.location.assign('/app/cost-monitoring')}
+              >
+                View Costs
+              </Button>
+            </div>
+
+            <div className="rounded-xl border border-border bg-surface p-5 shadow-sm transition-shadow hover:shadow-md">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-success/10 text-xl">
+                  💬
+                </div>
+                <div>
+                  <h3 className="font-semibold text-foreground">WhatsApp Invites</h3>
+                  <p className="text-body-sm text-muted-foreground">QR & links for groups</p>
+                </div>
+              </div>
+              <Button
+                variant="outline"
+                className="mt-4 w-full"
+                onClick={() => window.location.assign('/app/whatsapp-invites')}
+              >
+                Manage Invites
+              </Button>
+            </div>
+          </div>
+
           <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
             <PendingApprovalsQueue initialApprovals={MOCK_PENDING_APPROVALS} />
             <PlatformAlertsFeed initialAlerts={MOCK_PLATFORM_ALERTS} />

@@ -103,7 +103,9 @@ export function OtpVerificationPage({
       sessionStore.setSession(sessionFactory());
 
       let destination = '/auth/authenticated';
-      if (accessStore && pendingDemoAccessStore) {
+      if (activeChallenge.source === 'registration') {
+        destination = '/auth/payment-step';
+      } else if (accessStore && pendingDemoAccessStore) {
         const pendingProfileId = pendingDemoAccessStore.getProfileId();
         const pendingProfile = demoAccessProfiles.find(
           (profile) => profile.id === pendingProfileId,

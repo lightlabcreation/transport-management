@@ -12,8 +12,11 @@ import {
 import { AlertsPage } from '@/features/alerts';
 import { CostMonitoringPage } from '@/features/cost-monitoring';
 import { NavigationPage } from '@/features/navigation';
+import { PaymentsPage } from '@/features/payments';
 import { ReportsPage } from '@/features/reports';
+import { SosPage } from '@/features/sos';
 import { TripsPage } from '@/features/trips';
+import { WhatsAppCenterPage } from '@/features/whatsapp-invites';
 import {
   ApplicationModeGate,
   ApplicationModeReset,
@@ -28,6 +31,9 @@ import {
   mockAuthService,
   OtpVerificationPage,
   RegistrationPage,
+  ServiceListPage,
+  RegistrationPaymentPage,
+  RegistrationApprovalPage,
   TermsPlaceholderPage,
 } from '@/features/auth';
 import { GroupsPage } from '@/features/groups';
@@ -133,8 +139,20 @@ export const router = createBrowserRouter([
     element: <PermissionIntroductionPage />,
   },
   {
+    path: '/auth/service-list',
+    element: <ServiceListPage />,
+  },
+  {
     path: '/auth/register',
     element: <RegistrationPage authService={mockAuthService} />,
+  },
+  {
+    path: '/auth/payment-step',
+    element: <RegistrationPaymentPage />,
+  },
+  {
+    path: '/auth/approval-status',
+    element: <RegistrationApprovalPage />,
   },
   {
     path: '/auth/verify',
@@ -245,6 +263,18 @@ export const router = createBrowserRouter([
   },
   {
     path: '/app/cost-monitoring',
-    element: renderFramedApplicationPage('view-settings', <CostMonitoringPage />),
+    element: renderFramedApplicationPage('view-cost-monitoring', <CostMonitoringPage />),
+  },
+  {
+    path: '/app/payments',
+    element: renderFramedApplicationPage('view-payments', <PaymentsPage />),
+  },
+  {
+    path: '/app/sos',
+    element: renderFramedApplicationPage('view-sos', <SosPage />),
+  },
+  {
+    path: '/app/whatsapp-invites',
+    element: renderFramedApplicationPage('view-whatsapp-invites', <WhatsAppCenterPage />),
   },
 ]);

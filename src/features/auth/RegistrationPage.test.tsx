@@ -29,11 +29,19 @@ function renderRegistration(authService: AuthService) {
 }
 
 async function completeRequiredFields(user: ReturnType<typeof userEvent.setup>) {
-  await user.type(screen.getByLabelText('First name'), '  Priya  ');
-  await user.type(screen.getByLabelText('Last name'), '  Sharma  ');
+  const roleSelect = screen.queryByLabelText(/Service Category/i);
+  if (roleSelect && !(roleSelect as HTMLSelectElement).value) {
+    await user.selectOptions(roleSelect, 'driver');
+  }
+  await user.type(screen.getByLabelText('Name'), '  Priya  ');
+  await user.type(screen.getByLabelText('Last Name'), '  Sharma  ');
   await user.type(screen.getByLabelText('Country code'), '+91');
-  await user.type(screen.getByLabelText('Mobile number'), '98765 43210');
-  await user.click(screen.getByLabelText(/I accept the Terms/i));
+  await user.type(screen.getByLabelText('Mobile NO'), '98765 43210');
+  const plate = screen.queryByLabelText('Car plate number');
+  if (plate) {
+    await user.type(plate, 'ABC-1234');
+  }
+  await user.click(screen.getByLabelText(/Accept Terms & Condition/i));
 }
 
 describe('RegistrationPage', () => {
@@ -43,7 +51,7 @@ describe('RegistrationPage', () => {
     expect(screen.getByRole('heading', { name: 'Create your account' })).toBeInTheDocument();
     expect(screen.getByLabelText('Email (optional)')).toHaveAttribute('type', 'email');
     expect(screen.getByLabelText('Language')).toHaveValue('en');
-    expect(screen.getByRole('option', { name: 'English' })).toHaveValue('en');
+    expect(screen.getByRole('option', { name: /English/i })).toHaveValue('en');
     expect(screen.queryByLabelText(/password/i)).not.toBeInTheDocument();
   });
 
@@ -51,13 +59,13 @@ describe('RegistrationPage', () => {
     const user = userEvent.setup();
     renderRegistration(createAuthService(vi.fn()));
 
-    await user.click(screen.getByRole('button', { name: 'Create account' }));
+    await user.click(screen.getByRole('button', { name: 'Next' }));
 
-    expect(screen.getByLabelText('First name')).toHaveFocus();
-    expect(screen.getByText('Accept the Terms to create your account.')).toBeInTheDocument();
+    expect(screen.getByLabelText(/Service Category/i)).toHaveFocus();
+    expect(screen.getByText('Select your Service Category role to continue.')).toBeInTheDocument();
   });
 
-  it('normalizes values and passes a registration challenge to OTP', async () => {
+  it('normalizes values and passes a registration challenge to OTP with conditional driver plate', async () => {
     const user = userEvent.setup();
     const register = vi.fn<AuthService['register']>().mockResolvedValue({
       status: 'otp_sent',
@@ -69,7 +77,7 @@ describe('RegistrationPage', () => {
     const router = renderRegistration(createAuthService(register));
     await completeRequiredFields(user);
 
-    await user.click(screen.getByRole('button', { name: 'Create account' }));
+    await user.click(screen.getByRole('button', { name: 'Next' }));
 
     await waitFor(() => expect(router.state.location.pathname).toBe('/auth/verify'));
     expect(register).toHaveBeenCalledWith({
@@ -78,6 +86,9 @@ describe('RegistrationPage', () => {
       mobileNumber: '+919876543210',
       language: 'en',
       acceptedTerms: true,
+      role: 'driver',
+      carPlateNumber: 'ABC-1234',
+      trackLocation: true,
     });
     expect(router.state.location.state).toEqual({
       source: 'registration',
@@ -94,7 +105,7 @@ describe('RegistrationPage', () => {
     await completeRequiredFields(user);
     await user.type(screen.getByLabelText('Email (optional)'), 'invalid');
 
-    await user.click(screen.getByRole('button', { name: 'Create account' }));
+    await user.click(screen.getByRole('button', { name: 'Next' }));
 
     expect(
       screen.getByText('Enter a valid email address or leave this field empty.'),
@@ -111,11 +122,11 @@ describe('RegistrationPage', () => {
     renderRegistration(createAuthService(register));
     await completeRequiredFields(user);
 
-    await user.click(screen.getByRole('button', { name: 'Create account' }));
+    await user.click(screen.getByRole('button', { name: 'Next' }));
 
     const alert = await screen.findByRole('alert');
     expect(alert).toHaveTextContent(/account may already exist/i);
     expect(alert).toHaveFocus();
-    expect(screen.getByLabelText('First name')).toHaveValue('  Priya  ');
+    expect(screen.getByLabelText('Name')).toHaveValue('  Priya  ');
   });
 });

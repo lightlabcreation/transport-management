@@ -51,6 +51,47 @@ export function MemberPage() {
         </div>
       )}
 
+      {/* Member Quick Actions */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="rounded-xl border border-danger/20 bg-danger/5 p-5 shadow-sm transition-shadow hover:shadow-md">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-danger/20 text-xl">
+              🚨
+            </div>
+            <div>
+              <h3 className="font-semibold text-danger">SOS Emergency</h3>
+              <p className="text-body-sm text-danger/80">Trigger fleet alerts</p>
+            </div>
+          </div>
+          <Button
+            variant="danger"
+            className="mt-4 w-full bg-danger text-danger-foreground hover:bg-danger/90"
+            onClick={() => window.location.assign('/app/sos')}
+          >
+            Open SOS Panel
+          </Button>
+        </div>
+
+        <div className="rounded-xl border border-border bg-surface p-5 shadow-sm transition-shadow hover:shadow-md">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-success/10 text-xl">
+              💬
+            </div>
+            <div>
+              <h3 className="font-semibold text-foreground">WhatsApp Hub</h3>
+              <p className="text-body-sm text-muted-foreground">Join groups instantly</p>
+            </div>
+          </div>
+          <Button
+            variant="outline"
+            className="mt-4 w-full"
+            onClick={() => window.location.assign('/app/whatsapp-invites')}
+          >
+            View Invitations
+          </Button>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
         <div className="rounded-xl border border-border bg-card p-5 shadow-sm space-y-3">
           <h2 className="text-heading-md font-semibold text-foreground">Current GPS Status</h2>

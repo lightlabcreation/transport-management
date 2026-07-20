@@ -12,6 +12,18 @@ export default defineConfig({
         codeSplitting: {
           groups: [
             {
+              name: 'react',
+              test: /node_modules[\\/](react|react-dom|react-router)[\\/]/,
+            },
+            {
+              name: 'leaflet',
+              test: /node_modules[\\/](leaflet|react-leaflet)[\\/]/,
+            },
+            {
+              name: 'recharts',
+              test: /node_modules[\\/](recharts|d3)[\\/]/,
+            },
+            {
               name: 'vendor',
               test: /node_modules[\\/]/,
             },

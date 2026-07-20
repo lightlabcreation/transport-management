@@ -7,46 +7,31 @@ import {
 import type { NavigationItem } from '@/features/shell';
 
 const sharedNavigationItems: readonly NavigationItem[] = [
-  {
-    id: 'navigation',
-    label: 'Navigation',
-    href: '/app/navigation',
-    ariaLabel: 'Navigation',
-  },
+  { id: 'navigation', label: 'Navigation', href: '/app/navigation', ariaLabel: 'Navigation' },
   { id: 'trips', label: 'Trips', href: '/app/trips', ariaLabel: 'Trips' },
   { id: 'alerts', label: 'Alerts', href: '/app/alerts', ariaLabel: 'Alerts' },
-  {
-    id: 'notifications',
-    label: 'Notifications',
-    href: '/app/notifications',
-    ariaLabel: 'Notifications',
-  },
+  { id: 'notifications', label: 'Notifications', href: '/app/notifications', ariaLabel: 'Notifications' },
   { id: 'reports', label: 'Reports', href: '/app/reports', ariaLabel: 'Reports' },
+  { id: 'sos', label: '🚨 SOS Safety', href: '/app/sos', ariaLabel: 'SOS Safety Center' },
   { id: 'profile', label: 'Profile', href: '/app/profile', ariaLabel: 'Profile' },
   { id: 'settings', label: 'Settings', href: '/app/settings', ariaLabel: 'Settings' },
 ];
 
 const trackingNavigationItems: readonly NavigationItem[] = [
-  {
-    id: 'dashboard',
-    label: 'Dashboard',
-    href: '/app/dashboard',
-    ariaLabel: 'Dashboard',
-  },
+  { id: 'dashboard', label: 'Dashboard', href: '/app/dashboard', ariaLabel: 'Dashboard' },
   { id: 'live-map', label: 'Live Map', href: '/app/live-map', ariaLabel: 'Live Map' },
   { id: 'groups', label: 'Groups', href: '/app/groups', ariaLabel: 'Groups' },
   { id: 'speed', label: 'Speed', href: '/app/speed', ariaLabel: 'Speed' },
+  { id: 'payments', label: '💳 Payments', href: '/app/payments', ariaLabel: 'Payments & Billing' },
+  { id: 'whatsapp-invites', label: '💬 WhatsApp', href: '/app/whatsapp-invites', ariaLabel: 'WhatsApp Invites' },
+  { id: 'cost-monitoring', label: '📊 API Costs', href: '/app/cost-monitoring', ariaLabel: 'API Cost Monitoring' },
   ...sharedNavigationItems,
 ];
 
 const speedNavigationItems: readonly NavigationItem[] = [
-  {
-    id: 'speed-dashboard',
-    label: 'Speed Dashboard',
-    href: '/app/speed',
-    ariaLabel: 'Speed Dashboard',
-  },
-  ...sharedNavigationItems,
+  { id: 'speed-dashboard', label: 'Speed Dashboard', href: '/app/speed', ariaLabel: 'Speed Dashboard' },
+  { id: 'sos', label: '🚨 SOS Safety', href: '/app/sos', ariaLabel: 'SOS Safety Center' },
+  ...sharedNavigationItems.filter((i) => i.id !== 'sos'),
 ];
 
 const navigationCapabilities: Record<string, DemoCapability> = {
@@ -62,6 +47,10 @@ const navigationCapabilities: Record<string, DemoCapability> = {
   reports: 'view-reports',
   profile: 'view-profile',
   settings: 'view-settings',
+  sos: 'view-sos',
+  payments: 'view-payments',
+  'whatsapp-invites': 'view-whatsapp-invites',
+  'cost-monitoring': 'view-cost-monitoring',
 };
 
 export function getApplicationNavigation(

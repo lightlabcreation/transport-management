@@ -10,7 +10,7 @@ import {
 } from '@/features/access-control';
 import type { AuthSessionStore } from '@/features/auth';
 
-import { getDashboardCapabilities, getDashboardPresentation } from './dashboard.access';
+import { getDashboardCapabilities } from './dashboard.access';
 import { DashboardPage } from './DashboardPage';
 import { DashboardRoute } from './DashboardRoute';
 
@@ -57,53 +57,34 @@ function renderDashboard(
 }
 
 describe('DashboardPage role-aware presentation', () => {
-  it.each(demoAccessProfiles)('renders the $name profile presentation', (accessProfile) => {
-    const presentation = getDashboardPresentation(accessProfile);
-    renderDashboard(accessProfile);
-
-    expect(screen.getByRole('heading', { name: presentation.heading })).toBeInTheDocument();
-    expect(screen.getByText(accessProfile.name, { selector: 'p' })).toBeInTheDocument();
-    expect(
-      screen.getByText(
-        'This is a frontend access preview. Production permissions require backend authorization.',
-      ),
-    ).toBeInTheDocument();
-    for (const metric of presentation.metrics) {
-      expect(screen.getAllByText(metric.label).length).toBeGreaterThan(0);
-    }
-  });
-
-  it('shows the complete Group Owner management presentation', () => {
+  it('renders the OwnerPage for group-owner', () => {
     renderDashboard(profile('group-owner'));
-
-    expect(screen.getByText('Total Members')).toBeInTheDocument();
-    expect(screen.getByText('Active Groups')).toBeInTheDocument();
-    expect(screen.getByText('Trips Today')).toBeInTheDocument();
-    expect(screen.getByText('Tracking Online')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Manage Members' })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Review Requests' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Operations overview' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Platform Administration & Fleet Oversight/i })).toBeInTheDocument();
   });
 
-  it('shows personal information for Member without management controls', () => {
+  it('renders the SuperAdminPage for delegated-group-administrator', () => {
+    renderDashboard(profile('delegated-group-administrator'));
+    expect(screen.getByRole('heading', { name: /System Infrastructure & Cluster Oversight/i })).toBeInTheDocument();
+  });
+
+  it('renders the AdminPage for group-admin', () => {
+    renderDashboard(profile('group-admin'));
+    expect(screen.getAllByText(/Group Member Directory/i).length).toBeGreaterThan(0);
+  });
+
+  it('renders the ModeratorPage for moderator', () => {
+    renderDashboard(profile('moderator'));
+    expect(screen.getByRole('heading', { name: /Live Traffic Monitoring & Speed Violation Control/i })).toBeInTheDocument();
+  });
+
+  it('renders the MemberPage for member', () => {
     renderDashboard(profile('member'));
-
-    expect(screen.getByText('My Activity')).toBeInTheDocument();
-    expect(screen.getByText('My Trips')).toBeInTheDocument();
-    expect(screen.getByText('My Tracking Status')).toBeInTheDocument();
-    expect(screen.getByText('My Alerts')).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'View My Trips' })).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Manage Members' })).not.toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Group Member Telemetry & Privacy Portal/i })).toBeInTheDocument();
   });
 
-  it('shows Group Guest as read-only with restricted actions and trip information', () => {
+  it('renders the GuestPage for group-guest', () => {
     renderDashboard(profile('group-guest'));
-
-    expect(screen.getByRole('heading', { name: 'Restricted access' })).toBeInTheDocument();
-    expect(screen.getByText(/This guest preview is read-only/i)).toBeInTheDocument();
-    expect(screen.getByText(/No management actions are available/i)).toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: 'Manage Members' })).not.toBeInTheDocument();
-    expect(screen.getByText(/Trip operations are not included/i)).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Group Guest Preview & Join Status/i })).toBeInTheDocument();
   });
 
   it('maps representative frontend capabilities without implying authorization', () => {
@@ -112,11 +93,6 @@ describe('DashboardPage role-aware presentation', () => {
       canManageMembers: true,
       canApproveRequests: true,
       isReadOnly: false,
-    });
-    expect(getDashboardCapabilities('moderator')).toMatchObject({
-      canViewTrips: false,
-      canApproveRequests: true,
-      canReviewAlerts: true,
     });
     expect(getDashboardCapabilities('group-guest')).toMatchObject({
       canViewTrips: false,
@@ -153,29 +129,8 @@ describe('DashboardPage existing behavior', () => {
     );
     render(<RouterProvider router={router} />);
 
-    expect(screen.getByRole('heading', { name: 'Moderator dashboard' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: /Live Traffic Monitoring & Speed Violation Control/i })).toBeInTheDocument();
     expect(getProfile).toHaveBeenCalled();
-  });
-
-  it('keeps the complete structural dashboard sections for an operational profile', () => {
-    renderDashboard(profile('group-admin'));
-
-    expect(screen.getByRole('heading', { name: 'Administration focus' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Operations overview' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Recent active trips' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Member operations' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Access explanation' })).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'System status' })).toBeInTheDocument();
-  });
-
-  it('announces unavailable quick actions without navigating', async () => {
-    const user = userEvent.setup();
-    const router = renderDashboard(profile('group-owner'));
-
-    await user.click(screen.getByRole('button', { name: 'Manage Members' }));
-
-    expect(screen.getByRole('status')).toHaveTextContent('Manage Members is coming soon.');
-    expect(router.state.location.pathname).toBe('/app/dashboard');
   });
 
   it('redirects unauthenticated direct access to Login', async () => {

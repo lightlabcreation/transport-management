@@ -14,7 +14,11 @@ export type DemoCapability =
   | 'view-settings'
   | 'manage-members'
   | 'review-requests'
-  | 'read-only';
+  | 'read-only'
+  | 'view-payments'
+  | 'view-sos'
+  | 'view-whatsapp-invites'
+  | 'view-cost-monitoring';
 
 const sharedCapabilities: readonly DemoCapability[] = [
   'view-dashboard',
@@ -25,6 +29,7 @@ const sharedCapabilities: readonly DemoCapability[] = [
   'view-notifications',
   'view-profile',
   'view-settings',
+  'view-sos',
 ];
 
 const profileCapabilities: Record<DemoAccessProfileId, readonly DemoCapability[]> = {
@@ -35,6 +40,9 @@ const profileCapabilities: Record<DemoAccessProfileId, readonly DemoCapability[]
     'view-reports',
     'manage-members',
     'review-requests',
+    'view-payments',
+    'view-whatsapp-invites',
+    'view-cost-monitoring',
   ],
   'delegated-group-administrator': [
     ...sharedCapabilities,
@@ -43,6 +51,8 @@ const profileCapabilities: Record<DemoAccessProfileId, readonly DemoCapability[]
     'view-reports',
     'manage-members',
     'review-requests',
+    'view-payments',
+    'view-whatsapp-invites',
   ],
   'group-admin': [
     ...sharedCapabilities,
@@ -51,6 +61,7 @@ const profileCapabilities: Record<DemoAccessProfileId, readonly DemoCapability[]
     'view-reports',
     'manage-members',
     'review-requests',
+    'view-whatsapp-invites',
   ],
   moderator: [...sharedCapabilities, 'view-reports', 'review-requests'],
   member: [...sharedCapabilities, 'view-live-map', 'view-trips', 'view-reports'],

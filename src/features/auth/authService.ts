@@ -17,9 +17,12 @@ export interface RegisterInput {
   firstName: string;
   lastName: string;
   mobileNumber: string;
-  email?: string;
-  language: 'en';
+  email?: string | undefined;
+  language: string;
   acceptedTerms: boolean;
+  role?: string | undefined;
+  carPlateNumber?: string | undefined;
+  trackLocation?: boolean | undefined;
 }
 
 export interface VerifyOtpInput {

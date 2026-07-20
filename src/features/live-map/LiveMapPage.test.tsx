@@ -151,8 +151,8 @@ describe('LiveMapPage', () => {
     await user.click(screen.getByRole('button', { name: 'Navigate' }));
     expect(screen.getByRole('status')).toHaveTextContent('Navigate is preview only. Coming soon.');
 
-    await user.click(screen.getByRole('button', { name: 'Zoom in' }));
-    expect(screen.getByRole('status')).toHaveTextContent('Zoom in is preview only. Coming soon.');
+    await user.click(screen.getByRole('button', { name: 'Call' }));
+    expect(screen.getByRole('status')).toHaveTextContent('Call is preview only. Coming soon.');
   });
 
   it('renders a deterministic loading state without map positions', () => {

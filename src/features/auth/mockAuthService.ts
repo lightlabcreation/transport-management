@@ -27,11 +27,20 @@ export function createMockAuthService({
         expiresAt: '2030-01-01T00:05:00.000Z',
       };
     },
-    async register() {
+    async register(input) {
       await new Promise((resolve) => setTimeout(resolve, delayMs));
 
       if (outcome.type === 'failure') {
         throw new AuthServiceError(outcome.code);
+      }
+
+      try {
+        window.sessionStorage.setItem('transport-management.pending-registration', JSON.stringify(input));
+        if (input.role) {
+          window.sessionStorage.setItem('transport-management.auth-role', input.role);
+        }
+      } catch {
+        // Storage might fail in restricted environments
       }
 
       return {

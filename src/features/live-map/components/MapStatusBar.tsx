@@ -5,10 +5,10 @@ interface MapStatusBarProps {
 }
 
 const statuses = [
-  { label: 'Tracking mode', value: 'Live Telemetry' },
-  { label: 'GPS signal', value: 'Strong (Demo)' },
-  { label: 'Current speed', value: '38 km/h' },
-  { label: 'Location', value: 'Noida, Uttar Pradesh' },
+  { label: 'Tracking', value: 'Live · OpenStreetMap' },
+  { label: 'GPS Signal', value: '✅ Strong (4 sats)' },
+  { label: 'Avg Speed', value: '62 km/h' },
+  { label: 'Location', value: 'Dubai, UAE 🇦🇪' },
 ] as const;
 
 export function MapStatusBar({ onlineCount, isLifeTrackingOn, onToggleLifeTracking }: MapStatusBarProps) {

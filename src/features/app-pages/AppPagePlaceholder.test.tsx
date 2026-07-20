@@ -112,10 +112,9 @@ describe('application page placeholders', () => {
     const desktopNavigation = screen.getByRole('navigation', { name: /desktop navigation/i });
 
     for (const item of getApplicationNavigation('tracking')) {
-      expect(within(desktopNavigation).getByRole('link', { name: item.label })).toHaveAttribute(
-        'href',
-        item.href,
-      );
+      expect(
+        within(desktopNavigation).getByRole('link', { name: item.ariaLabel || item.label }),
+      ).toHaveAttribute('href', item.href);
     }
     expect(within(desktopNavigation).getByRole('link', { name: 'Reports' })).toHaveAttribute(
       'aria-current',

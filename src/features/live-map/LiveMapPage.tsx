@@ -8,7 +8,7 @@ import { browserApplicationModeStore } from '@/features/application-mode';
 import type { AuthSessionStore } from '@/features/auth';
 import { ApplicationShell } from '@/features/shell';
 
-import { MapCanvas } from './components/MapCanvas';
+import { LeafletMapCanvas } from './components/LeafletMapCanvas';
 import { MapStatusBar } from './components/MapStatusBar';
 import { MemberDetails } from './components/MemberDetails';
 import { MemberList } from './components/MemberList';
@@ -135,11 +135,10 @@ export function LiveMapPage({ sessionStore, accessStore, viewState = 'ready' }: 
         ) : (
           <>
             <div className="grid gap-section xl:grid-cols-[minmax(0,1.45fr)_minmax(20rem,0.55fr)]">
-              <MapCanvas
+              <LeafletMapCanvas
                 members={filteredMembers}
                 selectedMemberId={selectedMember?.id ?? null}
                 onSelectMember={handleSelectMember}
-                onPreviewAction={handlePreviewAction}
               />
               <MemberDetails member={selectedMember} onPreviewAction={handlePreviewAction} />
             </div>

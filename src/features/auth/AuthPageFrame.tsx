@@ -17,8 +17,8 @@ export function AuthPageFrame({
   footer,
 }: AuthPageFrameProps) {
   return (
-    <main className="min-h-screen bg-background text-foreground lg:grid lg:grid-cols-[44%_56%] lg:max-h-screen lg:overflow-hidden">
-      <aside className="relative hidden overflow-hidden bg-primary p-8 xl:p-12 text-primary-foreground lg:flex lg:flex-col lg:justify-center lg:gap-6">
+    <main className="min-h-screen bg-background text-foreground lg:grid lg:grid-cols-[44%_56%]">
+      <aside className="relative hidden bg-primary p-8 xl:p-12 text-primary-foreground lg:flex lg:flex-col lg:justify-center lg:gap-6 lg:sticky lg:top-0 lg:h-screen lg:overflow-hidden">
         <div className="relative z-10 space-y-4">
           <BrandMark inverse />
           <div className="inline-flex items-center gap-2 rounded-full border border-primary-foreground/30 bg-primary-foreground/10 px-3 py-1 text-body-xs font-semibold uppercase tracking-wider text-primary-foreground shadow-2xs">
@@ -45,12 +45,12 @@ export function AuthPageFrame({
         </div>
       </aside>
 
-      <section className="flex flex-col justify-center px-4 py-4 sm:px-8 lg:px-12 lg:py-4 lg:max-h-screen lg:overflow-y-auto">
-        <div className="lg:hidden mb-4">
+      <section className="flex min-h-screen flex-col justify-center px-4 py-8 sm:px-8 lg:px-12 lg:py-12">
+        <div className="lg:hidden mb-6">
           <BrandMark />
         </div>
 
-        <div className="w-full max-w-[560px] mx-auto my-auto">
+        <div className="w-full max-w-[560px] mx-auto">
           <div className="mb-3.5">
             <p className="text-body-xs font-bold uppercase tracking-wider text-primary">
               {eyebrow}

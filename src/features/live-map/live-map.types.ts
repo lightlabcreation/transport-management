@@ -13,4 +13,7 @@ export interface TrackedMember {
   distance: string;
   location: string;
   position: { x: number; y: number };
+  /** Real-world coordinates for the Leaflet map */
+  lat: number;
+  lng: number;
 }
