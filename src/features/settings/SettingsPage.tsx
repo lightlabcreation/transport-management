@@ -37,15 +37,21 @@ export function SettingsPage({ mode, onLogout }: SettingsPageProps) {
       localStorage.setItem('kiyaan-theme', selectedTheme);
       if (selectedTheme === 'dark') {
         document.documentElement.classList.add('dark');
+        document.documentElement.setAttribute('data-theme', 'dark');
       } else if (selectedTheme === 'light') {
         document.documentElement.classList.remove('dark');
+        document.documentElement.setAttribute('data-theme', 'light');
       } else {
         // System preference
-        const isSystemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const isSystemDark =
+          typeof window.matchMedia === 'function' &&
+          window.matchMedia('(prefers-color-scheme: dark)').matches;
         if (isSystemDark) {
           document.documentElement.classList.add('dark');
+          document.documentElement.setAttribute('data-theme', 'dark');
         } else {
           document.documentElement.classList.remove('dark');
+          document.documentElement.setAttribute('data-theme', 'light');
         }
       }
     }
