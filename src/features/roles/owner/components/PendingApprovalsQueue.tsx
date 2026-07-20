@@ -79,15 +79,15 @@ export function PendingApprovalsQueue({ initialApprovals }: PendingApprovalsQueu
       )}
 
       <div className="mt-5 overflow-x-auto">
-        <table className="w-full text-left text-body-sm">
+        <table className="w-full min-w-[680px] text-left text-body-sm">
           <thead>
             <tr className="border-b border-border text-muted-foreground">
-              <th className="pb-3 font-semibold">Group Details</th>
-              <th className="pb-3 font-semibold">Category & Privacy</th>
-              <th className="pb-3 font-semibold">Requested By</th>
-              <th className="pb-3 font-semibold">Members</th>
-              <th className="pb-3 font-semibold">Status</th>
-              <th className="pb-3 text-right font-semibold">Actions</th>
+              <th className="pb-3 pr-4 font-semibold whitespace-nowrap w-[30%]">Group Details</th>
+              <th className="pb-3 pr-4 font-semibold whitespace-nowrap">Category & Privacy</th>
+              <th className="pb-3 pr-4 font-semibold whitespace-nowrap">Requested By</th>
+              <th className="pb-3 pr-4 font-semibold whitespace-nowrap">Members</th>
+              <th className="pb-3 pr-4 font-semibold whitespace-nowrap">Status</th>
+              <th className="pb-3 text-right font-semibold whitespace-nowrap">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
@@ -100,31 +100,31 @@ export function PendingApprovalsQueue({ initialApprovals }: PendingApprovalsQueu
             ) : (
               approvals.map((item) => (
                 <tr key={item.id} className="transition-colors hover:bg-surface-muted/50">
-                  <td className="py-4">
+                  <td className="py-4 pr-4 align-top">
                     <p className="font-semibold text-foreground">{item.groupName}</p>
                     {item.notes && (
-                      <p className="mt-0.5 max-w-xs text-body-xs text-muted-foreground">
+                      <p className="mt-0.5 text-body-xs text-muted-foreground leading-snug max-w-[180px]">
                         {item.notes}
                       </p>
                     )}
                   </td>
-                  <td className="py-4">
-                    <div className="flex items-center gap-2">
+                  <td className="py-4 pr-4 align-top">
+                    <div className="flex flex-wrap items-center gap-1.5">
                       <Badge variant="neutral">{item.category}</Badge>
                       <Badge variant={item.privacy === 'Public' ? 'info' : 'outline'}>
                         {item.privacy}
                       </Badge>
                     </div>
                   </td>
-                  <td className="py-4">
+                  <td className="py-4 pr-4 align-top whitespace-nowrap">
                     <p className="font-medium text-foreground">{item.requestedBy}</p>
                     <p className="text-body-xs text-muted-foreground">{item.mobile}</p>
                     <p className="text-body-xs text-muted-foreground">{item.requestedAt}</p>
                   </td>
-                  <td className="py-4 font-medium text-foreground">
+                  <td className="py-4 pr-4 align-top whitespace-nowrap font-medium text-foreground">
                     {item.initialMembersCount} users
                   </td>
-                  <td className="py-4">
+                  <td className="py-4 pr-4 align-top">
                     <Badge
                       variant={
                         item.status === 'approved'

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import type { Group, GroupRole, GroupCapability, GroupFormState } from './groups.types';
+import { pendingGroupsStore } from './pending-groups.store';
 import {
   StepInfo,
   StepPrivacy,
@@ -162,6 +163,20 @@ export function CreateGroupPage({ onBack, onGroupCreated }: CreateGroupPageProps
       if (onGroupCreated) {
         onGroupCreated(newGroup);
       }
+
+      // Push to shared pending approvals store for Owner dashboard
+      pendingGroupsStore.add({
+        id: `appr-${newGroup.id}`,
+        groupName: newGroup.name,
+        category: form.category,
+        requestedBy: 'Demo Operator',
+        mobile: '+•• ••••••3210',
+        requestedAt: 'Just now',
+        privacy: form.visibility === 'public' ? 'Public' : 'Private',
+        initialMembersCount: 1,
+        status: 'pending',
+        notes: newGroup.description || undefined,
+      });
 
       setStep(7);
     }, 1200);
