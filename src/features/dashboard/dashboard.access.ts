@@ -115,7 +115,7 @@ const presentations: Record<DemoAccessProfileId, Omit<DashboardPresentation, 'ca
     profileId: 'moderator',
     profileName: 'Safety Moderator',
     eyebrow: 'Review and monitoring',
-    heading: 'Safety Moderator dashboard',
+    heading: 'Moderator dashboard',
     description: 'Review requests, reports, alerts, and recent activity within the demo scope.',
     summaryLabel: 'Moderation summary',
     metrics: [

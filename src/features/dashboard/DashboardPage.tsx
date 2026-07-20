@@ -121,6 +121,90 @@ export function DashboardPage({ sessionStore, accessProfile }: DashboardPageProp
           )}
         </section>
 
+        {/* Admin Dashboard Approval Notification Widget (Client "Admin get Notification on Dashboard") */}
+        {presentation.capabilities.canApproveRequests &&
+          (presentation.profileId === 'group-owner' ||
+            presentation.profileId === 'delegated-group-administrator') && (
+          <section className="rounded-xl border border-primary/30 bg-primary/5 p-page shadow-sm">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-center gap-3">
+                <span className="grid size-10 place-items-center rounded-lg bg-primary text-primary-foreground font-bold">
+                  🔔
+                </span>
+                <div>
+                  <h2 className="text-heading-sm font-semibold">Admin Approval Notifications</h2>
+                  <p className="text-body-sm text-muted-foreground">
+                    New driver registrations and payment approval requests pending review.
+                  </p>
+                </div>
+              </div>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate('/owner/approvals')}
+              >
+                View Approvals Queue →
+              </Button>
+            </div>
+
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              <div className="rounded-lg border border-border bg-surface p-4 shadow-xs">
+                <div className="flex items-center justify-between">
+                  <span className="rounded-full bg-warning/20 px-2.5 py-0.5 text-xs font-semibold text-warning-foreground">
+                    PENDING APPROVAL
+                  </span>
+                  <span className="text-body-xs text-muted-foreground">2 mins ago</span>
+                </div>
+                <p className="mt-2 text-body-sm font-semibold">Driver Registration (Car Plate: UP16-AB-9876)</p>
+                <p className="text-body-xs text-muted-foreground">Aarav Sharma • +91 9876543210 • Paid $49 via UPI</p>
+                <div className="mt-3 flex gap-2">
+                  <Button
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => setAnnouncement('Driver registration approved. Live Tracking activated.')}
+                  >
+                    Approve & Activate Live Tracking
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setAnnouncement('Registration rejected with reason.')}
+                  >
+                    Reject
+                  </Button>
+                </div>
+              </div>
+
+              <div className="rounded-lg border border-border bg-surface p-4 shadow-xs">
+                <div className="flex items-center justify-between">
+                  <span className="rounded-full bg-warning/20 px-2.5 py-0.5 text-xs font-semibold text-warning-foreground">
+                    PENDING APPROVAL
+                  </span>
+                  <span className="text-body-xs text-muted-foreground">15 mins ago</span>
+                </div>
+                <p className="mt-2 text-body-sm font-semibold">Fleet Group Service Registration</p>
+                <p className="text-body-xs text-muted-foreground">Custom Logistics Squad • Paid $199 via Stripe</p>
+                <div className="mt-3 flex gap-2">
+                  <Button
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => setAnnouncement('Fleet Group approved. Live Tracking activated.')}
+                  >
+                    Approve & Activate Group
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => setAnnouncement('Group rejected with reason.')}
+                  >
+                    Reject
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
         <div className="grid gap-section xl:grid-cols-[1.35fr_0.65fr]">
           <FocusSection
             heading={presentation.focusHeading}

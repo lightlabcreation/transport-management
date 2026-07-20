@@ -1,4 +1,6 @@
+import { useState } from 'react';
 import type { UserSummary } from './shell.types';
+import { SettingsDrawer } from './SettingsDrawer';
 
 interface ShellHeaderProps {
   pageTitle?: string | undefined;
@@ -15,6 +17,8 @@ export function ShellHeader({
   onLogout,
   userSummary,
 }: ShellHeaderProps) {
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
   return (
     <header className="sticky top-0 z-sticky flex h-[var(--spacing-control)] items-center justify-between border-b border-border bg-surface px-page shadow-sm md:h-16">
       {/* Left side: Menu toggle (mobile/tablet) & title */}
@@ -62,8 +66,26 @@ export function ShellHeader({
         <h1 className="text-body font-semibold text-foreground md:text-heading-sm">{pageTitle}</h1>
       </div>
 
-      {/* Right side: User summary & Log out button */}
-      <div className="flex items-center gap-4">
+      {/* Right side: Settings (⚙️), User summary & Log out button */}
+      <div className="flex items-center gap-3">
+        {/* Client Top-Right Settings ⚙️ Icon Button */}
+        <button
+          onClick={() => setIsSettingsOpen(true)}
+          aria-label="Open Settings Menu"
+          title="Settings & Service Registration"
+          className="flex h-10 w-10 items-center justify-center rounded-md border border-border bg-surface text-foreground hover:bg-surface-muted hover:text-primary focus-visible:outline-2 focus-visible:outline-focus-ring focus-visible:outline-offset-2 transition-colors"
+        >
+          <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+            />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+        </button>
+
         {userSummary && (
           <div className="hidden items-center gap-3 md:flex">
             <div className="flex flex-col text-right">
@@ -109,7 +131,11 @@ export function ShellHeader({
             </svg>
           </button>
         )}
+
+        {/* Settings Drawer Component */}
+        <SettingsDrawer isOpen={isSettingsOpen} onClose={() => setIsSettingsOpen(false)} />
       </div>
     </header>
   );
 }
+

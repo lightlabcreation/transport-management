@@ -32,21 +32,33 @@ export function LiveMapPage({ sessionStore, accessStore, viewState = 'ready' }: 
   const [statusFilter, setStatusFilter] = useState<StatusFilter>('all');
   const [selectedMember, setSelectedMember] = useState<TrackedMember | null>(null);
   const [announcement, setAnnouncement] = useState('');
+  const [isLifeTrackingOn, setIsLifeTrackingOn] = useState(true);
+
   const applicationMode = browserApplicationModeStore.getMode();
   const accessProfile = accessStore?.getProfile() ?? null;
+  const isVisitor = accessProfile?.id === 'group-guest';
+
   const applicationNavigation = applicationMode
     ? getApplicationNavigation(applicationMode, accessProfile)
     : [];
 
   const filteredMembers = useMemo(() => {
+    if (!isLifeTrackingOn) return [];
+
     const normalizedSearch = search.trim().toLowerCase();
     return trackedMembers.filter((member) => {
+      // Client Rule 2: Visitor Visible to himself only
+      const isVisitorMember = member.id.includes('guest') || member.name.toLowerCase().includes('visitor');
+      if (isVisitorMember && !isVisitor) {
+        return false;
+      }
+
       const matchesName =
         normalizedSearch === '' || member.name.toLowerCase().includes(normalizedSearch);
       const matchesStatus = statusFilter === 'all' || member.status === statusFilter;
       return matchesName && matchesStatus;
     });
-  }, [search, statusFilter]);
+  }, [search, statusFilter, isLifeTrackingOn, isVisitor]);
 
   if (!sessionStore.getSession()) return <Navigate to="/auth/login" replace />;
 
@@ -96,7 +108,14 @@ export function LiveMapPage({ sessionStore, accessStore, viewState = 'ready' }: 
         </header>
 
         <MapStatusBar
-          onlineCount={trackedMembers.filter((member) => member.status === 'online').length}
+          onlineCount={filteredMembers.filter((member) => member.status === 'online').length}
+          isLifeTrackingOn={isLifeTrackingOn}
+          onToggleLifeTracking={() => {
+            setIsLifeTrackingOn((prev) => !prev);
+            setAnnouncement(
+              !isLifeTrackingOn ? 'Life Tracking enabled.' : 'Life Tracking paused.'
+            );
+          }}
         />
 
         {viewState === 'loading' ? (
