@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import type { PaymentsViewState, SubscriptionPlan, Invoice, PaymentCard } from './payments.types';
+import type { PaymentsViewState, SubscriptionPlan, Invoice, PaymentCard, PlanTier } from './payments.types';
 import { MOCK_INVOICES, MOCK_CARDS } from './payments.data';
 import { SubscriptionPlansCard } from './components/SubscriptionPlansCard';
 import { CheckoutFormModal } from './components/CheckoutFormModal';
@@ -20,10 +20,10 @@ export function PaymentsPage() {
   const [invoices, setInvoices] = useState<Invoice[]>(MOCK_INVOICES);
   const [cards] = useState<PaymentCard[]>(MOCK_CARDS);
   const [selectedPlan, setSelectedPlan] = useState<SubscriptionPlan | null>(null);
-  const [selectedCycle, setSelectedCycle] = useState<'monthly' | 'yearly'>('yearly');
+  const [selectedCycle, setSelectedCycle] = useState<PlanTier>('yearly');
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
 
-  const handleSelectPlan = (plan: SubscriptionPlan, billingCycle: 'monthly' | 'yearly') => {
+  const handleSelectPlan = (plan: SubscriptionPlan, billingCycle: PlanTier) => {
     setSelectedPlan(plan);
     setSelectedCycle(billingCycle);
     setIsCheckoutOpen(true);

@@ -111,7 +111,7 @@ export function ProfilePage({ initialViewState = 'ready' }: ProfilePageProps) {
 
         <div className="flex shrink-0 items-center gap-3">
           <Button
-            variant={badgeDownloaded ? 'success' : 'outline'}
+            variant={badgeDownloaded ? 'primary' : 'outline'}
             size="sm"
             onClick={handleDownloadBadge}
           >
@@ -346,7 +346,7 @@ export function ProfilePage({ initialViewState = 'ready' }: ProfilePageProps) {
                   </div>
                   <Button
                     size="sm"
-                    variant={gpsBroadcast ? 'success' : 'outline'}
+                    variant={gpsBroadcast ? 'primary' : 'outline'}
                     onClick={() => setGpsBroadcast(!gpsBroadcast)}
                   >
                     {gpsBroadcast ? '📡 ACTIVE BROADCAST' : '⏸️ PAUSED'}

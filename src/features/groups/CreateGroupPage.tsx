@@ -139,9 +139,11 @@ export function CreateGroupPage({ onBack, onGroupCreated }: CreateGroupPageProps
 
       // Build the new Group object from wizard form data
       const nameWords = form.name.trim().split(/\s+/);
+      const w0 = nameWords[0] ?? '';
+      const w1 = nameWords[1] ?? '';
       const initials =
-        nameWords.length >= 2
-          ? `${nameWords[0][0]}${nameWords[1][0]}`.toUpperCase()
+        w0 && w1 && w0[0] && w1[0]
+          ? `${w0[0]}${w1[0]}`.toUpperCase()
           : form.name.slice(0, 2).toUpperCase();
 
       // Check active role: Platform Owner created groups are instantly ACTIVE without approval

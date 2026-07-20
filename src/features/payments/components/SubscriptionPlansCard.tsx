@@ -6,7 +6,7 @@ import { Badge } from '@/components/ui/badge';
 
 interface SubscriptionPlansCardProps {
   currentPlanId?: PlanTier | undefined;
-  onSelectPlan: (plan: SubscriptionPlan, billingCycle: 'monthly' | 'yearly') => void;
+  onSelectPlan: (plan: SubscriptionPlan, billingCycle: PlanTier) => void;
 }
 
 export function SubscriptionPlansCard({ currentPlanId, onSelectPlan }: SubscriptionPlansCardProps) {
