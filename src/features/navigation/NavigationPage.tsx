@@ -17,10 +17,37 @@ export function NavigationPage({ initialViewState = 'normal' }: NavigationPagePr
     initialViewState === 'no-route' ? '' : 'St. Mary School Ground, Sector 12',
   );
   const [selectedRouteId, setSelectedRouteId] = useState('route-1');
+  const [isNavigating, setIsNavigating] = useState(false);
+  const [navMessage, setNavMessage] = useState('');
   const [isReportModalOpen, setIsReportModalOpen] = useState(false);
   const [selectedHazard, setSelectedHazard] = useState<string>('Accident');
   const [reportNotes, setReportNotes] = useState('');
   const [activeReportStatus, setActiveReportStatus] = useState<string | null>(null);
+
+  const selectedRoute = MOCK_ROUTES.find((r) => r.id === selectedRouteId) || MOCK_ROUTES[0]!;
+
+  const handleRecentClick = (recentOrigin: string, recentDest: string) => {
+    setOrigin(recentOrigin);
+    setDestination(recentDest);
+    setViewState('normal');
+    setIsNavigating(false);
+    setNavMessage('');
+  };
+
+  const handleStartNavigation = () => {
+    setIsNavigating(true);
+    setNavMessage(
+      `Simulated GPS active. Route guidance started from "${origin}" to "${destination}" via ${selectedRoute.name}.`,
+    );
+  };
+
+  const handleClearRoute = () => {
+    setOrigin('');
+    setDestination('');
+    setViewState('no-route');
+    setIsNavigating(false);
+    setNavMessage('');
+  };
 
   const hazardTypes = [
     { type: 'Construction', icon: '🚧', color: 'bg-amber-500/10 text-amber-600 border-amber-500/30' },
@@ -317,6 +344,11 @@ export function NavigationPage({ initialViewState = 'normal' }: NavigationPagePr
                   Cancel Guidance
                 </Button>
               </div>
+            )}
+          </div>
+        </div>
+      )}
+
       {/* Report Road Hazard Modal Dialog (PDF Section 13 Compliant) */}
       {isReportModalOpen && (
         <div
